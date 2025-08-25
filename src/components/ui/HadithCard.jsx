@@ -6,9 +6,9 @@ import IslamicTitle from './IslamicTitle';
 export default function HadithCard() {
 	return (
 		<>
-			<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 via-green-700 to-green-950 p-6">
+			<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 via-green-700 to-green-950 p-2 md:p-6">
 				
-				<div className="max-w-3xl w-full bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20  mt-32">
+				<div className="max-w-3xl w-full bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-3.5 md:p-8 border border-white/20  mt-32">
 					<div className="flex items-center gap-3 mb-6">
 						<BookOpen className="w-8 h-8 text-blue-400" />
 						<h1 className="text-3xl font-bold text-white tracking-wide">

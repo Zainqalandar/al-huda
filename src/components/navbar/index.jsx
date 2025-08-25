@@ -48,12 +48,12 @@ const Navbar = () => {
 
 				{/* Mobile Dropdown */}
 				{isOpen && (
-					<div className="md:hidden bg-green-950/95 text-center py-4 space-y-4">
+					<div onClick={() => setIsOpen(!isOpen)} className="md:hidden bg-green-950/95 text-center py-4 space-y-4">
 						{navLinks.map((lnk) => (
 							<Link
 								key={lnk.id}
 								href={lnk.link}
-								className="block hover:text-yellow-400"
+								className={`block hover:text-yellow-400 ${path == lnk.link && 'text-yellow-400'}`}
 							>
 								{lnk.name}
 							</Link>
