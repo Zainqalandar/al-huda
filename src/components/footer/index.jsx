@@ -8,7 +8,7 @@ const Footer = () => {
 	 const path = usePathname();
 	return (
 		<>
-			<footer className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 text-white mt-20">
+			<footer className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 text-white">
 				<div className="container mx-auto px-6 py-10 text-center">
 					{/* Islamic Calligraphy / Logo */}
 					<h2 className="text-xl font-semibold text-yellow-400">
