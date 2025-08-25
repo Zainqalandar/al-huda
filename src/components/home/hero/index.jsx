@@ -5,7 +5,7 @@ const Hero = () => {
 	return (
 		<>
 			<section className="relative h-[90vh] flex items-center justify-center text-center bg-[url('/banner/Islamic-banner-two.png')] bg-cover bg-center">
-				<div className="absolute inset-0 "   style={{ background: "color-mix(in oklab, #0000008c 60%, #00000000)" }}></div>
+				<div className="absolute  "   style={{ background: "color-mix(in oklab, #0000008c 60%, #00000000)" }}></div>
 				<div className="relative z-10 max-w-3xl px-4">
 					<h1 className="text-4xl md:text-6xl font-bold text-yellow-400 mb-6">
 						Welcome to Islamic Knowledge
