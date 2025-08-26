@@ -12,28 +12,41 @@ const prayerTimes = [
 
 export default function PrayerTimeSlider() {
   const [current, setCurrent] = useState(0);
+  const [animating, setAnimating] = useState(false);
 
-   useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrent((prev) => (prev + 1) % prayerTimes.length);
-      }, 2000);
-      return () => clearInterval(interval);
-    }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleSlide((current + 1) % prayerTimes.length);
+    }, 2000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line
+  }, [current]);
+
+  const handleSlide = (nextIdx) => {
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrent(nextIdx);
+      setAnimating(false);
+    }, 300); // duration matches transition
+  };
 
   const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % prayerTimes.length);
+    handleSlide((current + 1) % prayerTimes.length);
   };
 
   const prevSlide = () => {
-    setCurrent((prev) =>
-      prev === 0 ? prayerTimes.length - 1 : prev - 1
-    );
+    handleSlide(current === 0 ? prayerTimes.length - 1 : current - 1);
   };
 
   return (
     <div className="w-full max-w-md mx-auto p-4">
       {/* Card */}
-      <div className="relative bg-green-100 dark:bg-green-900 shadow-lg rounded-2xl p-6 flex flex-col items-center transition-all duration-300">
+      <div
+        className={`relative bg-green-100 dark:bg-green-900 shadow-lg rounded-2xl p-6 flex flex-col items-center transition-all duration-300
+          ${animating ? "opacity-0 translate-x-8" : "opacity-100 translate-x-0"}
+        `}
+        style={{ willChange: "opacity, transform" }}
+      >
         <Clock className="w-10 h-10 text-yellow-400 mb-3" />
 
         <h2 className="text-xl font-semibold text-green-800 dark:text-green-100">
@@ -48,6 +61,7 @@ export default function PrayerTimeSlider() {
           <button
             onClick={prevSlide}
             className="p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
+            disabled={animating}
           >
             <ChevronLeft className="w-5 h-5 text-yellow-400" />
           </button>
@@ -57,6 +71,7 @@ export default function PrayerTimeSlider() {
           <button
             onClick={nextSlide}
             className="p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
+            disabled={animating}
           >
             <ChevronRight className="w-5 h-5 text-yellow-400" />
           </button>

@@ -12,7 +12,7 @@ const Footer = () => {
 				<div className="container mx-auto px-6 py-10 text-center">
 					{/* Islamic Calligraphy / Logo */}
 					<h2 className="text-xl font-semibold text-yellow-400">
-						بسم الله الرحمن الرحيم
+						اِیَّاكَ نَعْبُدُ وَ اِیَّاكَ نَسْتَعِیْنُ
 					</h2>
 
 					{/* Links */}
