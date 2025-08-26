@@ -39,51 +39,51 @@ export default function PrayerTimeSlider() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-4">
+    <div className="w-full max-w-md mx-auto px-2 py-4 sm:p-4">
       {/* Card */}
       <div
-        className={`relative bg-green-100 dark:bg-green-900 shadow-lg rounded-2xl p-6 flex flex-col items-center transition-all duration-300
-          ${animating ? "opacity-0 translate-x-8" : "opacity-100 translate-x-0"}
+        className={`relative bg-green-100 dark:bg-green-900 shadow-lg rounded-2xl p-4 sm:p-6 flex flex-col items-center transition-opacity duration-300
+          ${animating ? "opacity-0" : "opacity-100"}
         `}
-        style={{ willChange: "opacity, transform" }}
+        style={{ willChange: "opacity" }}
       >
-        <Clock className="w-10 h-10 text-yellow-400 mb-3" />
+        <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400 mb-2 sm:mb-3" />
 
-        <h2 className="text-xl font-semibold text-green-800 dark:text-green-100">
+        <h2 className="text-lg sm:text-xl font-semibold text-green-800 dark:text-green-100">
           {prayerTimes[current].name}
         </h2>
-        <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-2">
+        <p className="text-xl sm:text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1 sm:mt-2">
           {prayerTimes[current].time}
         </p>
 
         {/* Navigation */}
-        <div className="absolute top-1/2 left-3 -translate-y-1/2">
+        <div className="absolute top-1/2 left-2 sm:left-3 -translate-y-1/2">
           <button
             onClick={prevSlide}
-            className="p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
+            className="p-1 sm:p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
             disabled={animating}
           >
-            <ChevronLeft className="w-5 h-5 text-yellow-400" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
           </button>
         </div>
 
-        <div className="absolute top-1/2 right-3 -translate-y-1/2">
+        <div className="absolute top-1/2 right-2 sm:right-3 -translate-y-1/2">
           <button
             onClick={nextSlide}
-            className="p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
+            className="p-1 sm:p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
             disabled={animating}
           >
-            <ChevronRight className="w-5 h-5 text-yellow-400" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
           </button>
         </div>
       </div>
 
       {/* Indicators */}
-      <div className="flex justify-center mt-4 space-x-2">
+      <div className="flex justify-center mt-3 sm:mt-4 space-x-1 sm:space-x-2">
         {prayerTimes.map((_, idx) => (
           <span
             key={idx}
-            className={`w-3 h-3 rounded-full ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
               idx === current ? "bg-yellow-400" : "bg-gray-300"
             }`}
           />
