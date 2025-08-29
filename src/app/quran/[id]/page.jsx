@@ -90,9 +90,9 @@ export default function SurahDetail() {
 	if (error) return <p className="text-red-500">{error}</p>; // Show error if any
 
 	return (
-		<div className="min-h-screen mt-16 bg-green-50 p-6 flex flex-col items-center">
+		<div className="min-h-screen mt-16 bg-green-50 p-2 sm:p-6 flex flex-col items-center">
 			{/* Card Container */}
-			<div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl p-6 border border-green-200">
+			<div className="bg-white rounded-2xl  shadow-lg w-full max-w-3xl p-4 sm:p-6 border border-green-200">
 				{/* Surah Name Section */}
 				<h1 className="text-3xl font-bold text-green-800 text-center">
 					{surah.englishName} ({surah.englishNameTranslation})
@@ -103,7 +103,7 @@ export default function SurahDetail() {
 				</p>
 
 				{/* Info Icons */}
-				<div className="flex justify-center gap-6 my-4">
+				<div className="flex flex-wrap justify-center  gap-6 my-4">
 					<button className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700">
 						<Info size={18} /> Info
 					</button>
