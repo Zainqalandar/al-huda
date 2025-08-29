@@ -9,6 +9,8 @@ export default function SurahDetail() {
 	const [error, setError] = useState(null); // Error state
 	const [surah, setSurah] = useState(null); // Surah data
 
+	const [index, setIndex] = useState(0);
+
 	const [surahTwo, setSurahTwo] = useState(null); // Surah data
 	const [errorTwo, setErrorTwo] = useState(null); // Error state
 	const [loadingTwo, setLoadingTwo] = useState(true); // Loading state╬
@@ -19,8 +21,16 @@ export default function SurahDetail() {
 
 	const audioRef = useRef(null);
 
+	const nextVerse = () => {
+		if (index < surah.length - 1) setIndex(index + 1);
+		console.log("Next", index + 1)
+	};
 
-	console.log('surahTwo?.audio[1]?.originalUrl', surahTwo);
+	const prevVerse = () => {
+		if (index > 0) setIndex(index - 1);
+	};
+
+	console.log("index: ", index)
 
 	useEffect(() => {
 		const fetchDataTwo = async () => {
@@ -37,11 +47,8 @@ export default function SurahDetail() {
 				const data = await res.json();
 
 				setSurahTwo(data);
-				console.log('data', data);
 				setTimeout(() => {
-
 					setLoadingTwo(false);
-					
 				}, 3000);
 			} catch (error) {
 				console.log(error.message);
@@ -71,7 +78,6 @@ export default function SurahDetail() {
 		fetchDataTwo();
 	}, [id]);
 
-	console.log("loadingTwo", loadingTwo)
 
 	// Toggle Play/Pause
 	const handleAudioToggle = () => {
@@ -99,7 +105,7 @@ export default function SurahDetail() {
 				</h1>
 				<p className="text-lg text-green-600 text-center mb-4">
 					Surah {surah.name} - {surah.revelationType} (
-					{surah.numberOfAyahs} Ayahs) 
+					{surah.numberOfAyahs} Ayahs)
 				</p>
 
 				{/* Info Icons */}
@@ -113,11 +119,13 @@ export default function SurahDetail() {
 					>
 						{isPlaying ? (
 							<>
-								<Pause size={18} /> {loadingTwo? "Loading..." : "Listen"}
+								<Pause size={18} />{' '}
+								{loadingTwo ? 'Loading...' : 'Listen'}
 							</>
 						) : (
 							<>
-								<Play size={18} /> {loadingTwo? "Loading..." : "Listen"}
+								<Play size={18} />{' '}
+								{loadingTwo ? 'Loading...' : 'Listen'}
 							</>
 						)}
 					</button>
@@ -156,6 +164,31 @@ export default function SurahDetail() {
 						</div>
 					))}
 				</div>
+			</div>
+			<div className="flex justify-between mt-8 w-full max-w-3xl">
+				<button
+					onClick={prevVerse}
+					disabled={index === 0}
+					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition ${
+						index === 0
+							? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+							: 'bg-green-600 text-white hover:bg-green-700'
+					}`}
+				>
+					⬅️ Previous
+				</button>
+
+				<button
+					onClick={nextVerse}
+					disabled={index === surah.length - 1}
+					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition ${
+						index === surah.length - 1
+							? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+							: 'bg-green-600 text-white hover:bg-green-700'
+					}`}
+				>
+					Next ➡️
+				</button>
 			</div>
 		</div>
 	);
