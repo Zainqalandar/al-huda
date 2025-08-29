@@ -1,6 +1,5 @@
 import React from 'react';
 import Hero from './hero';
-import DailyInspiration from './daily-Inspiration';
 import QuotesSection from './quotes-section';
 import HadithSection from './hadith-section';
 import DuasSection from './duas-section';
@@ -13,7 +12,6 @@ const HomeRoot = () => {
 	return (
 		<>
 			<Hero />
-			{/* <DailyInspiration /> */}
 			<DailyInspirationSlider />
 			<QuotesSection />
 			<FAQAccordion />

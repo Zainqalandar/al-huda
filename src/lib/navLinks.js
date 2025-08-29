@@ -7,21 +7,26 @@ const navLinks = [
 		},
 		{
 			id: 1,
+			name: 'Quran',
+			link: '/quran',
+		},
+		{
+			id: 2,
 			name: 'Quotes',
 			link: '/quotes',
 		},
 		{
-			id: 2,
+			id: 3,
 			name: 'Hadith',
 			link: '/hadith',
 		},
 		{
-			id: 3,
+			id: 4,
 			name: 'Duas',
 			link: '/duas',
 		},
 		{
-			id: 4,
+			id: 5,
 			name: 'About',
 			link: '/about',
 		},

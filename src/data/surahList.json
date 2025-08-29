@@ -1,0 +1,74 @@
+[
+    {
+        "surahName": "Al-Faatiha",
+        "surahNameArabic": "الفاتحة",
+        "surahNameArabicLong": "سُورَةُ ٱلْفَاتِحَةِ",
+        "surahNameTranslation": "The Opening",
+        "revelationPlace": "Mecca",
+        "totalAyah": 7
+    },
+    {
+        "surahName": "Al-Baqara",
+        "surahNameArabic": "البقرة",
+        "surahNameArabicLong": "سورة البقرة",
+        "surahNameTranslation": "The Cow",
+        "revelationPlace": "Madina",
+        "totalAyah": 286
+    },
+    {
+        "surahName": "Aal-i-Imraan",
+        "surahNameArabic": "آل عمران",
+        "surahNameArabicLong": "سورة آل عمران",
+        "surahNameTranslation": "The Family of Imraan",
+        "revelationPlace": "Madina",
+        "totalAyah": 200
+    },
+    {
+        "surahName": "An-Nisaa",
+        "surahNameArabic": "النساء",
+        "surahNameArabicLong": "سورة النساء",
+        "surahNameTranslation": "The Women",
+        "revelationPlace": "Madina",
+        "totalAyah": 176
+    },
+    {
+        "surahName": "Al-Maaida",
+        "surahNameArabic": "المائدة",
+        "surahNameArabicLong": "سورة المائدة",
+        "surahNameTranslation": "The Table",
+        "revelationPlace": "Madina",
+        "totalAyah": 120
+    },
+    {
+        "surahName": "Al-An'aam",
+        "surahNameArabic": "الأنعام",
+        "surahNameArabicLong": "سورة الأنعام",
+        "surahNameTranslation": "The Cattle",
+        "revelationPlace": "Mecca",
+        "totalAyah": 165
+    },
+    {
+        "surahName": "Al-A'raaf",
+        "surahNameArabic": "الأعراف",
+        "surahNameArabicLong": "سورة الأعراف",
+        "surahNameTranslation": "The Heights",
+        "revelationPlace": "Mecca",
+        "totalAyah": 206
+    },
+    {
+        "surahName": "Al-Anfaal",
+        "surahNameArabic": "الأنفال",
+        "surahNameArabicLong": "سورة الأنفال",
+        "surahNameTranslation": "The Spoils of War",
+        "revelationPlace": "Madina",
+        "totalAyah": 75
+    },
+    {
+        "surahName": "At-Tawba",
+        "surahNameArabic": "التوبة",
+        "surahNameArabicLong": "سورة التوبة",
+        "surahNameTranslation": "The Repentance",
+        "revelationPlace": "Madina",
+        "totalAyah": 129
+    }
+]
