@@ -1,27 +1,31 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
-import { Info, Play, Pause, BookOpen, Eye } from 'lucide-react';
-import Loading from '@/components/ui/Loading';
+import React, { useEffect, useRef, useState } from 'react';
+import { Info, Play, BookOpen, Eye, Pause } from 'lucide-react'; // Icons
+import Loading from '@/components/ui/Loading'; // Custom loading spinner
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
 
 export default function SurahDetail() {
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [surah, setSurah] = useState(null);
+	const [loading, setLoading] = useState(true); // Loading state
+	const [error, setError] = useState(null); // Error state
+	const [surah, setSurah] = useState(null); // Surah data
 
-	const { id } = useParams();
+	const [surahTwo, setSurahTwo] = useState(null); // Surah data
+	const [errorTwo, setErrorTwo] = useState(null); // Error state
+	const [loadingTwo, setLoadingTwo] = useState(true); // Loading state╬
 
-	const [tab, setTab] = useState('translation');
 	const [isPlaying, setIsPlaying] = useState(false);
 
-	// Audio Ref
+	const { id } = useParams(); // Dynamic route param for Surah ID
+
 	const audioRef = useRef(null);
 
+
+	console.log('surahTwo?.audio[1]?.originalUrl', surahTwo);
+
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchDataTwo = async () => {
 			try {
-				setLoading(true);
+				setLoadingTwo(true);
 				const res = await fetch(
 					`https://quranapi.pages.dev/api/${id}.json`
 				);
@@ -32,19 +36,42 @@ export default function SurahDetail() {
 
 				const data = await res.json();
 
-				setSurah(data);
-				setLoading(false);
+				setSurahTwo(data);
+				console.log('data', data);
+				setTimeout(() => {
+
+					setLoadingTwo(false);
+					
+				}, 3000);
 			} catch (error) {
 				console.log(error.message);
-				setError(error.message);
-				setSurah(null);
+				setErrorTwo(error.message);
+				setSurahTwo(null);
 			} finally {
-				setLoading(false);
+				setLoadingTwo(false);
+			}
+		};
+		const fetchSurah = async () => {
+			try {
+				// Fetching Surah detail from API
+				const res = await fetch(
+					`https://api.alquran.cloud/v1/surah/${id}`
+				);
+				if (!res.ok) throw new Error('Failed to fetch Surah');
+				const data = await res.json();
+				setSurah(data.data); // Store Surah details
+			} catch (err) {
+				setError(err.message);
+			} finally {
+				setLoading(false); // Stop loader
 			}
 		};
 
-		fetchData();
+		fetchSurah();
+		fetchDataTwo();
 	}, [id]);
+
+	console.log("loadingTwo", loadingTwo)
 
 	// Toggle Play/Pause
 	const handleAudioToggle = () => {
@@ -59,109 +86,76 @@ export default function SurahDetail() {
 		}
 	};
 
-	if (loading) return <Loading />;
-	if (error) return <Error message={error} />;
+	if (loading) return <Loading />; // Show loader
+	if (error) return <p className="text-red-500">{error}</p>; // Show error if any
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-green-950 flex flex-col items-center justify-start py-10 px-4 text-center text-white mt-16">
-			{/* Tabs */}
-			<div className="flex gap-4 bg-green-700/40 backdrop-blur-md border border-green-400 rounded-full p-2 mb-8 shadow-lg">
-				<button
-					onClick={() => setTab('translation')}
-					className={`flex items-center gap-2 px-6 py-2 rounded-full font-medium transition ${
-						tab === 'translation'
-							? 'bg-green-600 text-white shadow'
-							: 'text-green-200 hover:text-white'
-					}`}
-				>
-					<BookOpen className="w-5 h-5" />
-					Translation
-				</button>
-				<button
-					onClick={() => setTab('reading')}
-					className={`flex items-center gap-2 px-6 py-2 rounded-full font-medium transition ${
-						tab === 'reading'
-							? 'bg-green-600 text-white shadow'
-							: 'text-green-200 hover:text-white'
-					}`}
-				>
-					<Eye className="w-5 h-5" />
-					Reading
-				</button>
-			</div>
+		<div className="min-h-screen mt-16 bg-green-50 p-6 flex flex-col items-center">
+			{/* Card Container */}
+			<div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl p-6 border border-green-200">
+				{/* Surah Name Section */}
+				<h1 className="text-3xl font-bold text-green-800 text-center">
+					{surah.englishName} ({surah.englishNameTranslation})
+				</h1>
+				<p className="text-lg text-green-600 text-center mb-4">
+					Surah {surah.name} - {surah.revelationType} (
+					{surah.numberOfAyahs} Ayahs) 
+				</p>
 
-			{/* Surah Title */}
-			<h2 className="text-2xl md:text-3xl font-arabic font-bold mb-6">
-				{surah?.surahNameArabicLong}
-			</h2>
-
-			{/* Bismila */}
-
-			<div className="flex justify-center items-center mb-6">
-				<Image
-					src="/basmalah/b.png"
-					alt="Basmalah"
-					width={500}
-					height={500}
-					className="w-full opacity-[0.9] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto object-contain"
-				/>
-			</div>
-
-			{/* Info & Audio */}
-			<div className="flex items-center justify-center gap-8 mb-6">
-				<button className="flex items-center gap-2 text-green-300 hover:text-white transition font-medium">
-					<Info className="w-5 h-5" />
-					Surah Info
-				</button>
-				<button
-					onClick={handleAudioToggle}
-					className="flex items-center gap-2 text-green-300 hover:text-white transition font-medium"
-				>
-					{isPlaying ? (
-						<Pause className="w-5 h-5" />
-					) : (
-						<Play className="w-5 h-5" />
-					)}
-					{isPlaying ? 'Pause Audio' : 'Play Audio'}
-				</button>
-			</div>
-
-			{/* Hidden Audio Element */}
-			<audio
-				ref={audioRef}
-				src={`${surah?.audio[1]?.originalUrl}`}
-				onEnded={() => setIsPlaying(false)}
-			/>
-
-			{/* Quranic Text */}
-			<div className=" text-2xl md:text-3xl leading-loose font-arabic text-green-100 tracking-wide">
-				<div className="bg-green-900/95 rounded-2xl p-6 shadow-lg max-w-4xl mx-auto">
-					<div
-						className="text-3xl md:text-4xl leading-loose font-arabic text-green-50 tracking-wide text-right"
-						dir="rtl"
+				{/* Info Icons */}
+				<div className="flex justify-center gap-6 my-4">
+					<button className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700">
+						<Info size={18} /> Info
+					</button>
+					<button
+						onClick={handleAudioToggle}
+						className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700"
 					>
-						{surah?.arabic1
-							.filter(
-								(arb) =>
-									arb !==
-									'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ'
-							)
-							.join(' ۝ ')}
-					</div>
+						{isPlaying ? (
+							<>
+								<Pause size={18} /> {loadingTwo? "Loading..." : "Listen"}
+							</>
+						) : (
+							<>
+								<Play size={18} /> {loadingTwo? "Loading..." : "Listen"}
+							</>
+						)}
+					</button>
+					<button className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700">
+						<BookOpen size={18} /> Tafsir
+					</button>
 				</div>
-			</div>
 
-			{/* Divider */}
-			<div className="w-full max-w-xl border-t border-green-500/30 my-8"></div>
+				<audio
+					ref={audioRef}
+					src={`${surahTwo?.audio[1]?.originalUrl}`}
+					onEnded={() => setIsPlaying(false)}
+				/>
 
-			{/* Navigation Buttons */}
-			<div className="flex justify-center gap-4">
-				<button className="px-6 py-2 rounded-lg bg-green-700 hover:bg-green-800 transition font-semibold shadow">
-					Beginning of Surah
-				</button>
-				<button className="px-6 py-2 rounded-lg bg-green-700 hover:bg-green-800 transition font-semibold shadow">
-					Next Surah →
-				</button>
+				{/* Ayahs List */}
+				<div className="mt-6 space-y-6">
+					{surah.ayahs.map((ayah) => (
+						<div
+							key={ayah.number}
+							className="p-4 bg-green-100 border border-green-200 rounded-xl shadow-sm hover:shadow-md transition"
+						>
+							{/* Arabic Text (Solid Green Color) */}
+							<p className="text-2xl text-green-900 text-right leading-relaxed font-medium">
+								{ayah.text}۝
+							</p>
+
+							{/* Ayah Number & Options */}
+							<div className="flex justify-between items-center mt-3">
+								<span className="text-sm text-green-700">
+									Ayah {ayah.numberInSurah}
+								</span>
+								<button className="flex items-center gap-1 text-green-600 hover:text-green-800">
+									<Eye size={16} /> View
+								</button>
+							</div>
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	);
