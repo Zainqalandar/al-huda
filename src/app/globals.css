@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Lateef&family=Scheherazade+New&display=swap');
+
+.font-arabic {
+  font-family: 'Amiri Quran', 'Scheherazade New', 'Lateef', serif;
+}
+
+
 /* :root {
   --background: #ffffff;
   --foreground: #171717;

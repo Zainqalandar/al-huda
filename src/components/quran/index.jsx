@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Loading from '../ui/Loading';
 import Error from '../ui/Error';
 import Filter from '../ui/Filter';
+import Link from 'next/link';
 
 export default function SurahList() {
 	const [surahList, setSurahList] = useState(null);
@@ -85,7 +86,8 @@ export default function SurahList() {
 				/>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					{surahList?.map((surah, index) => (
-						<div
+						<Link
+                        href={`/quran/${++index}`}
 							key={index}
 							className="bg-white border border-green-200 rounded-xl shadow-md hover:shadow-lg transition p-5 flex items-center justify-between"
 						>
@@ -108,7 +110,7 @@ export default function SurahList() {
 							<div className="text-green-800 font-bold text-xl">
 								{surah.surahNameArabic}
 							</div>
-						</div>
+						</Link>
 					))}
 				</div>
 			</div>
