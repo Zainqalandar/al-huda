@@ -15,7 +15,9 @@ export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body>
-				<Navbar />
+				<div>
+					<Navbar />
+				</div>
 				<DataProvider>{children}</DataProvider>
 				<Footer />
 			</body>
