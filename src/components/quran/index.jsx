@@ -4,44 +4,13 @@ import Loading from '../ui/Loading';
 import Error from '../ui/Error';
 import Filter from '../ui/Filter';
 import Link from 'next/link';
+import useSurahList from '@/hooks/useSurahList';
 
 export default function SurahList() {
-	const [surahList, setSurahList] = useState(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+	const { surahList, loading, error } = useSurahList();
 
 	const [sortBy, setSortBy] = useState('id');
 	const [order, setOrder] = useState('asc');
-
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setLoading(true);
-				const res = await fetch(
-					'https://quranapi.pages.dev/api/surah.json'
-				);
-
-				if (!res.ok) {
-					throw new Error('HTTP Error! status: ', res.status);
-				}
-
-				const data = await res.json();
-
-				const withIdData = addIdToSurahs(data);
-
-				setSurahList(withIdData);
-				setLoading(false);
-			} catch (error) {
-				console.log(error.message);
-				setError(error.message);
-				setSurahList(null);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchData();
-	}, []);
 
 	useEffect(() => {
 		if (surahList) {
@@ -62,17 +31,9 @@ export default function SurahList() {
 	}, [sortBy, order]);
 
 	const resetFilters = useCallback(() => {
-		console.log('Reset!');
 		setSortBy('id');
 		setOrder('asc');
 	}, []);
-
-	function addIdToSurahs(surahs) {
-		return surahs.map((surah, index) => ({
-			...surah,
-			id: index + 1,
-		}));
-	}
 
 	if (loading) return <Loading />;
 	if (error) return <Error message={error} />;

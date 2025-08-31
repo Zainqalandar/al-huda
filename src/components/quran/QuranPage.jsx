@@ -76,14 +76,12 @@ const QuranPage = () => {
 					`https://api.alquran.cloud/v1/surah/${id}`
 				);
 				if (!res.ok) {
-					console.log('res:::', res);
 					throw new Error('Failed to fetch Surah');
 				}
 				const data = await res.json();
 				setSurah(data.data); // Store Surah details
 				setError(null);
 			} catch (err) {
-				console.log('catch', err);
 				setError(err.message);
 			} finally {
 				setLoading(false); // Stop loader
