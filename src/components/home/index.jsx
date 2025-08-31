@@ -17,8 +17,8 @@ const HomeRoot = () => {
 			<FAQAccordion />
 			<HadithSection />
 			<DuasSection />
-			<AboutIslam />
 			<PrayerTimeSlider />
+			<AboutIslam />
 		</>
 	);
 };

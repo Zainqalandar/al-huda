@@ -1,38 +1,54 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
-import { Info, Play, BookOpen, Eye, Pause } from 'lucide-react'; // Icons
-import Loading from '@/components/ui/Loading'; // Custom loading spinner
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Eye } from 'lucide-react';
+import Loading from '@/components/ui/Loading';
 import { useParams } from 'next/navigation';
+import QuranPageBtn from '@/components/ui/QuranPageBtn';
+import { useRouter } from 'next/navigation';
+import { QuranData } from '@/app/DataProvider';
+import Error from '@/components/ui/Error';
+
+let totalPages = 114;
 
 export default function SurahDetail() {
-	const [loading, setLoading] = useState(true); // Loading state
-	const [error, setError] = useState(null); // Error state
-	const [surah, setSurah] = useState(null); // Surah data
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [surah, setSurah] = useState(null);
 
-	const [index, setIndex] = useState(0);
+	const router = useRouter();
+	const {pageNo, setPageNo} = useContext(QuranData);
 
-	const [surahTwo, setSurahTwo] = useState(null); // Surah data
-	const [errorTwo, setErrorTwo] = useState(null); // Error state
-	const [loadingTwo, setLoadingTwo] = useState(true); // Loading state╬
+	console.log("pageNo:: ", pageNo)
 
+
+	const [surahTwo, setSurahTwo] = useState(null);
+	const [errorTwo, setErrorTwo] = useState(null);
+	const [loadingTwo, setLoadingTwo] = useState(true);
 	const [isPlaying, setIsPlaying] = useState(false);
 
-	const { id } = useParams(); // Dynamic route param for Surah ID
-
-	const audioRef = useRef(null);
-
 	const nextVerse = () => {
-		if (index < surah.length - 1) setIndex(index + 1);
-		console.log("Next", index + 1)
+		if (pageNo < totalPages) {
+			const nextPage = pageNo + 1;
+			 setPageNo(nextPage);
+			 router.push(`/quran/${nextPage}`)
+		}
 	};
 
 	const prevVerse = () => {
-		if (index > 0) setIndex(index - 1);
+		if (pageNo > 0) {
+			const prevPage = pageNo - 1;
+			setPageNo(prevPage);
+			router.push(`/quran/${prevPage}`)
+		}
 	};
 
-	console.log("index: ", index)
+	const { id } = useParams();
+	const audioRef = useRef(null);
+
+	
 
 	useEffect(() => {
+		setPageNo(JSON.parse(id));
 		const fetchDataTwo = async () => {
 			try {
 				setLoadingTwo(true);
@@ -51,7 +67,6 @@ export default function SurahDetail() {
 					setLoadingTwo(false);
 				}, 3000);
 			} catch (error) {
-				console.log(error.message);
 				setErrorTwo(error.message);
 				setSurahTwo(null);
 			} finally {
@@ -64,10 +79,15 @@ export default function SurahDetail() {
 				const res = await fetch(
 					`https://api.alquran.cloud/v1/surah/${id}`
 				);
-				if (!res.ok) throw new Error('Failed to fetch Surah');
+				if (!res.ok) {
+					console.log("res:::", res)
+					throw new Error('Failed to fetch Surah')
+				};
 				const data = await res.json();
 				setSurah(data.data); // Store Surah details
+				setError(null);
 			} catch (err) {
+				console.log("catch", err)
 				setError(err.message);
 			} finally {
 				setLoading(false); // Stop loader
@@ -77,7 +97,6 @@ export default function SurahDetail() {
 		fetchSurah();
 		fetchDataTwo();
 	}, [id]);
-
 
 	// Toggle Play/Pause
 	const handleAudioToggle = () => {
@@ -92,8 +111,9 @@ export default function SurahDetail() {
 		}
 	};
 
+
 	if (loading) return <Loading />; // Show loader
-	if (error) return <p className="text-red-500">{error}</p>; // Show error if any
+	if (error || error === undefined) return <Error message={error} /> // Show error if any
 
 	return (
 		<div className="min-h-screen mt-16 bg-green-50 p-2 sm:p-6 flex flex-col items-center">
@@ -101,38 +121,17 @@ export default function SurahDetail() {
 			<div className="bg-white rounded-2xl  shadow-lg w-full max-w-3xl p-4 sm:p-6 border border-green-200">
 				{/* Surah Name Section */}
 				<h1 className="text-3xl font-bold text-green-800 text-center">
-					{surah.englishName} ({surah.englishNameTranslation})
+					{surah?.englishName} ({surah?.englishNameTranslation})
 				</h1>
 				<p className="text-lg text-green-600 text-center mb-4">
-					Surah {surah.name} - {surah.revelationType} (
-					{surah.numberOfAyahs} Ayahs)
+					Surah {surah?.name} - {surah?.revelationType} (
+					{surah?.numberOfAyahs} Ayahs)
 				</p>
 
 				{/* Info Icons */}
-				<div className="flex flex-wrap justify-center  gap-6 my-4">
-					<button className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700">
-						<Info size={18} /> Info
-					</button>
-					<button
-						onClick={handleAudioToggle}
-						className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700"
-					>
-						{isPlaying ? (
-							<>
-								<Pause size={18} />{' '}
-								{loadingTwo ? 'Loading...' : 'Listen'}
-							</>
-						) : (
-							<>
-								<Play size={18} />{' '}
-								{loadingTwo ? 'Loading...' : 'Listen'}
-							</>
-						)}
-					</button>
-					<button className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700">
-						<BookOpen size={18} /> Tafsir
-					</button>
-				</div>
+				<QuranPageBtn
+					btnInfo={{ handleAudioToggle, isPlaying, loadingTwo }}
+				/>
 
 				<audio
 					ref={audioRef}
@@ -142,7 +141,7 @@ export default function SurahDetail() {
 
 				{/* Ayahs List */}
 				<div className="mt-6 space-y-6">
-					{surah.ayahs.map((ayah) => (
+					{surah?.ayahs?.map((ayah) => (
 						<div
 							key={ayah.number}
 							className="p-4 bg-green-100 border border-green-200 rounded-xl shadow-sm hover:shadow-md transition"
@@ -165,29 +164,30 @@ export default function SurahDetail() {
 					))}
 				</div>
 			</div>
+
 			<div className="flex justify-between mt-8 w-full max-w-3xl">
 				<button
 					onClick={prevVerse}
-					disabled={index === 0}
-					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition ${
-						index === 0
+					disabled={pageNo === 1}
+					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition cursor-pointer ${
+						pageNo === 1
 							? 'bg-gray-300 text-gray-600 cursor-not-allowed'
 							: 'bg-green-600 text-white hover:bg-green-700'
 					}`}
 				>
-					⬅️ Previous
+					&larr; Previous
 				</button>
 
 				<button
 					onClick={nextVerse}
-					disabled={index === surah.length - 1}
-					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition ${
-						index === surah.length - 1
+					disabled={pageNo === totalPages}
+					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition cursor-pointer ${
+						pageNo === totalPages
 							? 'bg-gray-300 text-gray-600 cursor-not-allowed'
 							: 'bg-green-600 text-white hover:bg-green-700'
 					}`}
 				>
-					Next ➡️
+					Next &#8594;
 				</button>
 			</div>
 		</div>

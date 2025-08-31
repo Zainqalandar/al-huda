@@ -1,21 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-
-const faqs = [
-  {
-    question: "اسلام میں نماز کی اہمیت کیا ہے؟",
-    answer: "نماز دین اسلام کا ستون ہے اور ہر مسلمان پر فرض ہے۔ قرآن میں بار بار نماز قائم کرنے کا حکم آیا ہے۔",
-  },
-  {
-    question: "روزہ رکھنے کے فوائد کیا ہیں؟",
-    answer: "روزہ روحانی پاکیزگی اور جسمانی صحت کا ذریعہ ہے۔ یہ تقویٰ پیدا کرتا ہے اور نفس کو قابو میں رکھتا ہے۔",
-  },
-  {
-    question: "صدقہ دینے کی فضیلت کیا ہے؟",
-    answer: "صدقہ دل کو نرم کرتا ہے، محتاج کی مدد کرتا ہے اور اللہ کی رضا حاصل ہوتی ہے۔ یہ بلاؤں کو دور کرتا ہے۔",
-  },
-];
+import faqs from '@/data/faqs.json'
 
 export default function IslamicFAQ() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -42,7 +28,7 @@ export default function IslamicFAQ() {
               >
                 {faq.question}
                 <ChevronDown
-                  className={`h-5 w-5 text-green-600 transition-transform ${
+                  className={`h-5 w-5 text-green-600 transition-transform cursor-pointer ${
                     openIndex === index ? "rotate-180" : ""
                   }`}
                 />

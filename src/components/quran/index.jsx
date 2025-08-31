@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Loading from '../ui/Loading';
 import Error from '../ui/Error';
 import Filter from '../ui/Filter';
@@ -10,8 +10,38 @@ export default function SurahList() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	const [sortBy, setSortBy] = useState('number');
+	const [sortBy, setSortBy] = useState('id');
 	const [order, setOrder] = useState('asc');
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				setLoading(true);
+				const res = await fetch(
+					'https://quranapi.pages.dev/api/surah.json'
+				);
+
+				if (!res.ok) {
+					throw new Error('HTTP Error! status: ', res.status);
+				}
+
+				const data = await res.json();
+
+				const withIdData = addIdToSurahs(data);
+
+				setSurahList(withIdData);
+				setLoading(false);
+			} catch (error) {
+				console.log(error.message);
+				setError(error.message);
+				setSurahList(null);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, []);
 
 	useEffect(() => {
 		if (surahList) {
@@ -31,40 +61,18 @@ export default function SurahList() {
 		}
 	}, [sortBy, order]);
 
-	const resetFilters = () => {
-		setSortBy('number');
+	const resetFilters = useCallback(() => {
+		console.log('Reset!');
+		setSortBy('id');
 		setOrder('asc');
-	};
-
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setLoading(true);
-				const res = await fetch(
-					'https://quranapi.pages.dev/api/surah.json'
-				);
-
-				if (!res.ok) {
-					throw new Error('HTTP Error! status: ', res.status);
-				}
-
-				const data = await res.json();
-
-				setSurahList(data);
-				setLoading(false);
-			} catch (error) {
-				console.log(error.message);
-				setError(error.message);
-				setSurahList(null);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchData();
 	}, []);
 
-	console.log('surahs: ', surahList);
+	function addIdToSurahs(surahs) {
+		return surahs.map((surah, index) => ({
+			...surah,
+			id: index + 1,
+		}));
+	}
 
 	if (loading) return <Loading />;
 	if (error) return <Error message={error} />;
@@ -85,14 +93,14 @@ export default function SurahList() {
 					resetFilters={resetFilters}
 				/>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-					{surahList?.map((surah, index) => (
+					{surahList?.map((surah) => (
 						<Link
-                        href={`/quran/${++index}`}
-							key={index}
+							href={`/quran/${surah.id}`}
+							key={surah.id}
 							className="bg-white border border-green-200 rounded-xl shadow-md hover:shadow-lg transition p-5 flex items-center justify-between"
 						>
 							<div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-lg bg-green-600 text-white font-bold text-lg">
-								{sortBy == 'number' ? ++index : ''}
+								{surah.id}
 							</div>
 
 							<div className="flex-1 px-4">

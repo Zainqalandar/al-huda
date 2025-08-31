@@ -72,14 +72,14 @@ export default function DailyInspirationSlider() {
       {/* Navigation Arrows */}
       <button 
         onClick={handlePrev} 
-        className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-green-100"
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full cursor-pointer shadow hover:bg-green-100"
       >
         <ChevronLeft className="w-5 h-5 text-green-700" />
       </button>
       
       <button 
         onClick={handleNext} 
-        className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-green-100"
+        className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full cursor-pointer shadow hover:bg-green-100"
       >
         <ChevronRight className="w-5 h-5 text-green-700" />
       </button>

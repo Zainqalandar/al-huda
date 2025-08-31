@@ -63,7 +63,7 @@ export default function PrayerTimeSlider() {
             className="p-1 sm:p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
             disabled={animating}
           >
-            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 cursor-pointer" />
           </button>
         </div>
 
@@ -73,7 +73,7 @@ export default function PrayerTimeSlider() {
             className="p-1 sm:p-2 rounded-full bg-white dark:bg-green-800 hover:bg-green-200"
             disabled={animating}
           >
-            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 cursor-pointer" />
           </button>
         </div>
       </div>
