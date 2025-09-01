@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 
-const useSurahList = () => {
-	const [surahList, setSurahList] = useState(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+let cachedSurahs = null;
 
-    function addIdToSurahs(surahs) {
-		return surahs.map((surah, index) => ({
-			...surah,
-			id: index + 1,
-		}));
-	}
+const useSurahList = () => {
+	const [surahList, setSurahList] = useState(cachedSurahs);
+  const [loading, setLoading] = useState(!cachedSurahs);
+  const [error, setError] = useState(null);
+
+    
 
 	useEffect(() => {
+
+		if (cachedSurahs) return; 
+
 		const fetchData = async () => {
+			console.log("I'm hook!!")
 			try {
 				setLoading(true);
 				const res = await fetch(
@@ -26,7 +27,8 @@ const useSurahList = () => {
 
 				const data = await res.json();
 
-				const withIdData = addIdToSurahs(data);
+				const withIdData = data.map((surah, i) => ({ ...surah, id: i + 1 }));
+				cachedSurahs = withIdData;
 
 				setSurahList(withIdData);
 				setLoading(false);

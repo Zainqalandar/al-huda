@@ -7,14 +7,19 @@ import Link from 'next/link';
 import useSurahList from '@/hooks/useSurahList';
 
 export default function SurahList() {
-	const { surahList, loading, error } = useSurahList();
-
+	const [surah, setSurah] = useState(null);
 	const [sortBy, setSortBy] = useState('id');
 	const [order, setOrder] = useState('asc');
+	
+	const { surahList, loading, error } = useSurahList();
 
 	useEffect(() => {
-		if (surahList) {
-			let sorted = [...surahList];
+		if (surahList) setSurah(surahList);
+	}, [surahList]);
+
+	useEffect(() => {
+		if (surah) {
+			let sorted = [...surah];
 			sorted.sort((a, b) => {
 				if (sortBy === 'surahName') {
 					return order === 'asc'
@@ -26,7 +31,7 @@ export default function SurahList() {
 						: b[sortBy] - a[sortBy];
 				}
 			});
-			setSurahList(sorted);
+			setSurah(sorted);
 		}
 	}, [sortBy, order]);
 
@@ -45,7 +50,6 @@ export default function SurahList() {
 					📖 Surahs of the Holy Quran
 				</h1>
 
-				{/* Filter Component */}
 				<Filter
 					sortBy={sortBy}
 					setSortBy={setSortBy}
@@ -54,7 +58,7 @@ export default function SurahList() {
 					resetFilters={resetFilters}
 				/>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-					{surahList?.map((surah) => (
+					{surah?.map((surah) => (
 						<Link
 							href={`/quran/${surah.id}`}
 							key={surah.id}
