@@ -69,6 +69,7 @@ const QuranPage = () => {
 				setLoadingTwo(false);
 			}
 		};
+
 		const fetchSurah = async () => {
 			try {
 				// Fetching Surah detail from API
@@ -119,7 +120,7 @@ const QuranPage = () => {
 				</p>
 
 				<QuranPageBtn
-					btnInfo={{ handleAudioToggle, isPlaying, loadingTwo }}
+					btnInfo={{ handleAudioToggle, isPlaying, loadingTwo, surahTwo }}
 				/>
 
 				<audio

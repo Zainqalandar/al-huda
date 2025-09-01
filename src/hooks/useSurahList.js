@@ -14,7 +14,6 @@ const useSurahList = () => {
 		if (cachedSurahs) return; 
 
 		const fetchData = async () => {
-			console.log("I'm hook!!")
 			try {
 				setLoading(true);
 				const res = await fetch(

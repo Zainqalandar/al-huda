@@ -13,9 +13,8 @@ export default function QuranLayout() {
 	const { id } = useParams();
 	const [active, setActive] = useState(JSON.parse(id));
 	const [isMobile, setIsMobile] = useState(false);
-	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [sidebarOpen, setSidebarOpen] = useState(false);
 
-	console.log("QuranLayout!1")
 
 
 	const { surahList, loading, error } = useSurahList();
