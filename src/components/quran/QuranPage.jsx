@@ -4,19 +4,16 @@ import { Eye } from 'lucide-react';
 import Loading from '@/components/ui/Loading';
 import { useParams } from 'next/navigation';
 import QuranPageBtn from '@/components/ui/QuranPageBtn';
-import { useRouter } from 'next/navigation';
 import { QuranData } from '@/app/DataProvider';
 import Error from '@/components/ui/Error';
 
-let totalPages = 114; // ❌❌
 
 const QuranPage = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [surah, setSurah] = useState(null);
 
-	const router = useRouter();
-	const { pageNo, setPageNo } = useContext(QuranData);
+	const { setPageNo } = useContext(QuranData);
 
 
 	const [surahTwo, setSurahTwo] = useState(null);
@@ -24,21 +21,6 @@ const QuranPage = () => {
 	const [loadingTwo, setLoadingTwo] = useState(true);
 	const [isPlaying, setIsPlaying] = useState(false);
 
-	const nextVerse = () => {
-		if (pageNo < totalPages) {
-			const nextPage = pageNo + 1;
-			setPageNo(nextPage);
-			router.push(`/quran/${nextPage}`);
-		}
-	};
-
-	const prevVerse = () => {
-		if (pageNo > 0) {
-			const prevPage = pageNo - 1;
-			setPageNo(prevPage);
-			router.push(`/quran/${prevPage}`);
-		}
-	};
 
 	const { id } = useParams();
 	const audioRef = useRef(null);
@@ -125,7 +107,7 @@ const QuranPage = () => {
 
 				<audio
 					ref={audioRef}
-					src={`${surahTwo?.audio[1]?.originalUrl}`}
+					src={`https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/002.ogg`}
 					onEnded={() => setIsPlaying(false)}
 				/>
 
@@ -152,31 +134,7 @@ const QuranPage = () => {
 				</div>
 			</div>
 
-			<div className="flex justify-between mt-8 w-full max-w-3xl">
-				<button
-					onClick={prevVerse}
-					disabled={pageNo === 1}
-					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition cursor-pointer ${
-						pageNo === 1
-							? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-							: 'bg-green-600 text-white hover:bg-green-700'
-					}`}
-				>
-					&larr; Previous
-				</button>
 
-				<button
-					onClick={nextVerse}
-					disabled={pageNo === totalPages}
-					className={`px-6 py-2 rounded-xl shadow-md font-semibold transition cursor-pointer ${
-						pageNo === totalPages
-							? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-							: 'bg-green-600 text-white hover:bg-green-700'
-					}`}
-				>
-					Next &#8594;
-				</button>
-			</div>
 		</div>
 	);
 };
