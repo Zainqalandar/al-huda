@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import navLinks from '@/lib/navLinks';
@@ -7,14 +7,37 @@ import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [visible, setVisible] = useState(true);
+	const [lastScrollY, setLastScrollY] = useState(0);
 
-  const path = usePathname();
+	const path = usePathname();
 
+	// 👇 scroll event handle
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.scrollY > lastScrollY) {
+				// scroll down → hide
+				setVisible(false);
+			} else {
+				// scroll up → show
+				setVisible(true);
+			}
+			setLastScrollY(window.scrollY);
+		};
+
+		window.addEventListener('scroll', handleScroll);
+
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, [lastScrollY]);
 
 	return (
 		<>
-			<nav className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 text-white shadow-lg fixed top-0 left-0 w-full z-50">
-				<div className="container mx-auto px-6 py-4 flex justify-between items-center">
+			<nav
+				className={`bg-gradient-to-r from-green-900 via-green-800 to-green-900 text-white shadow-lg fixed top-0 left-0 w-full z-50 transform transition-transform duration-300 ${
+					visible ? 'translate-y-0' : '-translate-y-full'
+				}`}
+			>
+				<div className="container mx-auto px-6 py-3 flex justify-between items-center">
 					{/* Logo / Site Name */}
 					<Link
 						href="/"
@@ -29,7 +52,9 @@ const Navbar = () => {
 							<li key={lnk.id}>
 								<Link
 									href={lnk.link}
-									className={`hover:text-yellow-400 ${path == lnk.link && 'text-yellow-400'}`}
+									className={`hover:text-yellow-400 ${
+										path === lnk.link && 'text-yellow-400'
+									}`}
 								>
 									{lnk.name}
 								</Link>
@@ -48,12 +73,15 @@ const Navbar = () => {
 
 				{/* Mobile Dropdown */}
 				{isOpen && (
-					<div onClick={() => setIsOpen(!isOpen)} className="md:hidden bg-green-950/95 text-center py-4 space-y-4">
+					<div className="md:hidden bg-green-950/95 text-center py-4 space-y-4">
 						{navLinks.map((lnk) => (
 							<Link
 								key={lnk.id}
 								href={lnk.link}
-								className={`block hover:text-yellow-400 ${path == lnk.link && 'text-yellow-400'}`}
+								className={`block hover:text-yellow-400 ${
+									path === lnk.link && 'text-yellow-400'
+								}`}
+								onClick={() => setIsOpen(false)}
 							>
 								{lnk.name}
 							</Link>

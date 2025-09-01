@@ -8,14 +8,14 @@ import SidebarList from './list';
 import useSurahList from '@/hooks/useSurahList';
 import { useParams } from 'next/navigation';
 
-
 export default function QuranLayout() {
 	const { id } = useParams();
 	const [active, setActive] = useState(JSON.parse(id));
 	const [isMobile, setIsMobile] = useState(false);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
+	const [navVisible, setNavVisible] = useState(true);
+	const [lastScrollY, setLastScrollY] = useState(0);
 
 	const { surahList, loading, error } = useSurahList();
 
@@ -29,30 +29,54 @@ export default function QuranLayout() {
 		return () => window.removeEventListener('resize', checkScreen);
 	}, []);
 
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.scrollY > lastScrollY) {
+				// scroll down → navbar hide
+				setNavVisible(false);
+			} else {
+				// scroll up → navbar show
+				setNavVisible(true);
+			}
+			setLastScrollY(window.scrollY);
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, [lastScrollY]);
+
 	return (
 		<div className="flex  flex-col bg-green-50">
-			<SidebarLayoutHeader onSidebarOpen={setSidebarOpen} />
+			<SidebarLayoutHeader
+			surahs={surahList}
+			isActive={active}
+			 onSidebarOpen={setSidebarOpen} />
 
 			<div className="flex flex-1 pt-[64px]">
 				{/* Sidebar */}
 				<div
-					className={`fixed md:fixed top-[126px] left-0 h-[calc(100%-57px)] w-64 bg-green-950 text-green-50 flex flex-col border-r border-green-800 transform transition-transform duration-100 z-40
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-				>
-					<SidebarHeader
-						surahs={surahList}
-						onSidebarOpen={setSidebarOpen}
-						isActive={active}
-					/>
-					<SidebarFilters />
-					<SidebarList
-						onSetActive={setActive}
-						surahs={surahList}
-						isActive={active}
-						isLoading={loading}
-						OnSidebarOpen={setSidebarOpen}
-					/>
-				</div>
+			className={`fixed md:fixed left-0 h-[calc(100%-57px)] w-64 bg-green-950 text-green-50 flex flex-col border-r border-green-800 transform transition-transform duration-200 z-40
+				${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+			`}
+			style={{
+				top: navVisible ? "106px" : "50px", // 56 (navbar) + 50 (layout header) OR only 50px when navbar hidden
+				transition: "top 0.3s ease"
+			}}
+		>
+			<SidebarHeader
+				surahs={surahList}
+				onSidebarOpen={setSidebarOpen}
+				isActive={active}
+			/>
+			<SidebarFilters />
+			<SidebarList
+				onSetActive={setActive}
+				surahs={surahList}
+				isActive={active}
+				isLoading={loading}
+				OnSidebarOpen={setSidebarOpen}
+			/>
+		</div>
 
 				{/* Overlay for mobile */}
 				{sidebarOpen && isMobile < 768 && (

@@ -2,6 +2,7 @@ import './globals.css';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { DataProvider } from './DataProvider';
+import ScrollProgress from '@/components/ui/ScrollProgress';
 
 export const metadata = {
 	title: 'Al-Huda',
@@ -15,9 +16,8 @@ export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body>
-				<div>
-					<Navbar />
-				</div>
+				<Navbar />
+				<ScrollProgress />
 				<DataProvider>{children}</DataProvider>
 				<Footer />
 			</body>

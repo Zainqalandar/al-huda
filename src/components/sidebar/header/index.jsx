@@ -1,16 +1,45 @@
-import { Menu } from 'lucide-react';
-import React from 'react';
+"use client";
+import { PanelLeft } from "lucide-react";
+import React, { useState, useEffect } from "react";
 
-const SidebarLayoutHeader = ({ onSidebarOpen }) => {
+const SidebarLayoutHeader = ({ onSidebarOpen, surahs, isActive }) => {
+	const [navVisible, setNavVisible] = useState(true);
+	const [lastScrollY, setLastScrollY] = useState(0);
+
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.scrollY > lastScrollY) {
+				// scroll down → navbar hide
+				setNavVisible(false);
+			} else {
+				// scroll up → navbar show
+				setNavVisible(true);
+			}
+			setLastScrollY(window.scrollY);
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, [lastScrollY]);
+
 	return (
-		<header className="bg-green-100 border-b border-green-300 p-4 flex items-center gap-4 fixed top-[65px] left-0 right-0 z-49">
-			<button
-				className="text-green-900 cursor-pointer"
-				onClick={() => onSidebarOpen(true)}
-			>
-				<Menu size={24} />
-			</button>
-			<h1 className="text-xl font-bold text-green-900">Quran App</h1>
+		<header
+			className={`bg-white border-b border-gray-200 h-[50px] flex items-center px-4 fixed left-0 right-0 z-40 shadow-sm transition-all duration-300 ${
+				navVisible ? "top-[56px]" : "top-0"
+			}`}
+		>
+			{/* Left Section: Menu + Surah Name */}
+			<div className="flex items-center gap-3">
+				<button
+					className="text-gray-700 hover:text-green-600 transition"
+					onClick={() => onSidebarOpen(true)}
+				>
+					<PanelLeft size={22} />
+				</button>
+				<h1 className="text-lg font-semibold text-gray-900">
+					{surahs?.find((s) => s.id === isActive)?.surahNameArabicLong || "Quran App"}
+				</h1>
+			</div>
 		</header>
 	);
 };

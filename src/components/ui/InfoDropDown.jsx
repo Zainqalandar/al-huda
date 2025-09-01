@@ -20,7 +20,6 @@ const InfoDropDown = ({ surah }) => {
 		}
 	};
 
-	console.log('surah;:: ', surah);
 
 	return (
 		<>
