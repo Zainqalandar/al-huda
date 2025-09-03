@@ -9,7 +9,7 @@ import { useParams } from 'next/navigation';
 const Drawer = ({onSidebarOpen, sidebarOpen}) => {
 	const { id } = useParams();
 	const [active, setActive] = useState(JSON.parse(id));
-	const [navVisible, setNavVisible] = useState(false);
+	const [navVisible, setNavVisible] = useState(true);
 	const [lastScrollY, setLastScrollY] = useState(0);
 
 	const { surahs, loading } = useContext(SurhasList)

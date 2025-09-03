@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 const QuranChildPageLayout = ({ children }) => {
-	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [sidebarOpen, setSidebarOpen] = useState(false);
 
 	const { id } = useParams();
 
