@@ -1,100 +1,142 @@
 'use client';
-import { useEffect, useState } from 'react';
-import QuranPage from '../quran/QuranPage';
-import SidebarLayoutHeader from './header';
-import SidebarHeader from './sidebar-header';
-import SidebarFilters from './sidebar-filters';
-import SidebarList from './list';
-import useSurahList from '@/hooks/useSurahList';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Eye } from 'lucide-react';
+import Loading from '@/components/ui/Loading';
 import { useParams } from 'next/navigation';
+import QuranPageBtn from '@/components/ui/QuranPageBtn';
+import Error from '@/components/ui/Error';
+import { SurhasList } from '@/context/SurhasListProvider';
 
-export default function QuranLayout() {
+
+const QuranPage = () => {
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [surah, setSurah] = useState(null);
+
+	const { setPageNo } = useContext(SurhasList);
+
+
+	const [surahTwo, setSurahTwo] = useState(null);
+	const [errorTwo, setErrorTwo] = useState(null);
+	const [loadingTwo, setLoadingTwo] = useState(true);
+	const [isPlaying, setIsPlaying] = useState(false);
+
+
 	const { id } = useParams();
-	const [active, setActive] = useState(JSON.parse(id));
-	const [isMobile, setIsMobile] = useState(false);
-	const [sidebarOpen, setSidebarOpen] = useState(false);
-
-	const [navVisible, setNavVisible] = useState(true);
-	const [lastScrollY, setLastScrollY] = useState(0);
-
-	const { surahList, loading, error } = useSurahList();
+	const audioRef = useRef(null);
 
 	useEffect(() => {
-		const checkScreen = () => {
-			setIsMobile(window.innerWidth < 768);
-		};
-		checkScreen();
-		window.addEventListener('resize', checkScreen);
+		setPageNo(JSON.parse(id));
+		const fetchDataTwo = async () => {
+			try {
+				setLoadingTwo(true);
+				const res = await fetch(
+					`https://quranapi.pages.dev/api/${id}.json`
+				);
 
-		return () => window.removeEventListener('resize', checkScreen);
-	}, []);
+				if (!res.ok) {
+					throw new Error('HTTP Error! status: ' + res.status);
+				}
 
-	useEffect(() => {
-		const handleScroll = () => {
-			if (window.scrollY > lastScrollY) {
-				// scroll down → navbar hide
-				setNavVisible(false);
-			} else {
-				// scroll up → navbar show
-				setNavVisible(true);
+				const data = await res.json();
+
+				setSurahTwo(data);
+				setTimeout(() => {
+					setLoadingTwo(false);
+				}, 3000);
+			} catch (error) {
+				setErrorTwo(error.message);
+				setSurahTwo(null);
+			} finally {
+				setLoadingTwo(false);
 			}
-			setLastScrollY(window.scrollY);
 		};
 
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, [lastScrollY]);
+		const fetchSurah = async () => {
+			try {
+				// Fetching Surah detail from API
+				const res = await fetch(
+					`https://api.alquran.cloud/v1/surah/${id}`
+				);
+				if (!res.ok) {
+					throw new Error('Failed to fetch Surah');
+				}
+				const data = await res.json();
+				setSurah(data.data); // Store Surah details
+				setError(null);
+			} catch (err) {
+				setError(err.message);
+			} finally {
+				setLoading(false); // Stop loader
+			}
+		};
 
+		fetchSurah();
+		fetchDataTwo();
+	}, [id]);
+
+	// Toggle Play/Pause
+	const handleAudioToggle = () => {
+		if (!audioRef.current) return;
+
+		if (isPlaying) {
+			audioRef.current.pause();
+			setIsPlaying(false);
+		} else {
+			audioRef.current.play();
+			setIsPlaying(true);
+		}
+	};
+
+	if (loading) return <Loading />; // Show loader
+	if (error || error === undefined) return <Error message={error} />; // Show error if any
 	return (
-		<div className="flex  flex-col bg-green-50">
-			<SidebarLayoutHeader
-			surahs={surahList}
-			isActive={active}
-			 onSidebarOpen={setSidebarOpen} />
+		<div className="min-h-screen bg-green-50 p-2 sm:p-6 flex flex-col items-center">
+			<div className="bg-white rounded-2xl  shadow-lg w-full max-w-3xl p-4 sm:p-6 border border-green-200">
+				<h1 className="text-3xl font-bold text-green-800 text-center">
+					{surah?.englishName} ({surah?.englishNameTranslation})
+				</h1>
+				<p className="text-lg text-green-600 text-center mb-4">
+					Surah {surah?.name} - {surah?.revelationType} (
+					{surah?.numberOfAyahs} Ayahs)
+				</p>
 
-			<div className="flex flex-1 pt-[64px]">
-				{/* Sidebar */}
-				<div
-			className={`fixed md:fixed left-0 h-[calc(100%-57px)] w-64 bg-green-950 text-green-50 flex flex-col border-r border-green-800 transform transition-transform duration-200 z-40
-				${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-			`}
-			style={{
-				top: navVisible ? "106px" : "50px", // 56 (navbar) + 50 (layout header) OR only 50px when navbar hidden
-				transition: "top 0.3s ease"
-			}}
-		>
-			<SidebarHeader
-				surahs={surahList}
-				onSidebarOpen={setSidebarOpen}
-				isActive={active}
-			/>
-			<SidebarFilters />
-			<SidebarList
-				onSetActive={setActive}
-				surahs={surahList}
-				isActive={active}
-				isLoading={loading}
-				OnSidebarOpen={setSidebarOpen}
-			/>
-		</div>
+				<QuranPageBtn
+					btnInfo={{ handleAudioToggle, isPlaying, loadingTwo, surahTwo }}
+				/>
 
-				{/* Overlay for mobile */}
-				{sidebarOpen && isMobile < 768 && (
-					<div
-						className="fixed inset-0 bg-black/50 z-30 md:hidden"
-						onClick={() => setSidebarOpen(false)}
-					/>
-				)}
+				<audio
+					ref={audioRef}
+					src={`https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/002.ogg`}
+					onEnded={() => setIsPlaying(false)}
+				/>
 
-				{/* Body Content */}
-				<main
-					className={`flex-1 flex flex-col transition-all duration-300 ${
-						sidebarOpen ? 'md:ml-64' : 'md:ml-0'
-					}`}
-				>
-					<QuranPage />
-				</main>
+				<div className="mt-6 space-y-6">
+					{surah?.ayahs?.map((ayah) => (
+						<div
+							key={ayah.number}
+							className="p-4 bg-green-100 border border-green-200 rounded-xl shadow-sm hover:shadow-md transition"
+						>
+							<p className="text-2xl text-green-900 text-right leading-relaxed font-medium">
+								{ayah.text}۝
+							</p>
+
+							<div className="flex justify-between items-center mt-3">
+								<span className="text-sm text-green-700">
+									Ayah {ayah.numberInSurah}
+								</span>
+								<button className="flex items-center gap-1 text-green-600 hover:text-green-800">
+									<Eye size={16} /> View
+								</button>
+							</div>
+						</div>
+					))}
+				</div>
 			</div>
+
+
 		</div>
 	);
-}
+};
+
+export default QuranPage;

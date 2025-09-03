@@ -1,10 +1,17 @@
 "use client";
+import { SurhasList } from "@/context/SurhasListProvider";
 import { PanelLeft } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import React, { useState, useEffect, useContext } from "react";
 
-const SidebarLayoutHeader = ({ onSidebarOpen, surahs, isActive }) => {
+const AppBarHeader = ({ onSidebarOpen }) => {
 	const [navVisible, setNavVisible] = useState(true);
 	const [lastScrollY, setLastScrollY] = useState(0);
+
+	const { id: isActive } = useParams()
+
+
+	const { surahs } = useContext(SurhasList);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -31,17 +38,17 @@ const SidebarLayoutHeader = ({ onSidebarOpen, surahs, isActive }) => {
 			{/* Left Section: Menu + Surah Name */}
 			<div className="flex items-center gap-3">
 				<button
-					className="text-gray-700 hover:text-green-600 transition"
-					onClick={() => onSidebarOpen(true)}
+					className="text-gray-700 hover:text-green-600 transition cursor-pointer"
+					onClick={() => onSidebarOpen( prev => !prev)}
 				>
 					<PanelLeft size={22} />
 				</button>
-				<h1 className="text-lg font-semibold text-gray-900">
-					{surahs?.find((s) => s.id === isActive)?.surahNameArabicLong || "Quran App"}
+				<h1 className="text-lg font-semibold text-green-900">
+					{surahs?.find((s) => s.id == isActive)?.surahNameArabicLong || "Quran App"}
 				</h1>
 			</div>
 		</header>
 	);
 };
 
-export default SidebarLayoutHeader;
+export default AppBarHeader;

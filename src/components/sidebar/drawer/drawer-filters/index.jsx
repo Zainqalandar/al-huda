@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 import React from 'react';
 
-const SidebarFilters = () => {
+const DrawerFilters = () => {
 	return (
 		<div className="px-4 py-3 space-y-2 border-b border-green-800">
 			<div className="flex gap-2">
@@ -27,4 +27,4 @@ const SidebarFilters = () => {
 	);
 };
 
-export default SidebarFilters;
+export default DrawerFilters;

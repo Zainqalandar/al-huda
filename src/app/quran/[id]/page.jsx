@@ -1,20 +1,10 @@
-'use client';
-// import Sidebar from '@/components/ui/Sidebar';
-import Sidebar from "@/components/sidebar/index.jsx"
-import QuranAudioBottomBar from "@/components/ui/QuranAudioUI";
-import { useParams } from "next/navigation";
 
+import QuranAppBar from '@/components/sidebar/index.jsx';
 
-export default function SurahDetail() {
-	 const { id } = useParams();
+export default function QuranChildPage() {
 	return (
 		<>
-			<div
-			className=" mt-16"
-			>
-				<Sidebar />
-				<QuranAudioBottomBar initialSurah={id} />
-			</div>
+			<QuranAppBar />
 		</>
 	);
 }

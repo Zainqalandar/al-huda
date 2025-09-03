@@ -1,7 +1,6 @@
 import './globals.css';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { DataProvider } from './DataProvider';
 import ScrollProgress from '@/components/ui/ScrollProgress';
 
 export const metadata = {
@@ -18,7 +17,7 @@ export default function RootLayout({ children }) {
 			<body>
 				<Navbar />
 				<ScrollProgress />
-				<DataProvider>{children}</DataProvider>
+				{children}
 				<Footer />
 			</body>
 		</html>

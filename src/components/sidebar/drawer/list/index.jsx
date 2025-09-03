@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Items from './items';
 import Loading from '@/components/ui/Loading';
+import { useParams } from 'next/navigation';
 
-const SidebarList = ({ surahs, isActive, onSetActive, isLoading, OnSidebarOpen }) => {
+const DrawerList = ({ onSetActive, OnSidebarOpen, surahs, Loading: isLoading  }) => {
+	const { id: isActive } = useParams();
 	return (
 		<div className="flex-1 overflow-y-auto">
 			{isLoading ? (
@@ -20,4 +22,4 @@ const SidebarList = ({ surahs, isActive, onSetActive, isLoading, OnSidebarOpen }
 	);
 };
 
-export default SidebarList;
+export default DrawerList;
