@@ -335,14 +335,6 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }) {
 			<div className="w-full bg-emerald-700 text-white border-t border-emerald-600">
 				<div className="max-w-7xl mx-auto px-4">
 					<div className="flex flex-col md:flex-row items-center gap-3 py-3">
-						<button
-							onClick={() => {
-								const send = quranListen  === 'tr' ? 'ar' : 'tr'
-								addLanguage(send)
-							}}
-						>
-							Updated! {quranListen}
-						</button>
 						{/* Left: Surah info */}
 						<div className="flex-1 min-w-0">
 							<div className="flex items-center gap-3">

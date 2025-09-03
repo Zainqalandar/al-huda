@@ -6,7 +6,7 @@ const SurhasList = createContext();
 const SurhasListProvider = ({ children }) => {
 	const [surahs, setSurahs] = useState(null);
 	const [filterSurahs, setFilterSurahs] = useState(null);
-	const [language, setLanguage] = useState('ar');
+	const [language, setLanguage] = useState('tr');
 	const { surahList, loading, error } = useSurahList();
 	const [isPlaying, setIsPlaying] = useState(false);
 
