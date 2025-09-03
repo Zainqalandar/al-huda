@@ -6,7 +6,17 @@ const SurhasList = createContext();
 const SurhasListProvider = ({ children }) => {
 	const [surahs, setSurahs] = useState(null);
 	const [filterSurahs, setFilterSurahs] = useState(null);
+	const [language, setLanguage] = useState('ar');
 	const { surahList, loading, error } = useSurahList();
+	const [isPlaying, setIsPlaying] = useState(false);
+
+	const handleSetPlaying = () => {
+		setIsPlaying(isPlaying);
+	}
+
+	const addLanguage = (len) => {
+		setLanguage(len);
+	};
 
 	let currentPage = 1;
 	const [pageNo, setPageNo] = useState(currentPage);
@@ -33,6 +43,11 @@ const SurhasListProvider = ({ children }) => {
 				error,
 				filterSurahs,
 				addFilterSurahs,
+				language,
+				addLanguage,
+				addLanguage,
+				handleSetPlaying,
+				isPlaying
 			}}
 		>
 			{children}

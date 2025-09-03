@@ -1,7 +1,12 @@
+// 'use client';
 import './globals.css';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import ScrollProgress from '@/components/ui/ScrollProgress';
+// import { createContext, useState } from 'react';
+
+// const GlobarData = createContext();
+// export { GlobarData };
 
 export const metadata = {
 	title: 'Al-Huda',
@@ -12,12 +17,20 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+	// const [language, setLanguage] = useState('tr');
+
+	// const addLanguage = (len) => {
+	// 	setLanguage(len);
+	// };
+
 	return (
 		<html lang="en">
 			<body>
 				<Navbar />
 				<ScrollProgress />
-				{children}
+				{/* <GlobarData.Provider value={{ language, addLanguage }}> */}
+					{children}
+				{/* </GlobarData.Provider> */}
 				<Footer />
 			</body>
 		</html>

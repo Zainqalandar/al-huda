@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Eye } from 'lucide-react';
 import Loading from '@/components/ui/Loading';
 import { useParams } from 'next/navigation';
@@ -19,11 +19,9 @@ const QuranPage = () => {
 	const [surahTwo, setSurahTwo] = useState(null);
 	const [errorTwo, setErrorTwo] = useState(null);
 	const [loadingTwo, setLoadingTwo] = useState(true);
-	const [isPlaying, setIsPlaying] = useState(false);
 
 
 	const { id } = useParams();
-	const audioRef = useRef(null);
 
 	useEffect(() => {
 		setPageNo(JSON.parse(id));
@@ -41,9 +39,7 @@ const QuranPage = () => {
 				const data = await res.json();
 
 				setSurahTwo(data);
-				setTimeout(() => {
-					setLoadingTwo(false);
-				}, 3000);
+				setLoadingTwo(false);
 			} catch (error) {
 				setErrorTwo(error.message);
 				setSurahTwo(null);
@@ -75,18 +71,7 @@ const QuranPage = () => {
 		fetchDataTwo();
 	}, [id]);
 
-	// Toggle Play/Pause
-	const handleAudioToggle = () => {
-		if (!audioRef.current) return;
 
-		if (isPlaying) {
-			audioRef.current.pause();
-			setIsPlaying(false);
-		} else {
-			audioRef.current.play();
-			setIsPlaying(true);
-		}
-	};
 
 	if (loading) return <Loading />; // Show loader
 	if (error || error === undefined) return <Error message={error} />; // Show error if any
@@ -102,14 +87,10 @@ const QuranPage = () => {
 				</p>
 
 				<QuranPageBtn
-					btnInfo={{ handleAudioToggle, isPlaying, loadingTwo, surahTwo }}
+					btnInfo={{   loadingTwo, surahTwo }}
 				/>
 
-				<audio
-					ref={audioRef}
-					src={`https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/002.ogg`}
-					onEnded={() => setIsPlaying(false)}
-				/>
+
 
 				<div className="mt-6 space-y-6">
 					{surah?.ayahs?.map((ayah) => (
