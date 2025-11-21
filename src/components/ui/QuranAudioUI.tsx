@@ -33,6 +33,7 @@ interface QuranAudioBottomBarProps {
 	initialSurah?: number;
 	srcPattern?: (surahNum: number) => string;
 }
+
 export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: QuranAudioBottomBarProps) {
 	const router = useRouter();
 	const context = useContext(SurhasList);
@@ -40,26 +41,11 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 		throw new Error('QuranAudioUI must be used within SurhasListProvider');
 	}
 
-	const { pageNo, setPageNo, language: quranListen, handleSetPlaying } = context;
+	const { pageNo, setPageNo, language: quranListen, handleSetPlaying, isPlaying } = context;
 
-	console.log('language: ', quranListen);
-
-
-
-	// ---------------- INIT SURAH VALIDATION ----------------
-	useEffect(() => {
-		if (!pageNo || pageNo < 1 || pageNo > TOTAL_SURAHS) {
-			setPageNo(initialSurah);
-			router.push(`/quran/${initialSurah}`);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	// ---------------- HELPERS ----------------
+	// ---------------- HELPERS (moved before `src` state) ----------------
 	const buildDefault = (n: number): string =>
-		`https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/${String(
-			n
-		).padStart(3, '0')}.ogg`;
+		`https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/${String(n).padStart(3, '0')}.ogg`;
 
 	const getSeekableEnd = (el: HTMLAudioElement | null): number => {
 		try {
@@ -76,18 +62,6 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 	const rafIdRef = useRef<number | null>(null);
 	const lastFetchedSurahRef = useRef<number | null>(null);
 
-	// ---------------- STATES ----------------
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [duration, setDuration] = useState(0);
-	const [current, setCurrent] = useState(0);
-	const [volume, setVolume] = useState(0.9);
-	const [showVolume, setShowVolume] = useState(false);
-
-	// TR api data
-	const [surahTwo, setSurahTwo] = useState<QuranAPIResponse | null>(null);
-	const [loadingTwo, setLoadingTwo] = useState<boolean>(false);
-	const [errorTwo, setErrorTwo] = useState<string | null>(null);
-
 	// IMPORTANT: keep null when src not available (avoid empty-string warning)
 	const [src, setSrc] = useState<string | null>(() => {
 		const start = pageNo || initialSurah;
@@ -97,6 +71,38 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 			? srcPattern(start)
 			: buildDefault(start);
 	});
+
+	// Auto-play audio when language, surah, or src changes and isPlaying is true
+	useEffect(() => {
+		const el = audioRef.current;
+		if (!el || !src) return;
+		if (isPlaying) {
+			el.play().catch(() => {}); // ignore autoplay block
+		}
+	}, [quranListen, pageNo, src, isPlaying]);
+
+	console.log('language: ', quranListen);
+
+
+
+	// ---------------- INIT SURAH VALIDATION ----------------
+	useEffect(() => {
+		if (!pageNo || pageNo < 1 || pageNo > TOTAL_SURAHS) {
+			setPageNo(initialSurah);
+			router.push(`/quran/${initialSurah}`);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// ---------------- STATES ----------------
+	const [duration, setDuration] = useState(0);
+	const [current, setCurrent] = useState(0);
+	const [volume, setVolume] = useState(0.9);
+	const [showVolume, setShowVolume] = useState(false);
+	// TR api data
+	const [surahTwo, setSurahTwo] = useState<QuranAPIResponse | null>(null);
+	const [loadingTwo, setLoadingTwo] = useState<boolean>(false);
+	const [errorTwo, setErrorTwo] = useState<string | null>(null);
 
 	const resolveSrcForSurah = useCallback((surahNum: number, surahTwoState: QuranAPIResponse | null): string | null => {
 		if (String(quranListen).toLowerCase() === 'ar') {
@@ -231,26 +237,13 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 			setDuration(d);
 		};
 		const onProgress = () => {
-			// Sometimes duration stays 0 but seekable end advances; keep UI responsive
 			if (!duration) setCurrent(el.currentTime || 0);
 		};
 		const onTime = (): void => setCurrent(el.currentTime || 0);
-		const onPlay = (): void => {
-			setIsPlaying(true);
-			handleSetPlaying();
-			startRaf();
-		};
-		const onPause = (): void => {
-			setIsPlaying(false);
-			cancelRaf();
-		};
-		const onEnded = (): void => {
-			setIsPlaying(false);
-			cancelRaf();
-		};
-		const onError = (): void => {
-			// optional: you could surface el.error here
-		};
+		const onPlay = (): void => { startRaf(); };
+		const onPause = (): void => { cancelRaf(); };
+		const onEnded = (): void => { cancelRaf(); };
+		const onError = (): void => { };
 
 		el.addEventListener('loadedmetadata', onLoaded);
 		el.addEventListener('durationchange', onDurationChange);
@@ -288,6 +281,7 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 		try {
 			if (el.paused) await el.play();
 			else el.pause();
+			handleSetPlaying();
 		} catch (error) {
 			// autoplay blocked — ignore
 		}

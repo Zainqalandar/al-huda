@@ -4,10 +4,11 @@ import InfoDropDown from './InfoDropDown';
 import ListenSelectButton from './ListenSelectButton';
 import { SurhasList } from '@/context/SurhasListProvider';
 
+
 const QuranPageBtn = ({ btnInfo }) => {
 	const { loadingTwo, surahTwo: surah } = btnInfo;
 
-	const { addLanguage, language, isPlaying } = useContext(SurhasList);
+	const { handleLanguageChange, language, isPlaying } = useContext(SurhasList);
 
 	// language selection state (ar = Arabic, tr = Translation)
 	const [lang, setLang] = useState(language);
@@ -22,8 +23,8 @@ const QuranPageBtn = ({ btnInfo }) => {
 				loading={loadingTwo}
 				onChangeLanguage={(l: string) => setLang(l as 'tr' | 'ar')}
 				initial={lang}
-				onAddLan={addLanguage}
-		isPlaying={isPlaying}
+				onAddLan={handleLanguageChange}
+				isPlaying={isPlaying}
 			/>
 
 			{/* Tafsir button */}

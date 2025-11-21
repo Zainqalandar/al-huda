@@ -16,6 +16,7 @@ interface SurahListContext {
 	language: Language;
 	addLanguage: (len: Language) => void;
 	handleSetPlaying: () => void;
+	handleLanguageChange: (lang: Language) => void;
 	isPlaying: boolean;
 }
 
@@ -30,10 +31,15 @@ const SurhasListProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const handleSetPlaying = () => {
 		setIsPlaying(prev => !prev);
-	}
+	};
 
 	const addLanguage = (len: Language) => {
 		setLanguage(len);
+	};
+
+	const handleLanguageChange = (lang: Language) => {
+		setLanguage(lang);
+		setIsPlaying(true); // auto-play on language change
 	};
 
 	let currentPage: number = 1;
@@ -42,7 +48,6 @@ const SurhasListProvider = ({ children }: { children: React.ReactNode }) => {
 	const addFilterSurahs = (filterList: any[]) => {
 		setFilterSurahs(filterList);
 	};
-
 
 	useEffect(() => {
 		if (surahList) {
@@ -64,6 +69,7 @@ const SurhasListProvider = ({ children }: { children: React.ReactNode }) => {
 				language,
 				addLanguage,
 				handleSetPlaying,
+				handleLanguageChange,
 				isPlaying
 			}}
 		>
