@@ -103,6 +103,7 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 	const [surahTwo, setSurahTwo] = useState<QuranAPIResponse | null>(null);
 	const [loadingTwo, setLoadingTwo] = useState<boolean>(false);
 	const [errorTwo, setErrorTwo] = useState<string | null>(null);
+	const [playLoading, setPlayLoading] = useState(false);
 
 	const resolveSrcForSurah = useCallback((surahNum: number, surahTwoState: QuranAPIResponse | null): string | null => {
 		if (String(quranListen).toLowerCase() === 'ar') {
@@ -278,9 +279,26 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 	const togglePlay = async (): Promise<void> => {
 		const el = audioRef.current;
 		if (!el || !src) return;
+		if (isPlaying) {
+			el.pause();
+			handleSetPlaying();
+			return;
+		}
+		// If audio is not ready, show loading
+		if (el.readyState < 3) { // HAVE_FUTURE_DATA
+			setPlayLoading(true);
+			const onCanPlay = () => {
+				el.play().catch(() => {});
+				handleSetPlaying();
+				setPlayLoading(false);
+				el.removeEventListener('canplaythrough', onCanPlay);
+			};
+			el.addEventListener('canplaythrough', onCanPlay);
+			el.load();
+			return;
+		}
 		try {
-			if (el.paused) await el.play();
-			else el.pause();
+			await el.play();
 			handleSetPlaying();
 		} catch (error) {
 			// autoplay blocked — ignore
@@ -380,17 +398,19 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 
 								<button
 									onClick={togglePlay}
-									disabled={!src}
+									disabled={!src || loadingTwo || playLoading}
 									className="inline-flex items-center gap-2 bg-emerald-900 px-3 py-1.5 rounded text-sm font-medium hover:bg-emerald-800 disabled:opacity-50"
 									aria-label="Play / Pause"
 								>
-									{isPlaying ? (
+									{loadingTwo || playLoading ? (
+										<svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+									) : isPlaying ? (
 										<Pause className="w-4 h-4" />
 									) : (
 										<Play className="w-4 h-4" />
 									)}
 									<span className="hidden sm:inline">
-										{isPlaying ? 'Pause' : 'Play'}
+										{loadingTwo || playLoading ? 'Loading...' : isPlaying ? 'Pause' : 'Play'}
 									</span>
 								</button>
 

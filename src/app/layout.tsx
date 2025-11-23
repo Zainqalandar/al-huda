@@ -37,7 +37,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 				{/* <GlobarData.Provider value={{ language, addLanguage }}> */}
 					{children}
 				{/* </GlobarData.Provider> */}
-				<Footer />
+				{/* <Footer /> */}
 			</body>
 		</html>
 	);

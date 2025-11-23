@@ -1,6 +1,11 @@
 import { Loader2 } from "lucide-react";
 
-export default function Loading({ style="min-h-screen", isText=true }) {
+interface LoadingProps {
+  style?: string;
+  isText?: boolean;
+}
+
+export default function Loading({ style = "min-h-screen", isText = true }: LoadingProps) {
   return (
     <div className={`flex items-center justify-center bg-gradient-to-br from-green-900 via-green-700 to-green-950 ${style}`}>
       <div className="flex flex-col items-center space-y-4">
