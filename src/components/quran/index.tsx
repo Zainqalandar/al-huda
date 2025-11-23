@@ -46,9 +46,17 @@ export default function SurahList() {
 						</p>
 					</div>
 
-					<div className="text-green-800 font-bold text-xl">
-						{surah.surahNameArabic}
-					</div>
+						<div
+							className="text-green-800 font-bold text-2xl arabic-font drop-shadow-sm"
+							style={{
+								fontFamily: `'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif`,
+								direction: 'rtl',
+								color: '#176B87',
+								textShadow: '0 1px 4px #b2dfdb',
+							}}
+						>
+							{surah.surahNameArabic}
+						</div>
 				</Link>
 			))}
 		</div>

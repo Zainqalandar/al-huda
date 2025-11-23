@@ -99,17 +99,28 @@ const QuranPage = () => {
 					{surah?.ayahs?.map((ayah) => (
 						<div
 							key={ayah.number}
-							className="p-4 bg-green-100 border border-green-200 rounded-xl shadow-sm hover:shadow-md transition"
+							className="p-6 bg-gradient-to-br from-green-50 via-white to-green-100 border border-green-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 group relative overflow-hidden"
 						>
-							<p className="text-2xl text-green-900 text-right leading-relaxed font-medium">
-								{ayah.text}۝
+							{/* Decorative background pattern */}
+							<div className="absolute inset-0 pointer-events-none opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]" />
+
+							<p
+								className="text-2xl text-green-900 text-right leading-relaxed font-semibold arabic-font drop-shadow-sm z-10 relative"
+								style={{
+									fontFamily: `'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif`,
+									direction: 'rtl',
+									color: 'rgb(23 135 48)',
+									textShadow: '0 1px 4px #b2dfdb',
+								}}
+							>
+								{ayah.text} <span className="text-green-400 text-lg align-middle">۝</span>
 							</p>
 
-							<div className="flex justify-between items-center mt-3">
-								<span className="text-sm text-green-700">
+							<div className="flex justify-between items-center mt-4 z-10 relative">
+								<span className="inline-block bg-green-200 text-green-800 rounded-full px-3 py-1 text-xs font-bold shadow-sm border border-green-300">
 									Ayah {ayah.numberInSurah}
 								</span>
-								<button className="flex items-center gap-1 text-green-600 hover:text-green-800">
+								<button className="flex items-center gap-1 text-white bg-green-600 hover:bg-green-700 transition px-3 py-1.5 rounded-full shadow-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
 									<Eye size={16} /> View
 								</button>
 							</div>
