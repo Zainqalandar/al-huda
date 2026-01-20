@@ -1,19 +1,58 @@
-/* Arabic font import for Surah names */
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Noto+Naskh+Arabic:wght@700&family=Scheherazade+New:wght@700&display=swap');
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Amiri+Quran&family=Cormorant+Garamond:wght@500;600;700&family=Lateef&family=Manrope:wght@400;500;600&family=Noto+Naskh+Arabic:wght@700&family=Scheherazade+New:wght@700&display=swap');
 
-/* Optional: Utility class for Arabic font */
+:root {
+  --quran-ink: #14342b;
+  --quran-emerald: #1f7a5d;
+  --quran-emerald-deep: #0f5b44;
+  --quran-gold: #c79a42;
+  --quran-sand: #f6f2e7;
+  --quran-paper: #fdfbf6;
+  --quran-mist: #eef4ef;
+  --quran-shadow: rgba(20, 52, 43, 0.18);
+}
+
+.font-display {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.font-body {
+  font-family: 'Manrope', sans-serif;
+}
+
+.font-arabic {
+  font-family: 'Amiri Quran', 'Scheherazade New', 'Lateef', serif;
+}
+
 .arabic-font {
   font-family: 'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif;
   direction: rtl;
   letter-spacing: 0.5px;
   font-weight: 700;
 }
-@import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Lateef&family=Scheherazade+New&display=swap');
+@keyframes quran-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-.font-arabic {
-  font-family: 'Amiri Quran', 'Scheherazade New', 'Lateef', serif;
+@keyframes quran-soft-glow {
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.quran-fade-up {
+  animation: quran-fade-up 0.7s ease-out both;
 }
 
 

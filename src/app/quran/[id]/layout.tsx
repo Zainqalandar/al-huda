@@ -21,7 +21,7 @@ const QuranChildPageLayout = ({ children }) => {
 	return (
 		<>
 			<div className=" mt-16">
-				<div className="flex  flex-col bg-green-50">
+				<div className="flex flex-col bg-[var(--quran-sand)]">
 					<AppBarHeader onSidebarOpen={setSidebarOpen} />
 					<Drawer
 						onSidebarOpen={setSidebarOpen}

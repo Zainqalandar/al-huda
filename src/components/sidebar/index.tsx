@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Eye } from 'lucide-react';
 import Loading from '@/components/ui/Loading';
 import { useParams } from 'next/navigation';
@@ -79,57 +79,76 @@ const QuranPage = () => {
 	if (loading) return <Loading />; // Show loader
 	if (error || error === undefined) return <ErrorUI message={error} />; // Show error if any
 	return (
-		<div className="min-h-screen bg-green-50 p-2 sm:p-6 flex flex-col items-center">
-			<div className="bg-white rounded-2xl  shadow-lg w-full max-w-3xl p-4 sm:p-6 border border-green-200">
-				<h1 className="text-3xl font-bold text-green-800 text-center">
-					{surah?.englishName} ({surah?.englishNameTranslation})
-				</h1>
-				<p className="text-lg text-green-600 text-center mb-4">
-					Surah {surah?.name} - {surah?.revelationType} (
-					{surah?.numberOfAyahs} Ayahs)
-				</p>
+		<div className="relative min-h-screen w-full font-body text-[var(--quran-ink)]">
+			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_-200px,rgba(31,122,93,0.24),transparent)]" />
+			<div className="pointer-events-none absolute -top-24 right-[-12%] h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(199,154,66,0.4),transparent_70%)] blur-2xl" />
+			<div className="pointer-events-none absolute bottom-[-140px] left-[-8%] h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(31,122,93,0.35),transparent_70%)] blur-2xl" />
 
-				<QuranPageBtn
-					btnInfo={{   loadingTwo, surahTwo }}
-				/>
-
-
-
-				<div className="mt-6 space-y-6">
-					{surah?.ayahs?.map((ayah) => (
-						<div
-							key={ayah.number}
-							className="p-6 bg-gradient-to-br from-green-50 via-white to-green-100 border border-green-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 group relative overflow-hidden"
-						>
-							{/* Decorative background pattern */}
-							<div className="absolute inset-0 pointer-events-none opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]" />
-
-							<p
-								className="text-2xl text-green-900 text-right leading-relaxed font-semibold arabic-font drop-shadow-sm z-10 relative"
-								style={{
-									fontFamily: `'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif`,
-									direction: 'rtl',
-									color: 'rgb(23 135 48)',
-									textShadow: '0 1px 4px #b2dfdb',
-								}}
-							>
-								{ayah.text} <span className="text-green-400 text-lg align-middle">۝</span>
-							</p>
-
-							<div className="flex justify-between items-center mt-4 z-10 relative">
-								<span className="inline-block bg-green-200 text-green-800 rounded-full px-3 py-1 text-xs font-bold shadow-sm border border-green-300">
-									Ayah {ayah.numberInSurah}
-								</span>
-								<button className="flex items-center gap-1 text-white bg-green-600 hover:bg-green-700 transition px-3 py-1.5 rounded-full shadow-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
-									<Eye size={16} /> View
-								</button>
+			<div className="relative mx-auto max-w-4xl px-4 pb-20 pt-6 sm:pt-10">
+				<section className="rounded-3xl border border-emerald-200/70 bg-[var(--quran-paper)] p-6 sm:p-8 shadow-[0_20px_50px_-30px_var(--quran-shadow)] backdrop-blur-sm">
+					<div className="flex flex-col gap-6">
+						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+							<div>
+								<p className="text-[11px] uppercase tracking-[0.3em] text-[color:var(--quran-emerald)] opacity-70">
+									Surah {surah?.number}
+								</p>
+								<h1 className="font-display text-3xl sm:text-4xl text-[var(--quran-ink)]">
+									{surah?.englishName}
+								</h1>
+								<p className="text-sm text-[color:var(--quran-emerald-deep)] opacity-80">
+									{surah?.englishNameTranslation}
+								</p>
+							</div>
+							<div className="text-right">
+								<div className="arabic-font text-3xl text-[var(--quran-ink)]">
+									{surah?.name}
+								</div>
+								<p className="text-xs text-[color:var(--quran-emerald-deep)] opacity-70">
+									Revelation: {surah?.revelationType}
+								</p>
 							</div>
 						</div>
+
+						<div className="flex flex-wrap gap-2 text-xs">
+							<span className="rounded-full bg-emerald-100/80 px-3 py-1 font-semibold text-emerald-900">
+								{surah?.numberOfAyahs} Ayahs
+							</span>
+							<span className="rounded-full bg-amber-100/80 px-3 py-1 font-semibold text-amber-900">
+								{surah?.revelationType}
+							</span>
+						</div>
+
+						<QuranPageBtn btnInfo={{ loadingTwo, surahTwo }} />
+					</div>
+				</section>
+
+				<section className="mt-10 space-y-6">
+					{surah?.ayahs?.map((ayah, index) => (
+						<article
+							key={ayah.number}
+							style={{ animationDelay: `${index * 25}ms` }}
+							className="group relative overflow-hidden rounded-2xl border border-emerald-200/70 bg-white/80 p-5 sm:p-6 shadow-[0_16px_40px_-28px_var(--quran-shadow)] transition-all duration-200 quran-fade-up"
+						>
+							<div className="pointer-events-none absolute inset-0 opacity-0 transition duration-200 group-hover:opacity-100 bg-[radial-gradient(520px_200px_at_10%_10%,rgba(31,122,93,0.16),transparent)]" />
+							<div className="relative">
+								<div className="flex items-center justify-between">
+									<span className="inline-flex items-center rounded-full bg-emerald-100/80 px-3 py-1 text-xs font-semibold text-emerald-900">
+										Ayah {ayah.numberInSurah}
+									</span>
+									<button className="flex items-center gap-1 rounded-full bg-[var(--quran-emerald)] text-white px-3 py-1.5 text-sm font-medium shadow-sm hover:bg-[var(--quran-emerald-deep)] focus:outline-none focus:ring-2 focus:ring-emerald-200 transition">
+										<Eye size={16} /> View
+									</button>
+								</div>
+
+								<p className="mt-4 text-2xl sm:text-3xl text-right leading-relaxed arabic-font text-[var(--quran-ink)]">
+									{ayah.text}{' '}
+									<span className="text-amber-500 text-lg align-middle">۝</span>
+								</p>
+							</div>
+						</article>
 					))}
-				</div>
+				</section>
 			</div>
-
-
 		</div>
 	);
 };

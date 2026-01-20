@@ -38,10 +38,10 @@ const Items = ({ surahs, OnActive, onSetActive, OnSidebarOpen }: ItemsProps) => 
 						router.push(`/quran/${s.id}`);
 						if (window.innerWidth < 768) OnSidebarOpen(false);
 					}}
-					className={`flex items-center justify-between w-full px-4 py-2 text-left text-sm transition ${
+					className={`flex items-center justify-between w-full px-4 py-2 text-left text-sm transition rounded-lg ${
 						activeId === s.id
-							? 'bg-green-700 text-white font-semibold'
-							: 'text-green-200 hover:bg-green-800'
+							? 'bg-emerald-700/80 text-white font-semibold shadow-sm'
+							: 'text-emerald-200 hover:bg-emerald-900/50'
 					}`}
 				>
 					<span>
@@ -50,8 +50,8 @@ const Items = ({ surahs, OnActive, onSetActive, OnSidebarOpen }: ItemsProps) => 
 					<span
 						className={`w-6 h-6 flex items-center justify-center rounded-full text-xs ${
 							activeId === s.id
-								? 'bg-green-600 text-white'
-								: 'bg-green-900 text-green-400'
+								? 'bg-emerald-600 text-white'
+								: 'bg-emerald-950 text-emerald-400'
 						}`}
 					>
 						{s.id}

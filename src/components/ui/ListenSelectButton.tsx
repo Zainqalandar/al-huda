@@ -19,8 +19,8 @@ export default function ListenSelectButton({
 	isPlaying,
 }: ListenSelectButtonProps) {
 	const LANGS = [
-		{ key: 'ar', label: 'Listen Arbi' },
-		{ key: 'tr', label: 'Listen Translation' },
+		{ key: 'ar', label: 'Arabic Recitation' },
+		{ key: 'tr', label: 'Urdu Translation' },
 	];
 
 	const [selected, setSelected] = useState(initial);
@@ -49,8 +49,6 @@ export default function ListenSelectButton({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	console.log('isPlaying', isPlaying)
-
 	const selectedLabel =
 		LANGS.find((l) => l.key === selected)?.label ?? 'Listen';
 
@@ -59,7 +57,7 @@ export default function ListenSelectButton({
 			{/* Main button */}
 			<button
 				// onClick={() => onToggle(selected)}
-				className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-l-xl rounded-r-none shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+				className="flex items-center gap-2 rounded-l-xl rounded-r-none bg-[var(--quran-emerald)] text-white px-4 py-2 shadow hover:bg-[var(--quran-emerald-deep)] focus:outline-none focus:ring-2 focus:ring-emerald-200 transition"
 			>
 				{isPlaying ? <Pause size={16} /> : <Play size={16} />}
 				<span className="text-sm font-medium">
@@ -70,14 +68,16 @@ export default function ListenSelectButton({
 			{/* Split button dropdown */}
 			<button
 				onClick={() => setOpen((s) => !s)}
-				className="flex items-center justify-center bg-green-600 text-white px-3 py-2 rounded-r-xl shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+				aria-expanded={open}
+				aria-haspopup="listbox"
+				className="flex items-center justify-center rounded-r-xl bg-[var(--quran-emerald)] text-white px-3 py-2 shadow hover:bg-[var(--quran-emerald-deep)] focus:outline-none focus:ring-2 focus:ring-emerald-200 transition"
 			>
 				<ChevronDown size={16} />
 			</button>
 
 			{/* Dropdown menu */}
 			{open && (
-				<div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+				<div className="absolute right-0 mt-2 w-52 rounded-xl bg-[var(--quran-paper)] text-[var(--quran-ink)] shadow-lg ring-1 ring-black/5 z-50">
 					<div className="py-1">
 						{LANGS.map((l) => {
 							const active = l.key === selected;
@@ -90,15 +90,15 @@ export default function ListenSelectButton({
 										onAddLan(l.key)
 										setOpen(false);
 									}}
-									className={`w-full text-left flex items-center justify-between gap-2 px-4 py-2 text-sm hover:bg-gray-50 ${
-										active ? 'font-semibold' : ''
+									className={`w-full text-left flex items-center justify-between gap-2 px-4 py-2 text-sm hover:bg-emerald-50 ${
+										active ? 'font-semibold text-emerald-900' : 'text-[var(--quran-ink)]'
 									}`}
 								>
 									<span>{l.label}</span>
 									{active && (
 										<Check
 											size={14}
-											className="text-green-600"
+											className="text-emerald-600"
 										/>
 									)}
 								</button>

@@ -13,8 +13,8 @@ import { useRouter } from 'next/navigation';
 import { SurhasList } from '@/context/SurhasListProvider';
 
 const TOTAL_SURAHS: number = 114;
-// 'ar' -> archive.org Urdu translation (.ogg)
-// 'tr' -> quranapi.pages.dev (JSON -> audio[].originalUrl)
+// 'tr' -> archive.org Urdu translation (.ogg)
+// 'ar' -> quranapi.pages.dev (JSON -> audio[].originalUrl)
 // const quranListen = 'tr'; // <— yahan apni desired value set karna
 
 // ============ TYPES ============
@@ -87,10 +87,6 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 		}
 		prevLanguageRef.current = currentLang;
 	}, [quranListen, src, handleSetPlaying]);
-
-	console.log('language: ', quranListen);
-
-
 
 	// ---------------- INIT SURAH VALIDATION ----------------
 	useEffect(() => {
@@ -426,13 +422,13 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 	const coverUrl = (surahTwo && (surahTwo.image || surahTwo.cover || surahTwo.coverImage)) || null;
 
 	return (
-		<div className="fixed bottom-2 left-2 right-2 md:bottom-4 md:left-4 md:right-4 z-50">
-			<div className="bg-gradient-to-r from-emerald-700/95 to-emerald-800/95 text-white rounded-2xl shadow-2xl border border-emerald-600/60 backdrop-blur-sm">
+		<div className="fixed bottom-2 left-2 right-2 md:bottom-4 md:left-4 md:right-4 z-50 font-body">
+			<div className="bg-[linear-gradient(135deg,rgba(15,91,68,0.98),rgba(20,52,43,0.98))] text-white rounded-2xl shadow-2xl border border-emerald-800/60 backdrop-blur-sm">
 				<div className="max-w-7xl mx-auto px-3 md:px-4">
 					<div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 py-3 md:py-4">
 						{/* Left: artwork + track info */}
 						<div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-							<div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-emerald-900 rounded-md overflow-hidden flex-shrink-0 shadow-inner flex items-center justify-center ring-1 ring-emerald-500/20">
+							<div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-emerald-950 rounded-md overflow-hidden flex-shrink-0 shadow-inner flex items-center justify-center ring-1 ring-emerald-500/20">
 								{coverUrl ? (
 									// eslint-disable-next-line @next/next/no-img-element
 									<img src={coverUrl} alt={`Surah ${currentSurah} cover`} className="w-full h-full object-cover" />
@@ -443,7 +439,7 @@ export default function QuranAudioBottomBar({ initialSurah = 1, srcPattern }: Qu
 
 							<div className="min-w-0 flex-1 sm:flex-none">
 								<div className="text-sm md:text-base font-semibold leading-tight truncate">{surahTwo?.englishName || `Surah ${currentSurah}`}</div>
-								<div className="text-[11px] md:text-xs text-emerald-100/80 truncate">{String(quranListen).toLowerCase() === 'ar' ? 'Turkish audio' : 'Urdu audio'}</div>
+								<div className="text-[11px] md:text-xs text-emerald-100/80 truncate">{String(quranListen).toLowerCase() === 'ar' ? 'Arabic recitation' : 'Urdu translation'}</div>
 							</div>
 						</div>
 

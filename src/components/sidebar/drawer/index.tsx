@@ -52,7 +52,7 @@ const Drawer: React.FC<DrawerProps> = ({ onSidebarOpen, sidebarOpen }) => {
 		<>
 			{/* Sidebar */}
 			<div
-				className={`fixed md:fixed left-0 h-[calc(100%-57px)] w-64 bg-green-950 text-green-50 flex flex-col border-r border-green-800 transform transition-transform duration-200 z-51 md:z-50
+				className={`fixed md:fixed left-0 h-[calc(100%-57px)] w-64 bg-[linear-gradient(180deg,#0f2f28,#0b241f)] text-emerald-100 flex flex-col border-r border-emerald-900/60 transform transition-transform duration-200 z-51 md:z-50
 					${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
 				`}
 				style={{

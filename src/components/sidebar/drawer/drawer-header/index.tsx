@@ -20,12 +20,12 @@ const DrawerHeader = ({ surahs, onSidebarOpen }: DrawerHeaderProps) => {
 	
 
 	return (
-		<div className="px-4 py-3 border-b border-green-800 flex items-center justify-between">
-			<h2 className="text-lg font-bold text-green-200">
+		<div className="px-4 py-3 border-b border-emerald-900/60 flex items-center justify-between">
+			<h2 className="text-lg font-bold text-emerald-100 font-display">
 				{surahs?.find((s) => s.id === activeId)?.surahName}
 			</h2>
 			<button
-				className="text-green-300 cursor-pointer"
+				className="text-emerald-300 cursor-pointer hover:text-emerald-100 transition"
 				onClick={() => onSidebarOpen(false)}
 			>
 				<X size={20} />

@@ -28,52 +28,85 @@ const InfoDropDown: React.FC<InfoDropDownProps> = ({ surah }) => {
 
 
 	return (
-		<>
+		<div className="relative">
 			<button
 				onClick={() => setOpen(!open)}
-				className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl shadow cursor-pointer hover:bg-green-700"
+				aria-expanded={open}
+				aria-haspopup="true"
+				className="flex items-center gap-2 rounded-xl bg-[var(--quran-emerald)] text-white px-4 py-2 shadow hover:bg-[var(--quran-emerald-deep)] transition"
 			>
 				<Info size={18} /> Info
 			</button>
 
 			{open && (
-				<div className="relative inline-block text-left w-full sm:w-auto">
-					<div className="absolute top-[-20px] sm:top-[38px] sm:left-[-106px] z-20 mt-2 right-0 w-full sm:w-96 max-h-[80vh] overflow-y-auto rounded-xl shadow-lg bg-green-50 border border-green-200">
+				<div className="absolute left-0 mt-3 z-20 w-[min(92vw,420px)] max-h-[80vh] overflow-y-auto rounded-2xl border border-emerald-200/70 bg-[var(--quran-paper)] shadow-2xl">
 						{surah ? (
-							<div className="p-4 space-y-4 text-sm text-green-900">
+						<div className="p-4 space-y-4 text-sm text-[var(--quran-ink)]">
 								<div>
-									<h2 className="text-xl font-bold text-green-900 sm:text-red-900">
-										{surah.surahNameArabicLong} ({surah.surahNo})
-									</h2>
-									<p className="text-sm text-green-700">
-										{surah.surahName} - {surah.surahNameTranslation}
-									</p>
-									<p className="mt-1 text-xs text-green-600">
-										Revealed in {surah.revelationPlace} · {surah.totalAyah} Ayahs
-									</p>
+									<div className="flex items-start justify-between gap-3">
+										<div>
+											<p className="text-[11px] uppercase tracking-[0.3em] text-[color:var(--quran-emerald)] opacity-70">
+												Surah Info
+											</p>
+											<h2 className="arabic-font text-2xl text-[var(--quran-ink)]">
+												{surah.surahNameArabicLong}
+											</h2>
+											<p className="text-sm text-[color:var(--quran-emerald-deep)] opacity-80">
+												{surah.surahName} - {surah.surahNameTranslation}
+											</p>
+										</div>
+										<span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">
+											#{surah.surahNo}
+										</span>
+									</div>
+									<div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-emerald-900">
+										<span className="rounded-full bg-emerald-50 px-3 py-1 font-semibold">
+											{surah.revelationPlace}
+										</span>
+										<span className="rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-800">
+											{surah.totalAyah} Ayahs
+										</span>
+									</div>
 								</div>
 								<div>
-									<h3 className="font-semibold text-green-800 mb-2">Recitations</h3>
+									<h3 className="text-[11px] uppercase tracking-[0.3em] text-[color:var(--quran-emerald)] opacity-70 mb-2">
+										Recitations
+									</h3>
 									<ul className="space-y-2">
-										{(surah && surah.audio ? (Object.values(surah.audio) as Array<{ reciter?: string; url?: string }>) : []).map((reciter, idx) => (
-											<li key={idx} className="flex items-center justify-between bg-green-100 rounded-lg p-2">
-												<span className="text-sm">{reciter.reciter}</span>
-												<button onClick={() => handlePlay(reciter.url)} className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700">
-													{currentAudio === reciter.url ? <Pause size={16} /> : <Play size={16} />}
-												</button>
-											</li>
-										))}
+										{(surah && surah.audio ? (Object.values(surah.audio) as Array<{ reciter?: string; url?: string }>) : []).map((reciter, idx) => {
+											const active = currentAudio === reciter.url;
+											return (
+												<li
+													key={idx}
+													className={`flex items-center justify-between rounded-xl border px-3 py-2 ${
+														active
+															? 'border-emerald-300 bg-emerald-50'
+															: 'border-emerald-100/80 bg-white/80'
+													}`}
+												>
+													<span className="text-sm text-[var(--quran-ink)]">
+														{reciter.reciter || 'Reciter'}
+													</span>
+													<button
+														onClick={() => handlePlay(reciter.url)}
+														className="p-2 rounded-full bg-[var(--quran-emerald)] text-white hover:bg-[var(--quran-emerald-deep)] transition"
+														aria-label={active ? 'Pause recitation' : 'Play recitation'}
+													>
+														{active ? <Pause size={16} /> : <Play size={16} />}
+													</button>
+												</li>
+											);
+										})}
 									</ul>
 								</div>
 							</div>
 						) : (
-							<p>Loading...</p>
+							<p className="p-4 text-sm text-[color:var(--quran-emerald-deep)] opacity-80">Loading...</p>
 						)}
 					</div>
-					<audio ref={audioRef} onEnded={() => setCurrentAudio(null)} />
-				</div>
 			)}
-		</>
+			<audio ref={audioRef} onEnded={() => setCurrentAudio(null)} />
+		</div>
 	);
 };
 

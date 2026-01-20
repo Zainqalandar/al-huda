@@ -23,6 +23,9 @@ const AppBarHeader = ({ onSidebarOpen }: AppBarHeaderProps) => {
 	const activeIdNum = activeId ? parseInt(activeId, 10) : undefined;
 
 	const { surahs } = useContext(SurhasList);
+	const activeSurah = surahs?.find((s: SurahItem) => s.id === activeIdNum);
+	const headerTitle = activeSurah?.surahNameArabicLong || "Quran App";
+	const headerTitleClass = activeSurah?.surahNameArabicLong ? "arabic-font" : "font-display";
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -42,20 +45,20 @@ const AppBarHeader = ({ onSidebarOpen }: AppBarHeaderProps) => {
 
 	return (
 		<header
-			className={`bg-white border-b border-gray-200 h-[50px] flex items-center px-4 fixed left-0 right-0 z-40 shadow-sm transition-all duration-300 ${
+			className={`bg-[var(--quran-paper)] border-b border-emerald-100/80 h-[50px] flex items-center px-4 fixed left-0 right-0 z-40 shadow-sm backdrop-blur transition-all duration-300 ${
 				headerVisible ? "top-[56px]" : "top-0"
 			}`}
 		>
 			{/* Left Section: Menu + Surah Name */}
 			<div className="flex items-center gap-3">
 				<button
-					className="text-gray-700 hover:text-green-600 transition cursor-pointer"
+					className="text-[var(--quran-emerald)] hover:text-[var(--quran-emerald-deep)] transition cursor-pointer"
 					onClick={() => onSidebarOpen(prev => !prev)}
 				>
 					<PanelLeft size={20} />
 				</button>
-				<h1 className="text-lg font-semibold text-green-900">
-					{surahs?.find((s: SurahItem) => s.id === activeIdNum)?.surahNameArabicLong || "Quran App"}
+				<h1 className={`text-lg font-semibold text-[var(--quran-ink)] ${headerTitleClass}`}>
+					{headerTitle}
 				</h1>
 			</div>
 		</header>
