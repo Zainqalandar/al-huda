@@ -38,7 +38,7 @@ import type {
   UrduTafsirEntry,
 } from '@/types/quran';
 import { useAppSettings } from '@/components/providers/app-settings-provider';
-import { clampRange, isValidSurahId } from '@/lib/quran-utils';
+import { clampRange, formatAudioTime, isValidSurahId } from '@/lib/quran-utils';
 
 interface AyahWithTranslation {
   ayah: SurahAyah;
@@ -60,6 +60,21 @@ function getTranslationAudioUrl(surahNumber: number) {
   return `https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/${String(
     surahNumber
   ).padStart(3, '0')}.ogg`;
+}
+
+function getAudioDuration(audio: HTMLAudioElement) {
+  if (Number.isFinite(audio.duration) && audio.duration > 0) {
+    return audio.duration;
+  }
+
+  if (audio.seekable.length > 0) {
+    const seekableEnd = audio.seekable.end(audio.seekable.length - 1);
+    if (Number.isFinite(seekableEnd) && seekableEnd > 0) {
+      return seekableEnd;
+    }
+  }
+
+  return 0;
 }
 
 function escapeRegExp(input: string) {
@@ -134,6 +149,8 @@ export default function QuranReaderPage() {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayPending, setIsPlayPending] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
 
   const [tafseerOpen, setTafseerOpen] = useState(false);
   const [tafseerAyahNumber, setTafseerAyahNumber] = useState<number | null>(null);
@@ -310,11 +327,15 @@ export default function QuranReaderPage() {
       audio.removeAttribute('src');
       audio.load();
       setIsPlaying(false);
+      setAudioCurrentTime(0);
+      setAudioDuration(0);
       return;
     }
 
     audio.src = audioSrc;
     audio.load();
+    setAudioCurrentTime(0);
+    setAudioDuration(0);
 
     if (settings.autoPlayAudio) {
       audio
@@ -333,6 +354,27 @@ export default function QuranReaderPage() {
       return;
     }
 
+    const refreshDuration = () => {
+      setAudioDuration(getAudioDuration(audio));
+    };
+
+    const onLoaded = () => {
+      refreshDuration();
+    };
+    const onDurationChange = () => {
+      refreshDuration();
+    };
+    const onCanPlay = () => {
+      refreshDuration();
+    };
+    const onProgress = () => {
+      refreshDuration();
+    };
+    const onTime = () => {
+      setAudioCurrentTime(audio.currentTime || 0);
+      refreshDuration();
+    };
+
     const onPlay = () => {
       setIsPlaying(true);
       setIsPlayPending(false);
@@ -346,18 +388,28 @@ export default function QuranReaderPage() {
       setIsPlayPending(false);
     };
 
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('durationchange', onDurationChange);
+    audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('progress', onProgress);
+    audio.addEventListener('timeupdate', onTime);
     audio.addEventListener('play', onPlay);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnd);
     audio.addEventListener('error', onEnd);
 
     return () => {
+      audio.removeEventListener('loadedmetadata', onLoaded);
+      audio.removeEventListener('durationchange', onDurationChange);
+      audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('progress', onProgress);
+      audio.removeEventListener('timeupdate', onTime);
       audio.removeEventListener('play', onPlay);
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('ended', onEnd);
       audio.removeEventListener('error', onEnd);
     };
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     if (!tafseerOpen) {
@@ -441,8 +493,38 @@ export default function QuranReaderPage() {
     }
   };
 
+  const handleSeekChange = (rawValue: number) => {
+    const audio = audioRef.current;
+    if (!audio || !Number.isFinite(rawValue)) {
+      return;
+    }
+
+    const effectiveDuration =
+      audioDuration > 0 ? audioDuration : getAudioDuration(audio);
+
+    if (effectiveDuration <= 0) {
+      setAudioSourceError('Seek audio start hone ke baad available hogi.');
+      return;
+    }
+
+    const nextValue = clampRange(rawValue, 0, effectiveDuration);
+    try {
+      audio.currentTime = nextValue;
+      setAudioCurrentTime(nextValue);
+      setAudioDuration(effectiveDuration);
+      setAudioSourceError(null);
+    } catch {
+      setAudioSourceError('Seek is waqt apply nahi ho saki. Dubara try karein.');
+    }
+  };
+
   const toggleAudioPlay = async () => {
     const audio = audioRef.current;
+    if (loadingAudioSource) {
+      setAudioSourceError('Audio source load ho rahi hai. Thora wait karein.');
+      return;
+    }
+
     if (!audio || !audioSrc) {
       setAudioSourceError('Audio source abhi ready nahi hai.');
       return;
@@ -504,15 +586,24 @@ export default function QuranReaderPage() {
                   <p className="arabic-font text-3xl text-[var(--color-heading)]">
                     {surahDetail.name}
                   </p>
-                  <Button
-                    variant={favorite ? 'default' : 'outline'}
-                    size="sm"
-                    className="mt-3"
-                    onClick={() => toggleFavoriteSurah(surahId)}
-                  >
-                    <Heart className={`size-4 ${favorite ? 'fill-current' : ''}`} />
-                    {favorite ? 'Favorited' : 'Favorite Surah'}
-                  </Button>
+                  <div className="mt-3 flex flex-wrap justify-end gap-2">
+                    <Button
+                      size="sm"
+                      onClick={toggleAudioPlay}
+                      aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+                    >
+                      {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
+                      {isPlaying ? 'Pause Audio' : 'Play Audio'}
+                    </Button>
+                    <Button
+                      variant={favorite ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => toggleFavoriteSurah(surahId)}
+                    >
+                      <Heart className={`size-4 ${favorite ? 'fill-current' : ''}`} />
+                      {favorite ? 'Favorited' : 'Favorite Surah'}
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -533,6 +624,97 @@ export default function QuranReaderPage() {
                   </Button>
                 </div>
               ) : null}
+
+              <div className="mt-4 space-y-3 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
+                      Audio Control
+                    </p>
+                    <p className="mt-1 font-display text-xl text-[var(--color-heading)]">
+                      {activeReciterName}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant={settings.audioPreference === 'ar' ? 'default' : 'outline'}
+                      onClick={() => setAudioPreference('ar')}
+                    >
+                      Arabic Voice
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={settings.audioPreference === 'tr' ? 'default' : 'outline'}
+                      onClick={() => setAudioPreference('tr')}
+                    >
+                      Urdu Translation
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={audioDuration > 0 ? audioDuration : 1}
+                    step={0.1}
+                    value={
+                      audioDuration > 0
+                        ? clampRange(audioCurrentTime, 0, audioDuration)
+                        : 0
+                    }
+                    onChange={(event) => handleSeekChange(Number(event.target.value))}
+                    onInput={(event) =>
+                      handleSeekChange(Number((event.target as HTMLInputElement).value))
+                    }
+                    className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[color-mix(in_oklab,var(--color-surface-3),#c79a42_24%)] accent-[var(--color-accent)]"
+                    aria-label="Audio seek"
+                  />
+                  <div className="mt-1 flex items-center justify-between text-xs text-[var(--color-muted-text)]">
+                    <span>{formatAudioTime(audioCurrentTime)}</span>
+                    <span>{formatAudioTime(audioDuration)}</span>
+                  </div>
+                </div>
+
+                {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
+                  <div>
+                    <label htmlFor="reader-reciter-top" className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
+                      Voice
+                    </label>
+                    <div className="relative sm:max-w-sm">
+                      <select
+                        id="reader-reciter-top"
+                        className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium dark:bg-gray-500/50"
+                        value={selectedReciter}
+                        onChange={(event) => setSelectedReciter(Number(event.target.value))}
+                        aria-label="Reciter voice"
+                      >
+                        {audioReciters.map((reciter, index) => (
+                          <option key={`${reciter.reciter}-${index}`} value={index}>
+                            {reciter.reciter ?? `Reciter ${index + 1}`}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[var(--color-muted-text)]">
+                    {settings.audioPreference === 'tr'
+                      ? 'Translation mode enabled.'
+                      : 'Arabic recitation voices unavailable for this surah.'}
+                  </p>
+                )}
+
+                {loadingAudioSource ? (
+                  <p className="text-xs text-[var(--color-muted-text)]">Loading audio source...</p>
+                ) : null}
+                {audioSourceError ? (
+                  <p className="text-xs text-[var(--color-danger)]">{audioSourceError}</p>
+                ) : null}
+                <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
+              </div>
             </CardHeader>
           </Card>
 
@@ -576,91 +758,6 @@ export default function QuranReaderPage() {
                 </div>
               </div>
             </CardContent>
-
-            <div className="border-t border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[color-mix(in_oklab,var(--color-surface),transparent_6%)] p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
-                    Audio Control
-                  </p>
-                  <p className="mt-1 font-display text-xl text-[var(--color-heading)]">
-                    {activeReciterName}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant={settings.audioPreference === 'ar' ? 'default' : 'outline'}
-                    onClick={() => setAudioPreference('ar')}
-                  >
-                    Arabic Voice
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={settings.audioPreference === 'tr' ? 'default' : 'outline'}
-                    onClick={() => setAudioPreference('tr')}
-                  >
-                    Urdu Translation
-                  </Button>
-                </div>
-              </div>
-
-              <div className="mt-3 grid gap-3 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-                <Button
-                  size="icon"
-                  onClick={toggleAudioPlay}
-                  disabled={loadingAudioSource || !audioSrc}
-                  aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
-                >
-                  {isPlaying ? <Pause className="size-5" /> : <Play className="size-5" />}
-                </Button>
-
-                <p className="text-sm text-[var(--color-muted-text)]">
-                  {isPlaying ? 'Audio chal rahi hai.' : 'Audio play karne ke liye button dabayen.'}
-                </p>
-
-                <div />
-              </div>
-
-              {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
-                <div className="mt-3">
-                  <label htmlFor="reader-reciter" className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                    Voice
-                  </label>
-                  <div className="relative sm:max-w-sm">
-                    <select
-                      id="reader-reciter"
-                      className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium"
-                      value={selectedReciter}
-                      onChange={(event) => setSelectedReciter(Number(event.target.value))}
-                      aria-label="Reciter voice"
-                    >
-                      {audioReciters.map((reciter, index) => (
-                        <option key={`${reciter.reciter}-${index}`} value={index}>
-                          {reciter.reciter ?? `Reciter ${index + 1}`}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
-                  </div>
-                </div>
-              ) : (
-                <p className="mt-3 text-xs text-[var(--color-muted-text)]">
-                  {settings.audioPreference === 'tr'
-                    ? 'Translation mode enabled.'
-                    : 'Arabic recitation voices unavailable for this surah.'}
-                </p>
-              )}
-
-              {loadingAudioSource ? (
-                <p className="mt-2 text-xs text-[var(--color-muted-text)]">Loading audio source...</p>
-              ) : null}
-              {audioSourceError ? (
-                <p className="mt-2 text-xs text-[var(--color-danger)]">{audioSourceError}</p>
-              ) : null}
-              <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
-            </div>
-
             {!showWordByWord ? (
               <p className="px-4 pb-3 pt-2 text-xs text-[var(--color-muted-text)]">
                 Word-by-word mode will be enabled when tokenized ayah data is available.
