@@ -1,28 +1,36 @@
-"use client";
-import React, { useEffect, useState } from "react";
+'use client';
 
-const ScrollProgress = () => {
+import { useEffect, useState } from 'react';
+
+export default function ScrollProgress() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const updateProgress = () => {
+    const update = () => {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
-      setProgress(scrolled);
+      const total = Math.max(1, scrollHeight - clientHeight);
+      setProgress((scrollTop / total) * 100);
     };
 
-    window.addEventListener("scroll", updateProgress);
-    return () => window.removeEventListener("scroll", updateProgress);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-[9999]">
+    <div
+      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5 bg-transparent"
+      aria-hidden="true"
+    >
       <div
-        className="h-full bg-green-500 transition-all duration-150 ease-linear"
-        style={{ width: `${progress}%` }}
-      ></div>
+        className="h-full bg-[var(--color-accent)] transition-[width] duration-200"
+        style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+      />
     </div>
   );
-};
-
-export default ScrollProgress;
+}

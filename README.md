@@ -1,34 +1,36 @@
-# 🌿 IC Project - Info Cards
+# Al-Huda
 
-A modern, responsive, and animated **Info Cards UI** built with **React, TailwindCSS, and Framer Motion**.  
-This project demonstrates reusable components, smooth animations, and a green-themed design system.  
+A modern Islamic web app built with Next.js App Router, TypeScript, Tailwind CSS, and shadcn-style UI components.
 
----
+## Features
+- Premium responsive UI (mobile-first, light/dark/system themes)
+- Quran Surah directory with search + sorting
+- Quran reader with:
+  - Ayah-by-ayah and continuous modes
+  - Debounced ayah search with highlighting
+  - Last-read auto-resume + highlighted state
+  - Surah favorites and ayah bookmarks
+  - Arabic font selector + font size controls
+- Bottom audio player with Arabic recitation / Urdu translation modes
+- Settings page for reading, theme, typography, and audio defaults
+- Offline-friendly service worker caching for app routes + Quran APIs
+- SEO basics: metadata, `sitemap.xml`, `robots.txt`
+- Unit tests for core Quran utility helpers
 
-## ✨ Features
-- 🎨 Clean and minimal **green-themed UI**
-- 📱 **Responsive design** (works on all devices)
-- ⚡ Built with **React + TailwindCSS**
-- 🎞️ **Framer Motion animations** for smooth transitions
-- ♻️ **Reusable card components**
+## Environment
+Create `.env.local` using `.env.example`:
 
----
-
-## 📸 Preview
-![Preview](link-to-screenshot-or-demo.gif)
-
----
-
-## 🛠️ Tech Stack
-- **React** (UI Library)
-- **TailwindCSS** (Styling)
-- **Framer Motion** (Animations)
-
----
-
-## 🚀 Getting Started
-
-### 1️⃣ Clone the repo
 ```bash
-git clone https://github.com/your-username/ic-project.git
-cd ic-project
+cp .env.example .env.local
+```
+
+`NEXT_PUBLIC_SITE_URL` is used for sitemap, robots, and metadata base URL.
+
+## Scripts
+```bash
+npm run dev
+npm run lint
+npm run test
+npm run build
+npm run start
+```

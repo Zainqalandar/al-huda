@@ -1,5 +1,5 @@
-interface NavLink {
-	id: number;
-	name: string;
-	link: string;
+export interface NavLink {
+  id: number;
+  name: string;
+  link: string;
 }

@@ -1,54 +1,39 @@
-import React from 'react';
 import quotes from '@/data/quotes.json';
-import IslamicTitle from '@/components/ui/IslamicTitle';
-
-interface CardProps {
-	text: string;
-	reference?: string;
-}
-
-const Card = ({ text, reference }: CardProps) => {
-	return (
-		<>
-			<div className="bg-white/10 border border-yellow-500/40 rounded-xl p-6 shadow-lg hover:shadow-yellow-500/20 transition duration-300">
-				<p className="text-lg italic text-gray-100">“{text}”</p>
-				{reference && (
-					<p className="mt-4 text-sm text-yellow-300 font-semibold">
-						~ {reference}
-					</p>
-				)}
-			</div>
-		</>
-	);
-};
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface QuotesSectionProps {
-	total?: number;
-}
-interface Quote {
-	id: number| string;
-	text: string;
-	reference?: string;
+  total?: number;
 }
 
+export default function QuotesSection({ total = quotes.length }: QuotesSectionProps) {
+  return (
+    <div className="pb-16 pt-10" data-slot="page-shell">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <Badge className="mb-2">Collection</Badge>
+          <h1 className="font-display text-4xl text-[var(--color-heading)]">Islamic Quotes</h1>
+          <p className="mt-2 text-sm text-[var(--color-muted-text)]">
+            Brief reminders from the Quran and Sunnah for everyday reflection.
+          </p>
+        </div>
+      </div>
 
-const QuotesSection = ({ total = 6 }: QuotesSectionProps) => {
-	return (
-		<>
-			<section className="py-16 bg-green-900 text-white">
-				<IslamicTitle title="Famous Islamic Quotes" />
-				<div className="container mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
-					{quotes.slice(0, total).map((q: Quote) => (
-						<Card
-							key={q.id}
-							text={q.text}
-							reference={q.reference}
-						/>
-					))}
-				</div>
-			</section>
-		</>
-	);
-};
-
-export default QuotesSection;
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {quotes.slice(0, total).map((quote, index) => (
+          <Card key={quote.id} className="animate-fade-up" style={{ animationDelay: `${index * 60}ms` }}>
+            <CardHeader>
+              <CardTitle className="text-lg">“{quote.text}”</CardTitle>
+              <CardDescription>{quote.reference}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-accent)]">
+                Keep reflecting
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

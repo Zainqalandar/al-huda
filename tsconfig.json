@@ -21,7 +21,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "plugins": [
       {
         "name": "next"
@@ -32,8 +32,13 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, ".next/types/app/about/page.tsx", ".next/types/app/duas/page.tsx", ".next/types/app/hadith/page.tsx", ".next/types/app/quotes/page.tsx"  ],
+    "**/*.tsx",
+    ".next/types/app/about/page.tsx",
+    ".next/types/app/duas/page.tsx",
+    ".next/types/app/hadith/page.tsx",
+    ".next/types/app/quotes/page.tsx",
+    ".next/dev/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

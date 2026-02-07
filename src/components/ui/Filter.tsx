@@ -1,139 +1,97 @@
 'use client';
-import { SurhasList } from '@/context/SurhasListProvider';
-import { ArrowUpDown, RotateCcw } from 'lucide-react';
-import { useContext, useEffect, useState } from 'react';
 
-type SortBy = 'id' | 'surahName' | 'totalAyah';
-type Order = 'asc' | 'desc';
+import { ArrowUpDown, RotateCcw, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useSurahContext } from '@/hooks/useSurahContext';
+import type { SurahSortBy } from '@/types/quran';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function Filter() {
-	const { addFilterSurahs, surahs } = useContext(SurhasList);
-	const [sortBy, setSortBy] = useState<SortBy>('id');
-	const [order, setOrder] = useState<Order>('asc');
+  const {
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy,
+    order,
+    setOrder,
+    resetFilters,
+    filterSurahs,
+  } = useSurahContext();
 
-	useEffect(() => {
-		if (surahs) {
-			const saved = localStorage.getItem('filter');
-			let initialSortBy: SortBy = 'id';
-			let initialOrder: Order = 'asc';
+  const [queryInput, setQueryInput] = useState(searchQuery);
+  const debouncedQuery = useDebouncedValue(queryInput, 300);
 
-			if (saved) {
-				const parseSaved = JSON.parse(saved);
-				const parsedSortBy = parseSaved?.sortBy;
-				const parsedOrder = parseSaved?.order;
+  useEffect(() => {
+    setSearchQuery(debouncedQuery);
+  }, [debouncedQuery, setSearchQuery]);
 
-				if (
-					parsedSortBy === 'id' ||
-					parsedSortBy === 'surahName' ||
-					parsedSortBy === 'totalAyah'
-				) {
-					initialSortBy = parsedSortBy;
-				}
+  const handleReset = () => {
+    setQueryInput('');
+    resetFilters();
+  };
 
-				if (parsedOrder === 'asc' || parsedOrder === 'desc') {
-					initialOrder = parsedOrder;
-				}
+  return (
+    <Card className="mb-6">
+      <CardContent className="p-4 sm:p-5">
+        <div className="grid gap-3 lg:grid-cols-[1.3fr_auto_auto_auto] lg:items-end">
+          <div className="space-y-1">
+            <label htmlFor="surah-search" className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
+              Search Surah
+            </label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+              <Input
+                id="surah-search"
+                placeholder="Name, translation, or number"
+                value={queryInput}
+                onChange={(event) => setQueryInput(event.target.value)}
+                className="pl-9"
+                aria-label="Search Surahs"
+              />
+            </div>
+          </div>
 
-				setSortBy(initialSortBy);
-				setOrder(initialOrder);
-			}
+          <div className="space-y-1">
+            <label htmlFor="surah-sort" className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
+              Sort by
+            </label>
+            <select
+              id="surah-sort"
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value as SurahSortBy)}
+              className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-medium text-[var(--color-text)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
+            >
+              <option value="id">Number</option>
+              <option value="surahName">Name</option>
+              <option value="totalAyah">Ayah count</option>
+            </select>
+          </div>
 
-			let sorted = [...surahs];
-			sorted.sort((a, b) => {
-				if (initialSortBy === 'surahName') {
-					return initialOrder === 'asc'
-						? a.surahName.localeCompare(b.surahName)
-						: b.surahName.localeCompare(a.surahName);
-				} else {
-					return initialOrder === 'asc'
-						? a[initialSortBy] - b[initialSortBy]
-						: b[initialSortBy] - a[initialSortBy];
-				}
-			});
-			addFilterSurahs(sorted);
-		}
-	}, [surahs]);
+          <Button
+            type="button"
+            variant="outline"
+            className="lg:mb-px"
+            onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
+            aria-label="Toggle sort direction"
+          >
+            <ArrowUpDown className="size-4" />
+            {order === 'asc' ? 'Ascending' : 'Descending'}
+          </Button>
 
-	useEffect(() => {
-		if (surahs) {
-			let sorted = [...surahs];
-			sorted.sort((a, b) => {
-				if (sortBy === 'surahName') {
-					return order === 'asc'
-						? a.surahName.localeCompare(b.surahName)
-						: b.surahName.localeCompare(a.surahName);
-				} else {
-					return order === 'asc'
-						? a[sortBy] - b[sortBy]
-						: b[sortBy] - a[sortBy];
-				}
-			});
-			addFilterSurahs(sorted);
-			localStorage.setItem(
-				'filter',
-				JSON.stringify({
-					sortBy: sortBy,
-					order: order,
-				})
-			);
-		}
-	}, [sortBy, order, surahs]);
+          <Button type="button" variant="secondary" className="lg:mb-px" onClick={handleReset}>
+            <RotateCcw className="size-4" />
+            Reset
+          </Button>
+        </div>
 
-	const resetFilters = () => {
-		setSortBy('id');
-		setOrder('asc');
-	};
-
-	return (
-		<div className="relative overflow-hidden rounded-2xl border border-emerald-200/70 bg-[var(--quran-paper)] p-4 sm:p-5 shadow-[0_16px_40px_-28px_var(--quran-shadow)] backdrop-blur-sm mb-8">
-			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(520px_200px_at_20%_10%,rgba(31,122,93,0.15),transparent)]" />
-			<div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-				<div className="flex items-center gap-3">
-					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100/80 text-emerald-800">
-						<ArrowUpDown className="h-5 w-5" />
-					</div>
-					<div>
-						<p className="text-[11px] uppercase tracking-[0.3em] text-[color:var(--quran-emerald)] opacity-70">
-							Refine
-						</p>
-						<span className="font-display text-lg text-[var(--quran-ink)]">
-							Sort Surahs
-						</span>
-					</div>
-				</div>
-
-				<div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-					<div className="flex flex-col">
-						<label className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--quran-emerald)] opacity-70">
-							Sort by
-						</label>
-						<select
-							value={sortBy}
-							onChange={(e) => setSortBy(e.target.value as SortBy)}
-							className="mt-1 px-4 py-2 border border-emerald-200/80 rounded-xl bg-white/80 text-[var(--quran-ink)] font-medium shadow-sm hover:border-emerald-300 focus:ring-2 focus:ring-emerald-200 focus:outline-none"
-						>
-							<option value="id">Number</option>
-							<option value="surahName">Name</option>
-							<option value="totalAyah">Ayahs</option>
-						</select>
-					</div>
-
-					<button
-						onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-						className="mt-4 sm:mt-5 px-4 py-2 rounded-xl font-semibold shadow-sm transition-all cursor-pointer duration-200 bg-[var(--quran-emerald)] text-white hover:bg-[var(--quran-emerald-deep)]"
-					>
-						{order === 'asc' ? 'Ascending' : 'Descending'}
-					</button>
-
-					<button
-						onClick={resetFilters}
-						className="mt-4 sm:mt-5 flex items-center gap-2 px-4 py-2 cursor-pointer rounded-xl border border-amber-200/80 text-amber-800 bg-amber-50/70 font-semibold shadow-sm transition-all duration-200 hover:bg-amber-100"
-					>
-						<RotateCcw className="w-4 h-4" />
-						Reset
-					</button>
-				</div>
-			</div>
-		</div>
-	);
+        <p className="mt-3 text-xs text-[var(--color-muted-text)]">
+          Showing {filterSurahs.length} surah{filterSurahs.length === 1 ? '' : 's'}.
+        </p>
+      </CardContent>
+    </Card>
+  );
 }

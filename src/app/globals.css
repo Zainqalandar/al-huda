@@ -1,40 +1,148 @@
-@import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Amiri+Quran&family=Cormorant+Garamond:wght@500;600;700&family=Lateef&family=Manrope:wght@400;500;600&family=Noto+Naskh+Arabic:wght@700&family=Scheherazade+New:wght@700&display=swap');
+@import 'tailwindcss';
 
 :root {
-  --quran-ink: #14342b;
-  --quran-emerald: #1f7a5d;
-  --quran-emerald-deep: #0f5b44;
-  --quran-gold: #c79a42;
-  --quran-sand: #f6f2e7;
-  --quran-paper: #fdfbf6;
-  --quran-mist: #eef4ef;
-  --quran-shadow: rgba(20, 52, 43, 0.18);
+  --color-bg: #f7f5ef;
+  --color-surface: #fffdfa;
+  --color-surface-2: #f1ece2;
+  --color-surface-3: #e8e0d2;
+  --color-text: #173126;
+  --color-heading: #0d2f24;
+  --color-muted-text: #456356;
+  --color-border: #d8cfbf;
+  --color-accent: #1f7a5d;
+  --color-accent-soft: #2d8f6f;
+  --color-accent-foreground: #f8fff9;
+  --color-danger: #b93f34;
+  --color-ring: #1f7a5d;
+
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+
+  --shadow-soft: 0 12px 36px -24px rgb(14 63 44 / 0.35);
+  --shadow-card: 0 16px 42px -28px rgb(13 48 36 / 0.42);
+
+  --arabic-font-scale: 1.1;
+}
+
+.dark {
+  --color-bg: #0f1f1a;
+  --color-surface: #142821;
+  --color-surface-2: #1a3228;
+  --color-surface-3: #214235;
+  --color-text: #eff8f2;
+  --color-heading: #f6fff9;
+  --color-muted-text: #a9c7b8;
+  --color-border: #2a4b3d;
+  --color-accent: #49b589;
+  --color-accent-soft: #5dc89b;
+  --color-accent-foreground: #062417;
+  --color-danger: #ef7468;
+  --color-ring: #5dc89b;
+
+  --shadow-soft: 0 16px 42px -26px rgb(5 16 12 / 0.72);
+  --shadow-card: 0 24px 52px -30px rgb(3 11 8 / 0.82);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(950px 340px at 50% -120px, color-mix(in oklab, var(--color-accent), transparent 82%), transparent),
+    radial-gradient(700px 300px at 110% 0%, color-mix(in oklab, #c79a42, transparent 82%), transparent),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 .font-display {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-display), 'Cormorant Garamond', serif;
 }
 
 .font-body {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body), 'Manrope', sans-serif;
 }
 
 .font-arabic {
-  font-family: 'Amiri Quran', 'Scheherazade New', 'Lateef', serif;
+  font-family: 'Amiri Quran', 'Noto Naskh Arabic', 'Scheherazade New', serif;
+}
+
+:root[data-arabic-font='amiriQuran'] .arabic-font {
+  font-family: 'Amiri Quran', 'Amiri', 'Noto Naskh Arabic', serif;
+}
+
+:root[data-arabic-font='notoNaskh'] .arabic-font {
+  font-family: 'Noto Naskh Arabic', 'Amiri Quran', serif;
+}
+
+:root[data-arabic-font='scheherazade'] .arabic-font {
+  font-family: 'Scheherazade New', 'Noto Naskh Arabic', serif;
 }
 
 .arabic-font {
-  font-family: 'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif;
   direction: rtl;
-  letter-spacing: 0.5px;
+  line-height: 1.95;
+  font-size: clamp(1.5rem, 3.8vw, 2rem);
   font-weight: 700;
+  letter-spacing: 0;
+  font-variant-ligatures: contextual;
 }
 
-@keyframes quran-fade-up {
+.arabic-reading {
+  font-size: clamp(1.45rem, calc(1.15rem + 2.1vw), 2.15rem);
+  line-height: 2.08;
+  font-size: calc(clamp(1.45rem, calc(1.15rem + 2.1vw), 2.15rem) * var(--arabic-font-scale));
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-accent), white 65%);
+  color: var(--color-heading);
+}
+
+[data-slot='page-shell'] {
+  width: min(100%, 78rem);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  [data-slot='page-shell'] {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -42,41 +150,6 @@
   }
 }
 
-@keyframes quran-soft-glow {
-  0% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 0.6;
-  }
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
 }
-
-.quran-fade-up {
-  animation: quran-fade-up 0.7s ease-out both;
-}
-
-
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */

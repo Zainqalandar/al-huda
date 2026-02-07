@@ -1,48 +1,121 @@
-import React, { useEffect, useState } from 'react';
+'use client';
 
-let cachedSurahs = null;
+import { useEffect, useState } from 'react';
 
-const useSurahList = () => {
-	const [surahList, setSurahList] = useState(cachedSurahs);
-  const [loading, setLoading] = useState(!cachedSurahs);
-  const [error, setError] = useState(null);
+import type { SurahListItem } from '@/types/quran';
 
-    
+const SURAH_LIST_CACHE_KEY = 'alhuda.surah-list.v1';
+let cachedSurahs: SurahListItem[] | null = null;
 
-	useEffect(() => {
+interface UseSurahListResult {
+  surahList: SurahListItem[];
+  loading: boolean;
+  error: string | null;
+}
 
-		if (cachedSurahs) return; 
+function normalizeSurahList(input: unknown): SurahListItem[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
 
-		const fetchData = async () => {
-			try {
-				setLoading(true);
-				const res = await fetch(
-					'https://quranapi.pages.dev/api/surah.json'
-				);
+  return input.reduce<SurahListItem[]>((acc, surah, index) => {
+    if (!surah || typeof surah !== 'object') {
+      return acc;
+    }
 
-				if (!res.ok) {
-					throw new Error('HTTP Error! status: ' + res.status);
-				}
+    const item = surah as Record<string, unknown>;
+    const rawId = Number(item.id ?? item.surahNo ?? index + 1);
+    const id = Number.isFinite(rawId) ? rawId : index + 1;
 
-				const data = await res.json();
+    acc.push({
+      id,
+      surahName: String(item.surahName ?? ''),
+      surahNameArabic: String(item.surahNameArabic ?? ''),
+      surahNameArabicLong:
+        item.surahNameArabicLong !== undefined
+          ? String(item.surahNameArabicLong)
+          : undefined,
+      surahNameTranslation: String(item.surahNameTranslation ?? ''),
+      revelationPlace: String(item.revelationPlace ?? ''),
+      totalAyah: Number(item.totalAyah ?? 0),
+      surahNo: Number(item.surahNo ?? id),
+      audio:
+        typeof item.audio === 'object' && item.audio !== null
+          ? (item.audio as SurahListItem['audio'])
+          : undefined,
+    });
 
-				const withIdData = data.map((surah, i) => ({ ...surah, id: i + 1 }));
-				cachedSurahs = withIdData;
+    return acc;
+  }, []);
+}
 
-				setSurahList(withIdData);
-				setLoading(false);
-			} catch (error) {
-				setError(error.message);
-				setSurahList(null);
-			} finally {
-				setLoading(false);
-			}
-		};
+export default function useSurahList(): UseSurahListResult {
+  const [surahList, setSurahList] = useState<SurahListItem[]>(cachedSurahs ?? []);
+  const [loading, setLoading] = useState<boolean>(cachedSurahs === null);
+  const [error, setError] = useState<string | null>(null);
 
-		fetchData();
-	}, []);
+  useEffect(() => {
+    if (cachedSurahs !== null) {
+      setSurahList(cachedSurahs);
+      setLoading(false);
+      return;
+    }
 
-	return { surahList, loading, error };
-};
+    const localCached = window.localStorage.getItem(SURAH_LIST_CACHE_KEY);
+    if (localCached) {
+      try {
+        const parsed = normalizeSurahList(JSON.parse(localCached));
+        if (parsed.length > 0) {
+          cachedSurahs = parsed;
+          setSurahList(parsed);
+          setLoading(false);
+        }
+      } catch {
+        // keep fetching
+      }
+    }
 
-export default useSurahList;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('https://quranapi.pages.dev/api/surah.json', {
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          throw new Error(`Surah list request failed (${res.status})`);
+        }
+
+        const payload = (await res.json()) as unknown;
+        const normalized = normalizeSurahList(payload);
+
+        cachedSurahs = normalized;
+        setSurahList(normalized);
+        window.localStorage.setItem(SURAH_LIST_CACHE_KEY, JSON.stringify(normalized));
+        setError(null);
+      } catch (fetchError) {
+        if ((fetchError as Error).name === 'AbortError') {
+          return;
+        }
+
+        setError(
+          fetchError instanceof Error
+            ? fetchError.message
+            : 'Unable to load Surah list.'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchData();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  return { surahList, loading, error };
+}
