@@ -46,6 +46,14 @@ export interface SurahMeta {
   audio?: Record<string, SurahAudioOption>;
 }
 
+export interface UrduTafsirEntry {
+  surahId: number;
+  ayahNumber: number;
+  sourceId: number;
+  sourceName: string;
+  textHtml: string;
+}
+
 export interface AyahBookmark {
   id: string;
   surahId: number;
