@@ -8,14 +8,17 @@ import {
   Bookmark,
   BookmarkCheck,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Heart,
+  Menu,
   Pause,
   Play,
   Search,
   Sparkles,
   X,
 } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import Loading from '@/components/ui/Loading';
 import Error from '@/components/ui/Error';
@@ -54,6 +57,81 @@ function sanitizeTafsirHtml(html: string) {
     .replace(/\sstyle="[^"]*"/gi, '')
     .replace(/\sstyle='[^']*'/gi, '')
     .replace(/javascript:/gi, '');
+}
+
+function formatTafsirHtml(html: string) {
+  const sanitizedHtml = sanitizeTafsirHtml(html);
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return sanitizedHtml;
+  }
+
+  const parser = new DOMParser();
+  const documentNode = parser.parseFromString(
+    `<div id="tafseer-rich-root">${sanitizedHtml}</div>`,
+    'text/html'
+  );
+  const root = documentNode.getElementById('tafseer-rich-root');
+
+  if (!root) {
+    return sanitizedHtml;
+  }
+
+  for (const node of Array.from(root.childNodes)) {
+    if (node.nodeType !== 3) {
+      break;
+    }
+
+    const rawTitle = node.textContent?.trim() ?? '';
+    root.removeChild(node);
+
+    if (!rawTitle) {
+      continue;
+    }
+
+    const normalizedTitle = rawTitle.replace(/[٭*]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (normalizedTitle) {
+      const title = documentNode.createElement('h4');
+      title.className = 'tafseer-topic';
+      title.textContent = normalizedTitle;
+      root.insertBefore(title, root.firstChild);
+    }
+
+    break;
+  }
+
+  root.querySelectorAll('div.ur:not(.page-number)').forEach((element) => {
+    element.classList.add('tafseer-urdu-block');
+  });
+
+  root.querySelectorAll('p.ur').forEach((element) => {
+    element.classList.add('tafseer-urdu-paragraph');
+  });
+
+  root.querySelectorAll('p:not(.tafseer-urdu-paragraph)').forEach((element) => {
+    element.classList.add('tafseer-body-paragraph');
+  });
+
+  root.querySelectorAll('.page-number').forEach((element) => {
+    element.classList.add('tafseer-page-number');
+  });
+
+  root.querySelectorAll('.text-translation').forEach((element) => {
+    element.classList.add('tafseer-translation');
+  });
+
+  root.querySelectorAll('.arabic, .qpc-hafs').forEach((element) => {
+    element.classList.add('tafseer-arabic-inline');
+  });
+
+  root.querySelectorAll('.reference').forEach((element) => {
+    element.classList.add('tafseer-reference-chip');
+  });
+
+  root.querySelectorAll('.saw').forEach((element) => {
+    element.classList.add('tafseer-salawat');
+  });
+
+  return root.innerHTML;
 }
 
 function getTranslationAudioUrl(surahNumber: number) {
@@ -110,11 +188,14 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 
 export default function QuranReaderPage() {
   const params = useParams<{ id?: string | string[] }>();
+  const router = useRouter();
   const idParam = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const surahId = Number(idParam ?? 1);
 
   const {
     setPageNo,
+    surahs,
+    loading: surahListLoading,
     toggleFavoriteSurah,
     isFavoriteSurah,
     bookmarks,
@@ -136,6 +217,9 @@ export default function QuranReaderPage() {
   const [surahMeta, setSurahMeta] = useState<SurahMeta | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [didAutoResume, setDidAutoResume] = useState(false);
+  const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
+  const [navigatorSearch, setNavigatorSearch] = useState('');
+  const [expandedSurahId, setExpandedSurahId] = useState<number>(surahId);
 
   const debouncedSearch = useDebouncedValue(searchInput, 280);
   const resumeTargetRef = useRef<HTMLButtonElement | null>(null);
@@ -239,6 +323,24 @@ export default function QuranReaderPage() {
   const currentLastRead =
     lastRead?.surahId === surahId ? lastRead : null;
 
+  const filteredNavigatorSurahs = useMemo(() => {
+    const normalizedQuery = navigatorSearch.trim().toLowerCase();
+    const ordered = [...surahs].sort((left, right) => left.id - right.id);
+
+    if (!normalizedQuery) {
+      return ordered;
+    }
+
+    return ordered.filter((surah) => {
+      return (
+        surah.surahName.toLowerCase().includes(normalizedQuery) ||
+        surah.surahNameArabic.toLowerCase().includes(normalizedQuery) ||
+        surah.surahNameTranslation.toLowerCase().includes(normalizedQuery) ||
+        String(surah.id).includes(normalizedQuery)
+      );
+    });
+  }, [navigatorSearch, surahs]);
+
   useEffect(() => {
     if (!currentLastRead || didAutoResume) {
       return;
@@ -252,6 +354,31 @@ export default function QuranReaderPage() {
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setDidAutoResume(true);
   }, [currentLastRead, didAutoResume]);
+
+  useEffect(() => {
+    setExpandedSurahId(surahId);
+  }, [surahId]);
+
+  useEffect(() => {
+    if (!isNavigatorOpen) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsNavigatorOpen(false);
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = tafseerOpen ? 'hidden' : previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isNavigatorOpen, tafseerOpen]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -438,6 +565,10 @@ export default function QuranReaderPage() {
     settings.audioPreference === 'tr'
       ? 'Urdu Translation'
       : audioReciters[selectedReciter]?.reciter ?? 'Arabic Recitation';
+  const formattedTafsirHtml = useMemo(
+    () => (tafseerData?.textHtml ? formatTafsirHtml(tafseerData.textHtml) : ''),
+    [tafseerData?.textHtml]
+  );
 
   if (loading) {
     return <Loading label="Loading Surah..." />;
@@ -518,6 +649,71 @@ export default function QuranReaderPage() {
     }
   };
 
+  const jumpAudioBy = (seconds: number) => {
+    const audio = audioRef.current;
+    if (!audio || !audioSrc) {
+      setAudioSourceError('Audio source abhi ready nahi hai.');
+      return;
+    }
+
+    const detectedDuration = getAudioDuration(audio);
+    const effectiveDuration = detectedDuration > 0 ? detectedDuration : audioDuration;
+    const baseTime = Number.isFinite(audio.currentTime)
+      ? audio.currentTime
+      : audioCurrentTime;
+    const upperLimit =
+      effectiveDuration > 0
+        ? effectiveDuration
+        : Math.max(baseTime + Math.abs(seconds), 0);
+
+    const nextValue = clampRange(baseTime + seconds, 0, upperLimit);
+
+    try {
+      audio.currentTime = nextValue;
+      setAudioCurrentTime(nextValue);
+      if (effectiveDuration > 0) {
+        setAudioDuration(effectiveDuration);
+      }
+      setAudioSourceError(null);
+    } catch {
+      setAudioSourceError('Audio skip apply nahi ho saka.');
+    }
+  };
+
+  const handlePreviousAudioStep = () => {
+    jumpAudioBy(-10);
+  };
+
+  const handleNextAudioStep = () => {
+    jumpAudioBy(10);
+  };
+
+  const handleSurahNavigation = (targetSurahId: number) => {
+    setExpandedSurahId(targetSurahId);
+    setIsNavigatorOpen(false);
+
+    if (targetSurahId === surahId) {
+      return;
+    }
+
+    router.push(`/quran/${targetSurahId}`);
+  };
+
+  const handleAyahNavigation = (targetSurahId: number, ayahNumber: number) => {
+    const anchor = `ayah-${ayahNumber}`;
+    setExpandedSurahId(targetSurahId);
+    setIsNavigatorOpen(false);
+
+    if (targetSurahId !== surahId) {
+      router.push(`/quran/${targetSurahId}#${anchor}`);
+      return;
+    }
+
+    window.location.hash = anchor;
+    const target = document.getElementById(anchor);
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   const toggleAudioPlay = async () => {
     const audio = audioRef.current;
     if (loadingAudioSource) {
@@ -572,29 +768,37 @@ export default function QuranReaderPage() {
           <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(130deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,#c79a42,var(--color-surface)_88%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))]">
             <CardHeader>
               <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <Badge className="mb-2">Surah {surahDetail.number}</Badge>
-                  <CardTitle className="font-display text-4xl text-[var(--color-heading)]">
-                    {surahDetail.englishName}
-                  </CardTitle>
-                  <CardDescription className="mt-1 text-sm">
-                    {surahDetail.englishNameTranslation} • {surahDetail.revelationType} •{' '}
-                    {surahDetail.numberOfAyahs} ayahs
-                  </CardDescription>
+                <div className="flex items-start gap-3">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={() => {
+                      setExpandedSurahId(surahId);
+                      setIsNavigatorOpen(true);
+                    }}
+                    aria-label="Open Surah navigator"
+                    className="mt-0.5"
+                  >
+                    <Menu className="size-4" />
+                  </Button>
+
+                  <div>
+                    <Badge className="mb-2">Surah {surahDetail.number}</Badge>
+                    <CardTitle className="font-display text-4xl text-[var(--color-heading)]">
+                      {surahDetail.englishName}
+                    </CardTitle>
+                    <CardDescription className="mt-1 text-sm">
+                      {surahDetail.englishNameTranslation} • {surahDetail.revelationType} •{' '}
+                      {surahDetail.numberOfAyahs} ayahs
+                    </CardDescription>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="arabic-font text-3xl text-[var(--color-heading)]">
                     {surahDetail.name}
                   </p>
                   <div className="mt-3 flex flex-wrap justify-end gap-2">
-                    <Button
-                      size="sm"
-                      onClick={toggleAudioPlay}
-                      aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
-                    >
-                      {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
-                      {isPlaying ? 'Pause Audio' : 'Play Audio'}
-                    </Button>
                     <Button
                       variant={favorite ? 'default' : 'outline'}
                       size="sm"
@@ -675,6 +879,37 @@ export default function QuranReaderPage() {
                     <span>{formatAudioTime(audioCurrentTime)}</span>
                     <span>{formatAudioTime(audioDuration)}</span>
                   </div>
+                </div>
+
+                <div className="mt-1 flex items-center justify-center gap-2">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={handlePreviousAudioStep}
+                    aria-label="Previous 10 seconds"
+                  >
+                    <ChevronLeft className="size-5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="min-w-[8.5rem] justify-center"
+                    onClick={toggleAudioPlay}
+                    aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+                  >
+                    {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
+                    {isPlaying ? 'Pause Audio' : 'Play Audio'}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={handleNextAudioStep}
+                    aria-label="Next 10 seconds"
+                  >
+                    <ChevronRight className="size-5" />
+                  </Button>
                 </div>
 
                 {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
@@ -920,6 +1155,150 @@ export default function QuranReaderPage() {
         </aside>
       </div>
 
+      {isNavigatorOpen ? (
+        <div className="fixed inset-0 z-[85]">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45"
+            onClick={() => setIsNavigatorOpen(false)}
+            aria-label="Close surah navigator"
+          />
+          <aside className="absolute left-0 top-0 h-full w-full max-w-md border-r border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] shadow-2xl">
+            <div className="flex h-full flex-col">
+              <div className="border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
+                      Quran Navigator
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--color-muted-text)]">
+                      Surah aur Ayah par direct jump karein.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsNavigatorOpen(false)}
+                    aria-label="Close navigator"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
+
+                <label
+                  htmlFor="surah-navigator-search"
+                  className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]"
+                >
+                  Search Surah
+                </label>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                  <Input
+                    id="surah-navigator-search"
+                    value={navigatorSearch}
+                    onChange={(event) => setNavigatorSearch(event.target.value)}
+                    placeholder="Surah name / Arabic / number"
+                    className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_24%)] pl-9"
+                  />
+                </div>
+              </div>
+
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+                {surahListLoading ? (
+                  <p className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3 text-sm text-[var(--color-muted-text)]">
+                    Surah list load ho rahi hai...
+                  </p>
+                ) : null}
+
+                {!surahListLoading && filteredNavigatorSurahs.length === 0 ? (
+                  <p className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3 text-sm text-[var(--color-muted-text)]">
+                    Koi surah match nahi hui. Search change karein.
+                  </p>
+                ) : null}
+
+                {!surahListLoading
+                  ? filteredNavigatorSurahs.map((surah) => {
+                      const isCurrentSurah = surah.id === surahId;
+                      const isExpanded = expandedSurahId === surah.id;
+                      const ayahCount =
+                        isCurrentSurah && surahDetail
+                          ? surahDetail.numberOfAyahs
+                          : surah.totalAyah;
+                      const ayahNumbers = Array.from(
+                        { length: Math.max(ayahCount, 0) },
+                        (_, index) => index + 1
+                      );
+
+                      return (
+                        <div
+                          key={surah.id}
+                          className={`rounded-xl border p-3 ${isCurrentSurah ? 'border-[color-mix(in_oklab,var(--color-accent),#c79a42_48%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)]' : 'border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_68%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)]'}`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSurahNavigation(surah.id)}
+                              className="min-w-0 flex-1 rounded-lg text-left outline-none transition hover:text-[var(--color-heading)] focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]/40"
+                            >
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted-text)]">
+                                Surah {surah.id} • {ayahCount} Ayahs
+                              </p>
+                              <p className="mt-1 font-display text-xl text-[var(--color-heading)]">
+                                {surah.surahName}
+                              </p>
+                              <p className="mt-1 text-sm text-[var(--color-muted-text)]">
+                                {surah.surahNameTranslation}
+                              </p>
+                              <p className="font-arabic mt-1 text-right text-base text-[var(--color-heading)]">
+                                {surah.surahNameArabic}
+                              </p>
+                            </button>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              onClick={() =>
+                                setExpandedSurahId((previous) =>
+                                  previous === surah.id ? 0 : surah.id
+                                )
+                              }
+                              aria-label={
+                                isExpanded ? 'Hide ayah numbers' : 'Show ayah numbers'
+                              }
+                            >
+                              <ChevronDown
+                                className={`size-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                              />
+                            </Button>
+                          </div>
+
+                          {isExpanded ? (
+                            <div className="mt-3 grid grid-cols-8 gap-1.5">
+                              {ayahNumbers.map((ayahNumber) => (
+                                <button
+                                  key={`${surah.id}-${ayahNumber}`}
+                                  type="button"
+                                  onClick={() =>
+                                    handleAyahNavigation(surah.id, ayahNumber)
+                                  }
+                                  className="rounded-md border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[color-mix(in_oklab,var(--color-surface),white_22%)] px-1.5 py-1 text-xs font-semibold text-[var(--color-text)] transition hover:border-[var(--color-accent-soft)] hover:text-[var(--color-heading)]"
+                                >
+                                  {ayahNumber}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })
+                  : null}
+              </div>
+            </div>
+          </aside>
+        </div>
+      ) : null}
+
       {tafseerOpen ? (
         <div className="fixed inset-0 z-[90]">
           <button
@@ -953,9 +1332,12 @@ export default function QuranReaderPage() {
               </div>
 
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
-                <Card className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)]">
-                  <CardContent className="p-4">
-                    <p className="arabic-font text-right text-[var(--color-heading)]">
+                <Card className="border-[color-mix(in_oklab,#c79a42,var(--color-border)_52%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_93%))] shadow-[var(--shadow-soft)]">
+                  <CardContent className="space-y-2 p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color-mix(in_oklab,var(--color-muted-text),#f3d690_38%)]">
+                      Arabic Ayah
+                    </p>
+                    <p className="arabic-font text-right text-[color-mix(in_oklab,#f7e1ad,var(--color-heading)_58%)]">
                       {tafseerAyahText}
                     </p>
                   </CardContent>
@@ -978,13 +1360,13 @@ export default function QuranReaderPage() {
                 ) : null}
 
                 {tafseerData ? (
-                  <Card className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_16%)]">
-                    <CardContent className="p-5">
+                  <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_48%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_10%),color-mix(in_oklab,var(--color-surface-2),white_4%))] shadow-[var(--shadow-soft)]">
+                    <CardContent className="p-5 sm:p-6">
                       <div
-                        className="urdu-font space-y-4 text-right leading-relaxed text-[var(--color-text)]"
+                        className="tafseer-rich urdu-font text-right leading-relaxed text-[var(--color-text)]"
                         dir="rtl"
                         dangerouslySetInnerHTML={{
-                          __html: sanitizeTafsirHtml(tafseerData.textHtml),
+                          __html: formattedTafsirHtml,
                         }}
                       />
                     </CardContent>

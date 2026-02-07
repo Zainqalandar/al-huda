@@ -139,6 +139,90 @@ body {
   color: var(--color-text);
 }
 
+.tafseer-rich {
+  color: color-mix(in oklab, var(--color-text), #def4e8 18%);
+  line-height: 2.08;
+  text-wrap: pretty;
+}
+
+.tafseer-rich .tafseer-topic {
+  margin-bottom: 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--color-accent), #c79a42 45%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, #c79a42, transparent 72%),
+    color-mix(in oklab, var(--color-surface-2), white 7%)
+  );
+  border-radius: 0.85rem;
+  padding: 0.55rem 0.8rem;
+  text-align: right;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: color-mix(in oklab, #f7e1ad, var(--color-heading) 56%);
+}
+
+.tafseer-rich .tafseer-urdu-block {
+  margin: 0.75rem 0;
+  border-inline-start: 3px solid color-mix(in oklab, var(--color-accent), #c79a42 52%);
+  border-radius: 0.8rem;
+  background: color-mix(in oklab, var(--color-surface-2), transparent 20%);
+  padding: 0.72rem 0.85rem;
+}
+
+.tafseer-rich .tafseer-urdu-paragraph,
+.tafseer-rich .tafseer-body-paragraph {
+  margin-bottom: 0.8rem;
+  color: color-mix(in oklab, var(--color-text), #def2e6 15%);
+}
+
+.tafseer-rich .tafseer-page-number {
+  margin: 0.85rem 0 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in oklab, var(--color-accent), #c79a42 40%);
+  background: color-mix(in oklab, var(--color-surface-3), #c79a42 14%);
+  color: color-mix(in oklab, #e2f9ec, var(--color-text) 70%);
+  padding: 0.18rem 0.62rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.tafseer-rich .tafseer-translation {
+  color: color-mix(in oklab, #9fe0c2, var(--color-text) 48%);
+  font-style: italic;
+}
+
+.tafseer-rich .tafseer-arabic-inline {
+  font-family: 'Amiri Quran', 'Noto Naskh Arabic', 'Scheherazade New', serif;
+  font-weight: 700;
+  color: color-mix(in oklab, #f9e5b7, var(--color-heading) 52%);
+  background: color-mix(in oklab, #c79a42, transparent 80%);
+  border: 1px solid color-mix(in oklab, #c79a42, transparent 56%);
+  border-radius: 0.45rem;
+  padding-inline: 0.38rem;
+  margin-inline: 0.14rem;
+  line-height: 2.05;
+}
+
+.tafseer-rich .tafseer-salawat {
+  color: color-mix(in oklab, #f1d28b, var(--color-heading) 62%);
+}
+
+.tafseer-rich .tafseer-reference-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-accent), #c79a42 46%);
+  background: color-mix(in oklab, var(--color-surface-2), #c79a42 18%);
+  color: color-mix(in oklab, #d8f4e8, var(--color-text) 68%);
+  padding-inline: 0.5rem;
+  padding-block: 0.08rem;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
 a {
   color: inherit;
 }
