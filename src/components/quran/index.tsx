@@ -40,15 +40,14 @@ export default function SurahList() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {filterSurahs.map((surah, index) => {
+      {filterSurahs.map((surah) => {
         const isFavorite = favorites.includes(surah.id);
         const hasLastRead = lastRead?.surahId === surah.id;
 
         return (
           <Card
             key={surah.id}
-            className="group animate-fade-up transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
-            style={{ animationDelay: `${index * 35}ms` }}
+            className="group transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">

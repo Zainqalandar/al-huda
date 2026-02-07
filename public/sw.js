@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'alhuda-v1';
+const CACHE_VERSION = 'alhuda-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const API_CACHE = `${CACHE_VERSION}-api`;
 
-const CORE_ASSETS = ['/', '/quran', '/hadith', '/about', '/settings'];
+const CORE_ASSETS = ['/'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -31,6 +31,19 @@ function isApiRequest(requestUrl) {
   );
 }
 
+function isNextAsset(requestUrl) {
+  return requestUrl.pathname.startsWith('/_next/');
+}
+
+function cacheResponse(cacheName, request, response) {
+  if (!response || !response.ok) {
+    return;
+  }
+
+  const copy = response.clone();
+  caches.open(cacheName).then((cache) => cache.put(request, copy));
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
@@ -38,9 +51,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const requestUrl = request.url;
+  const requestUrl = new URL(request.url);
 
-  if (isApiRequest(requestUrl)) {
+  if (isApiRequest(requestUrl.href)) {
     event.respondWith(
       caches.open(API_CACHE).then(async (cache) => {
         try {
@@ -63,27 +76,56 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
+          cacheResponse(STATIC_CACHE, request, response);
           return response;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/')))
+        .catch(async () => {
+          const cached = await caches.match(request);
+          if (cached) {
+            return cached;
+          }
+
+          const fallback = await caches.match('/');
+          if (fallback) {
+            return fallback;
+          }
+
+          return new Response('Offline', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' },
+          });
+        })
+    );
+    return;
+  }
+
+  if (requestUrl.origin === self.location.origin && isNextAsset(requestUrl)) {
+    event.respondWith(
+      fetch(request, { cache: 'no-store' })
+        .then((response) => {
+          cacheResponse(STATIC_CACHE, request, response);
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
 
   event.respondWith(
     caches.match(request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
-      return fetch(request)
+      const fetchPromise = fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
+          cacheResponse(STATIC_CACHE, request, response);
           return response;
         })
         .catch(() => cached);
+
+      if (cached) {
+        void fetchPromise;
+        return cached;
+      }
+
+      return fetchPromise;
     })
   );
 });

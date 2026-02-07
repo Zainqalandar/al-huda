@@ -69,9 +69,10 @@ export default function SiteHeader() {
 
       <div
         id="mobile-nav"
+        aria-hidden={!open}
         className={cn(
           'grid overflow-hidden border-t border-[var(--color-border)] transition-[grid-template-rows] duration-300 md:hidden',
-          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          open ? 'pointer-events-auto grid-rows-[1fr]' : 'pointer-events-none grid-rows-[0fr]'
         )}
       >
         <nav className="min-h-0 bg-[var(--color-bg)]" aria-label="Mobile">
