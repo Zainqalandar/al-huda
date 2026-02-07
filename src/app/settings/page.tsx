@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Trash2 } from 'lucide-react';
+import { ChevronDown, Trash2 } from 'lucide-react';
 
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
@@ -74,17 +74,20 @@ export default function SettingsPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
                 Arabic Font
               </p>
-              <select
-                className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm"
-                value={settings.arabicFont}
-                onChange={(event) =>
-                  setArabicFont(event.target.value as typeof settings.arabicFont)
-                }
-              >
-                <option value="amiriQuran">Amiri Quran</option>
-                <option value="notoNaskh">Noto Naskh</option>
-                <option value="scheherazade">Scheherazade</option>
-              </select>
+              <div className="relative">
+                <select
+                  className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium"
+                  value={settings.arabicFont}
+                  onChange={(event) =>
+                    setArabicFont(event.target.value as typeof settings.arabicFont)
+                  }
+                >
+                  <option value="amiriQuran">Amiri Quran</option>
+                  <option value="notoNaskh">Noto Naskh</option>
+                  <option value="scheherazade">Scheherazade</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+              </div>
             </div>
 
             <div>

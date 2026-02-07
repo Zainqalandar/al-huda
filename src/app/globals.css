@@ -115,6 +115,30 @@ body {
   letter-spacing: 0;
 }
 
+.app-select {
+  border: 1px solid color-mix(in oklab, var(--color-accent), var(--color-border) 58%);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--color-surface), white 22%),
+      color-mix(in oklab, #c79a42, var(--color-surface) 94%)
+    );
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-select:focus-visible {
+  border-color: color-mix(in oklab, var(--color-accent), var(--color-border) 30%);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-ring), transparent 40%);
+}
+
+.app-select option,
+.app-select optgroup {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
 a {
   color: inherit;
 }

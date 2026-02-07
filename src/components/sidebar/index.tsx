@@ -9,10 +9,8 @@ import {
   BookmarkCheck,
   ChevronDown,
   Heart,
-  Minus,
   Pause,
   Play,
-  Plus,
   Search,
   Sparkles,
   X,
@@ -114,8 +112,6 @@ export default function QuranReaderPage() {
   const {
     settings,
     setReadingMode,
-    setArabicFontScale,
-    setArabicFont,
     setAudioPreference,
   } = useAppSettings();
 
@@ -541,8 +537,8 @@ export default function QuranReaderPage() {
           </Card>
 
           <Card className="z-20 overflow-hidden border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_90%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))] shadow-[var(--shadow-card)] backdrop-blur">
-            <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="sm:col-span-2 lg:col-span-1">
+            <CardContent className="grid gap-3 p-4 sm:grid-cols-2">
+              <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
                   Read mode
                 </label>
@@ -577,62 +573,6 @@ export default function QuranReaderPage() {
                     placeholder="Arabic / translation"
                     className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_26%)] pl-9"
                   />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="arabic-font" className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                  Arabic font
-                </label>
-                <div className="relative">
-                  <select
-                    id="arabic-font"
-                    className="h-10 w-full appearance-none rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_26%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] px-3 pr-9 text-sm font-medium text-[var(--color-text)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
-                    value={settings.arabicFont}
-                    onChange={(event) =>
-                      setArabicFont(event.target.value as typeof settings.arabicFont)
-                    }
-                  >
-                    <option value="amiriQuran">Amiri Quran</option>
-                    <option value="notoNaskh">Noto Naskh</option>
-                    <option value="scheherazade">Scheherazade</option>
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                  Font size
-                </label>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      setArabicFontScale(
-                        clampRange(settings.arabicFontScale - 0.05, 0.9, 1.9)
-                      )
-                    }
-                    aria-label="Decrease font size"
-                  >
-                    <Minus className="size-4" />
-                  </Button>
-                  <span className="min-w-[4rem] text-center text-sm font-semibold text-[var(--color-heading)]">
-                    {Math.round(settings.arabicFontScale * 100)}%
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      setArabicFontScale(
-                        clampRange(settings.arabicFontScale + 0.05, 0.9, 1.9)
-                      )
-                    }
-                    aria-label="Increase font size"
-                  >
-                    <Plus className="size-4" />
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -690,7 +630,7 @@ export default function QuranReaderPage() {
                   <div className="relative sm:max-w-sm">
                     <select
                       id="reader-reciter"
-                      className="h-10 w-full appearance-none rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_24%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_94%))] px-3 pr-9 text-sm font-medium text-[var(--color-text)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
+                      className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium"
                       value={selectedReciter}
                       onChange={(event) => setSelectedReciter(Number(event.target.value))}
                       aria-label="Reciter voice"
