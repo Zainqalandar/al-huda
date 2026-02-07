@@ -6,8 +6,11 @@ import {
   BookCheck,
   Bookmark,
   BookmarkCheck,
+  ChevronDown,
   Heart,
   Minus,
+  Pause,
+  Play,
   Plus,
   Search,
   Sparkles,
@@ -23,13 +26,19 @@ import { Input } from '@/components/ui/input';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSurahContext } from '@/hooks/useSurahContext';
 import { fetchSurahDetail, fetchSurahMeta } from '@/lib/quran-api';
-import type { SurahAyah, SurahDetail, SurahMeta } from '@/types/quran';
+import type { SurahAudioOption, SurahAyah, SurahDetail, SurahMeta } from '@/types/quran';
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import { clampRange, isValidSurahId } from '@/lib/quran-utils';
 
 interface AyahWithTranslation {
   ayah: SurahAyah;
   translation?: string;
+}
+
+function getTranslationAudioUrl(surahNumber: number) {
+  return `https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/${String(
+    surahNumber
+  ).padStart(3, '0')}.ogg`;
 }
 
 function escapeRegExp(input: string) {
@@ -84,6 +93,7 @@ export default function QuranReaderPage() {
     setReadingMode,
     setArabicFontScale,
     setArabicFont,
+    setAudioPreference,
   } = useAppSettings();
 
   const [loading, setLoading] = useState(true);
@@ -95,6 +105,16 @@ export default function QuranReaderPage() {
 
   const debouncedSearch = useDebouncedValue(searchInput, 280);
   const resumeTargetRef = useRef<HTMLButtonElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [audioSrc, setAudioSrc] = useState('');
+  const [audioReciters, setAudioReciters] = useState<SurahAudioOption[]>([]);
+  const [selectedReciter, setSelectedReciter] = useState(0);
+  const [loadingAudioSource, setLoadingAudioSource] = useState(false);
+  const [audioSourceError, setAudioSourceError] = useState<string | null>(null);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayPending, setIsPlayPending] = useState(false);
 
   useEffect(() => {
     if (!isValidSurahId(surahId)) {
@@ -184,8 +204,135 @@ export default function QuranReaderPage() {
     setDidAutoResume(true);
   }, [currentLastRead, didAutoResume]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadAudioSource = async () => {
+      setLoadingAudioSource(true);
+      setAudioSourceError(null);
+
+      if (settings.audioPreference === 'tr') {
+        setAudioReciters([]);
+        setSelectedReciter(0);
+        setAudioSrc(getTranslationAudioUrl(surahId));
+        setLoadingAudioSource(false);
+        return;
+      }
+
+      try {
+        const meta = await fetchSurahMeta(surahId, controller.signal);
+        const availableReciters = Object.values(meta.audio ?? {}).filter(
+          (item) => item.originalUrl || item.url
+        );
+
+        setAudioReciters(availableReciters);
+        if (availableReciters.length === 0) {
+          setAudioSrc('');
+          setAudioSourceError('No Arabic recitation source found for this surah.');
+          return;
+        }
+
+        const nextReciterIndex = clampRange(
+          selectedReciter,
+          0,
+          availableReciters.length - 1
+        );
+
+        if (nextReciterIndex !== selectedReciter) {
+          setSelectedReciter(nextReciterIndex);
+        }
+
+        const source =
+          availableReciters[nextReciterIndex]?.originalUrl ??
+          availableReciters[nextReciterIndex]?.url ??
+          '';
+        setAudioSrc(source);
+      } catch (loadError) {
+        const errorObject = loadError as { name?: string; message?: string };
+        if (errorObject.name === 'AbortError') {
+          return;
+        }
+
+        setAudioSrc('');
+        setAudioSourceError(errorObject.message ?? 'Audio source failed to load.');
+      } finally {
+        setLoadingAudioSource(false);
+      }
+    };
+
+    void loadAudioSource();
+
+    return () => {
+      controller.abort();
+    };
+  }, [selectedReciter, settings.audioPreference, surahId]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    if (!audioSrc) {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      setIsPlaying(false);
+      return;
+    }
+
+    audio.src = audioSrc;
+    audio.load();
+
+    if (settings.autoPlayAudio) {
+      audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+      return;
+    }
+
+    setIsPlaying(false);
+  }, [audioSrc, settings.autoPlayAudio]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    const onPlay = () => {
+      setIsPlaying(true);
+      setIsPlayPending(false);
+    };
+    const onPause = () => {
+      setIsPlaying(false);
+      setIsPlayPending(false);
+    };
+    const onEnd = () => {
+      setIsPlaying(false);
+      setIsPlayPending(false);
+    };
+
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('ended', onEnd);
+    audio.addEventListener('error', onEnd);
+
+    return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('ended', onEnd);
+      audio.removeEventListener('error', onEnd);
+    };
+  }, []);
+
   const highlightQuery = debouncedSearch.trim();
   const favorite = isFavoriteSurah(surahId);
+  const activeReciterName =
+    settings.audioPreference === 'tr'
+      ? 'Urdu Translation'
+      : audioReciters[selectedReciter]?.reciter ?? 'Arabic Recitation';
 
   if (loading) {
     return <Loading label="Loading Surah..." />;
@@ -201,12 +348,53 @@ export default function QuranReaderPage() {
   }
 
   const showWordByWord = false;
+  const toggleAudioPlay = async () => {
+    const audio = audioRef.current;
+    if (!audio || !audioSrc) {
+      setAudioSourceError('Audio source abhi ready nahi hai.');
+      return;
+    }
+
+    setAudioSourceError(null);
+
+    const isCurrentlyPlaying = !audio.paused && !audio.ended;
+    if (isCurrentlyPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+      setIsPlayPending(false);
+      return;
+    }
+
+    setIsPlayPending(true);
+
+    if (audio.src !== audioSrc) {
+      audio.src = audioSrc;
+      audio.load();
+    }
+
+    const playPromise = audio.play();
+    if (!playPromise) {
+      setIsPlayPending(false);
+      return;
+    }
+
+    playPromise
+      .then(() => {
+        setIsPlaying(true);
+        setIsPlayPending(false);
+      })
+      .catch(() => {
+        setIsPlaying(false);
+        setIsPlayPending(false);
+        setAudioSourceError('Play start nahi ho saki. Dusri voice try karein.');
+      });
+  };
 
   return (
-    <div className="pb-44 pt-6 sm:pt-8" data-slot="page-shell">
+    <div className="pb-16 pt-6 sm:pt-8" data-slot="page-shell">
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-5">
-          <Card>
+          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(130deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,#c79a42,var(--color-surface)_88%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))]">
             <CardHeader>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -236,7 +424,7 @@ export default function QuranReaderPage() {
               </div>
 
               {currentLastRead ? (
-                <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3 text-sm text-[var(--color-muted-text)]">
+                <div className="mt-4 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(125deg,color-mix(in_oklab,var(--color-surface-2),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface-2)_90%))] p-3 text-sm text-[var(--color-muted-text)]">
                   Last read: Ayah {currentLastRead.ayahNumber}
                   <Button
                     ref={resumeTargetRef}
@@ -255,7 +443,7 @@ export default function QuranReaderPage() {
             </CardHeader>
           </Card>
 
-          <Card className=" z-20 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] bg-[color-mix(in_oklab,var(--color-surface),transparent_12%)] backdrop-blur">
+          <Card className="z-20 overflow-hidden border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_90%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))] shadow-[var(--shadow-card)] backdrop-blur">
             <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="sm:col-span-2 lg:col-span-1">
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
@@ -290,7 +478,7 @@ export default function QuranReaderPage() {
                     value={searchInput}
                     onChange={(event) => setSearchInput(event.target.value)}
                     placeholder="Arabic / translation"
-                    className="pl-9"
+                    className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_26%)] pl-9"
                   />
                 </div>
               </div>
@@ -299,18 +487,21 @@ export default function QuranReaderPage() {
                 <label htmlFor="arabic-font" className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
                   Arabic font
                 </label>
-                <select
-                  id="arabic-font"
-                  className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm"
-                  value={settings.arabicFont}
-                  onChange={(event) =>
-                    setArabicFont(event.target.value as typeof settings.arabicFont)
-                  }
-                >
-                  <option value="amiriQuran">Amiri Quran</option>
-                  <option value="notoNaskh">Noto Naskh</option>
-                  <option value="scheherazade">Scheherazade</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="arabic-font"
+                    className="h-10 w-full appearance-none rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_26%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] px-3 pr-9 text-sm font-medium text-[var(--color-text)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
+                    value={settings.arabicFont}
+                    onChange={(event) =>
+                      setArabicFont(event.target.value as typeof settings.arabicFont)
+                    }
+                  >
+                    <option value="amiriQuran">Amiri Quran</option>
+                    <option value="notoNaskh">Noto Naskh</option>
+                    <option value="scheherazade">Scheherazade</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                </div>
               </div>
 
               <div>
@@ -348,15 +539,100 @@ export default function QuranReaderPage() {
                 </div>
               </div>
             </CardContent>
+
+            <div className="border-t border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[color-mix(in_oklab,var(--color-surface),transparent_6%)] p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
+                    Audio Control
+                  </p>
+                  <p className="mt-1 font-display text-xl text-[var(--color-heading)]">
+                    {activeReciterName}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant={settings.audioPreference === 'ar' ? 'default' : 'outline'}
+                    onClick={() => setAudioPreference('ar')}
+                  >
+                    Arabic Voice
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={settings.audioPreference === 'tr' ? 'default' : 'outline'}
+                    onClick={() => setAudioPreference('tr')}
+                  >
+                    Urdu Translation
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-3 grid gap-3 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+                <Button
+                  size="icon"
+                  onClick={toggleAudioPlay}
+                  disabled={loadingAudioSource || !audioSrc}
+                  aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+                >
+                  {isPlaying ? <Pause className="size-5" /> : <Play className="size-5" />}
+                </Button>
+
+                <p className="text-sm text-[var(--color-muted-text)]">
+                  {isPlaying ? 'Audio chal rahi hai.' : 'Audio play karne ke liye button dabayen.'}
+                </p>
+
+                <div />
+              </div>
+
+              {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
+                <div className="mt-3">
+                  <label htmlFor="reader-reciter" className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
+                    Voice
+                  </label>
+                  <div className="relative sm:max-w-sm">
+                    <select
+                      id="reader-reciter"
+                      className="h-10 w-full appearance-none rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_24%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_94%))] px-3 pr-9 text-sm font-medium text-[var(--color-text)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
+                      value={selectedReciter}
+                      onChange={(event) => setSelectedReciter(Number(event.target.value))}
+                      aria-label="Reciter voice"
+                    >
+                      {audioReciters.map((reciter, index) => (
+                        <option key={`${reciter.reciter}-${index}`} value={index}>
+                          {reciter.reciter ?? `Reciter ${index + 1}`}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-3 text-xs text-[var(--color-muted-text)]">
+                  {settings.audioPreference === 'tr'
+                    ? 'Translation mode enabled.'
+                    : 'Arabic recitation voices unavailable for this surah.'}
+                </p>
+              )}
+
+              {loadingAudioSource ? (
+                <p className="mt-2 text-xs text-[var(--color-muted-text)]">Loading audio source...</p>
+              ) : null}
+              {audioSourceError ? (
+                <p className="mt-2 text-xs text-[var(--color-danger)]">{audioSourceError}</p>
+              ) : null}
+              <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
+            </div>
+
             {!showWordByWord ? (
-              <p className="px-4 pb-3 text-xs text-[var(--color-muted-text)]">
+              <p className="px-4 pb-3 pt-2 text-xs text-[var(--color-muted-text)]">
                 Word-by-word mode will be enabled when tokenized ayah data is available.
               </p>
             ) : null}
           </Card>
 
           {settings.readingMode === 'continuous' ? (
-            <Card>
+            <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_50%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_93%))]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Sparkles className="size-5 text-[var(--color-accent)]" />
@@ -373,7 +649,7 @@ export default function QuranReaderPage() {
                       <span id={`ayah-${ayah.numberInSurah}`}>
                         {ayah.text}
                       </span>{' '}
-                      <span className="mx-1 text-sm text-[var(--color-accent)]">
+                      <span className="mx-1 text-sm text-[color-mix(in_oklab,var(--color-accent),#c79a42_42%)]">
                         ({ayah.numberInSurah})
                       </span>{' '}
                       {index === filteredAyahs.length - 1 ? '' : ' '}
@@ -392,7 +668,7 @@ export default function QuranReaderPage() {
                   <Card
                     id={`ayah-${ayah.numberInSurah}`}
                     key={ayah.number}
-                    className={isLastRead ? 'border-[var(--color-accent-soft)] ring-2 ring-[var(--color-accent)]/20' : ''}
+                    className={`border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_10%),color-mix(in_oklab,#c79a42,var(--color-surface)_96%))] ${isLastRead ? 'ring-2 ring-[var(--color-accent)]/20' : ''}`}
                   >
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -459,7 +735,7 @@ export default function QuranReaderPage() {
         </div>
 
         <aside className="space-y-4 xl:sticky xl:top-[5rem] xl:self-start">
-          <Card>
+          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_92%))]">
             <CardHeader>
               <CardTitle className="text-xl">Bookmarks</CardTitle>
               <CardDescription>
@@ -472,7 +748,7 @@ export default function QuranReaderPage() {
                   <Link
                     key={bookmark.id}
                     href={`#ayah-${bookmark.ayahNumber}`}
-                    className="block rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-text)] transition hover:border-[var(--color-accent-soft)]"
+                    className="block rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-surface-2),white_8%),color-mix(in_oklab,#c79a42,var(--color-surface-2)_94%))] px-3 py-2 text-sm text-[var(--color-text)] transition hover:border-[var(--color-accent-soft)]"
                   >
                     Ayah {bookmark.ayahNumber}
                   </Link>
@@ -485,7 +761,7 @@ export default function QuranReaderPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_93%))]">
             <CardHeader>
               <CardTitle className="text-xl">Word-by-word</CardTitle>
             </CardHeader>
