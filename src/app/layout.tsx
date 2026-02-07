@@ -55,11 +55,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL || 'https://al-huda.vercel.app'
   ),
   title: {
-    default: 'Al-Huda | Quran, Hadith & Duas',
+    default: 'Al-Huda | Quran Learning App',
     template: '%s | Al-Huda',
   },
   description:
-    'A modern Islamic companion for Quran reading, hadith, duas, and daily reflection.',
+    'A modern Quran learning app with focused recitation, bookmarks, resume, and audio study tools.',
   applicationName: 'Al-Huda',
   icons: {
     icon: '/logos/logo2.png',
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Al-Huda',
     description:
-      'Read the Quran with focus, explore hadith and duas, and continue your Islamic learning journey.',
+      'Read, resume, and listen to the Quran with a focused mobile-first learning experience.',
     siteName: 'Al-Huda',
     type: 'website',
   },
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Al-Huda',
     description:
-      'Quran reading, hadith, duas, and Islamic reflection in a clean responsive app.',
+      'Quran-first app for recitation, audio, bookmarks, and learning progression.',
   },
 };
 

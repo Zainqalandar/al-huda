@@ -14,7 +14,7 @@ export default function SiteFooter() {
             Read with Khushu, Learn with Clarity
           </h2>
           <p className="max-w-md text-sm text-[var(--color-muted-text)]">
-            Al-Huda provides Quran reading, duas, hadith, and daily reminders in a
+            Al-Huda provides Quran reading, recitation audio, and study tools in a
             focused and respectful interface.
           </p>
         </div>

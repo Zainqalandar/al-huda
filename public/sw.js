@@ -2,7 +2,7 @@ const CACHE_VERSION = 'alhuda-v1';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const API_CACHE = `${CACHE_VERSION}-api`;
 
-const CORE_ASSETS = ['/', '/quran', '/quotes', '/hadith', '/duas', '/about'];
+const CORE_ASSETS = ['/', '/quran', '/hadith', '/about', '/settings'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
