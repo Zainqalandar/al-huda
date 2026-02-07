@@ -41,6 +41,7 @@ export interface SurahMeta {
   totalAyah: number;
   surahNo: number;
   english?: string[];
+  urdu?: string[];
   arabic1?: string[];
   audio?: Record<string, SurahAudioOption>;
 }

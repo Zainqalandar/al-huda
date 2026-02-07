@@ -161,11 +161,14 @@ export default function QuranReaderPage() {
       return [];
     }
 
+    const translationByPreference =
+      settings.audioPreference === 'tr' ? surahMeta?.urdu : surahMeta?.english;
+
     return surahDetail.ayahs.map((ayah, index) => ({
       ayah,
-      translation: surahMeta?.english?.[index],
+      translation: translationByPreference?.[index] ?? surahMeta?.english?.[index],
     }));
-  }, [surahDetail, surahMeta?.english]);
+  }, [settings.audioPreference, surahDetail, surahMeta?.english, surahMeta?.urdu]);
 
   const filteredAyahs = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();
@@ -714,7 +717,10 @@ export default function QuranReaderPage() {
                       </p>
 
                       {translation ? (
-                        <p className="mt-3 text-sm leading-relaxed text-[var(--color-muted-text)]">
+                        <p
+                          className={`mt-3 text-sm leading-relaxed text-[var(--color-muted-text)] ${settings.audioPreference === 'tr' ? 'urdu-font text-right text-[1.02rem]' : ''}`}
+                          dir={settings.audioPreference === 'tr' ? 'rtl' : 'ltr'}
+                        >
                           <HighlightText text={translation} query={highlightQuery} />
                         </p>
                       ) : null}
