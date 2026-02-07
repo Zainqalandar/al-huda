@@ -10,13 +10,71 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/layout/theme-toggle';
 
+interface SessionUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadSession = async () => {
+      try {
+        setAuthLoading(true);
+        const response = await fetch('/api/auth/session', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          if (!ignore) {
+            setSessionUser(null);
+          }
+          return;
+        }
+
+        const payload = (await response.json()) as { user: SessionUser | null };
+        if (!ignore) {
+          setSessionUser(payload.user ?? null);
+        }
+      } catch {
+        if (!ignore) {
+          setSessionUser(null);
+        }
+      } finally {
+        if (!ignore) {
+          setAuthLoading(false);
+        }
+      }
+    };
+
+    void loadSession();
+
+    return () => {
+      ignore = true;
+    };
+  }, [pathname]);
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+    } finally {
+      setSessionUser(null);
+      setOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[color-mix(in_oklab,var(--color-bg),transparent_10%)] backdrop-blur-lg">
@@ -52,6 +110,29 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 md:flex">
+            {authLoading ? (
+              <span className="text-xs text-[var(--color-muted-text)]">Checking...</span>
+            ) : sessionUser ? (
+              <>
+                <span className="max-w-[10rem] truncate text-sm text-[var(--color-muted-text)]">
+                  {sessionUser.name}
+                </span>
+                <Button size="sm" variant="outline" onClick={handleSignOut}>
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/signin">Sign In</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/signup">Sign Up</Link>
+                </Button>
+              </>
+            )}
+          </div>
           <ThemeToggle />
           <Button
             variant="outline"
@@ -96,6 +177,29 @@ export default function SiteHeader() {
               );
             })}
           </ul>
+          <div className="border-t border-[var(--color-border)] px-4 py-3">
+            {authLoading ? (
+              <p className="text-xs text-[var(--color-muted-text)]">Checking session...</p>
+            ) : sessionUser ? (
+              <div className="flex items-center justify-between gap-2">
+                <p className="truncate text-sm text-[var(--color-muted-text)]">
+                  {sessionUser.name}
+                </p>
+                <Button size="sm" variant="outline" onClick={handleSignOut}>
+                  Sign out
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button asChild size="sm" variant="outline" className="flex-1">
+                  <Link href="/signin">Sign In</Link>
+                </Button>
+                <Button asChild size="sm" className="flex-1">
+                  <Link href="/signup">Sign Up</Link>
+                </Button>
+              </div>
+            )}
+          </div>
         </nav>
       </div>
     </header>

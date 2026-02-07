@@ -67,6 +67,18 @@ const TRACK_PAGES: TrackPageItem[] = [
     purpose: 'Theme, reading, audio, and data preferences.',
   },
   {
+    name: 'Sign In',
+    path: '/signin',
+    category: 'System',
+    purpose: 'User login page for existing accounts.',
+  },
+  {
+    name: 'Sign Up',
+    path: '/signup',
+    category: 'System',
+    purpose: 'User registration page with unique email validation.',
+  },
+  {
     name: 'Admin',
     path: '/admin',
     category: 'System',
