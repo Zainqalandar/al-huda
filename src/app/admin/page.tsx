@@ -1,20 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   Activity,
   BookOpen,
   Globe,
   LayoutDashboard,
-  Search,
   Settings2,
   ShieldCheck,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 interface TrackPageItem {
   name: string;
@@ -123,31 +121,13 @@ const CATEGORY_META = {
 } as const;
 
 export default function AdminPage() {
-  const [query, setQuery] = useState('');
-
-  const filteredPages = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) {
-      return TRACK_PAGES;
-    }
-
-    return TRACK_PAGES.filter((item) => {
-      return (
-        item.name.toLowerCase().includes(normalizedQuery) ||
-        item.path.toLowerCase().includes(normalizedQuery) ||
-        item.category.toLowerCase().includes(normalizedQuery) ||
-        item.purpose.toLowerCase().includes(normalizedQuery)
-      );
-    });
-  }, [query]);
-
   const grouped = useMemo(() => {
     return {
-      Core: filteredPages.filter((item) => item.category === 'Core'),
-      Quran: filteredPages.filter((item) => item.category === 'Quran'),
-      System: filteredPages.filter((item) => item.category === 'System'),
+      Core: TRACK_PAGES.filter((item) => item.category === 'Core'),
+      Quran: TRACK_PAGES.filter((item) => item.category === 'Quran'),
+      System: TRACK_PAGES.filter((item) => item.category === 'System'),
     };
-  }, [filteredPages]);
+  }, []);
 
   return (
     <div className="pb-16 pt-10" data-slot="page-shell">
@@ -165,70 +145,23 @@ export default function AdminPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <LayoutDashboard className="size-5 text-[var(--color-accent)]" />
-                Sidebar Tracking
+                Admin Sidebar
               </CardTitle>
-              <CardDescription>
-                Saare pages yahan se monitor aur open karein.
-              </CardDescription>
+              <CardDescription>Admin sections yahan se open karein.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label
-                  htmlFor="admin-page-search"
-                  className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]"
-                >
-                  Search Page
-                </label>
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
-                  <Input
-                    id="admin-page-search"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Page name or route"
-                    className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_24%)] pl-9"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {(['Core', 'Quran', 'System'] as const).map((category) => {
-                  const Icon = CATEGORY_META[category].icon;
-                  const items = grouped[category];
-
-                  return (
-                    <div
-                      key={category}
-                      className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)] p-2"
-                    >
-                      <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                        <Icon className="size-3.5" />
-                        {CATEGORY_META[category].heading}
-                        <span className="ml-auto rounded-full bg-[color-mix(in_oklab,var(--color-accent),white_70%)] px-1.5 py-0.5 text-[10px] tracking-normal text-[var(--color-heading)]">
-                          {items.length}
-                        </span>
-                      </p>
-                      <div className="space-y-1">
-                        {items.length > 0 ? (
-                          items.map((item) => (
-                            <Link
-                              key={`${item.path}-${item.name}`}
-                              href={item.path.includes('[') ? '/quran/1' : item.path}
-                              className="block rounded-lg px-2 py-1.5 text-sm text-[var(--color-text)] transition hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_12%)] hover:text-[var(--color-heading)]"
-                            >
-                              {item.name}
-                            </Link>
-                          ))
-                        ) : (
-                          <p className="px-2 py-1 text-xs text-[var(--color-muted-text)]">
-                            No match
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <CardContent className="space-y-2">
+              <Link
+                href="/admin"
+                className="block rounded-lg border border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] px-3 py-2 text-sm font-semibold text-[var(--color-heading)]"
+              >
+                Tracking Dashboard
+              </Link>
+              <Link
+                href="/admin/users"
+                className="block rounded-lg border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] px-3 py-2 text-sm transition hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_10%)]"
+              >
+                Users Table
+              </Link>
             </CardContent>
           </Card>
         </aside>
@@ -242,7 +175,7 @@ export default function AdminPage() {
                     Total Track Points
                   </p>
                   <p className="mt-1 font-display text-3xl text-[var(--color-heading)]">
-                    {filteredPages.length}
+                    {TRACK_PAGES.length}
                   </p>
                 </div>
                 <Activity className="size-5 text-[var(--color-accent)]" />
