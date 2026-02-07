@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { signInSchema } from '@/lib/auth/schemas';
 import { verifyPassword } from '@/lib/auth/password';
 import { attachSessionCookie } from '@/lib/auth/session';
-import { findUserByEmail } from '@/lib/auth/users-store';
+import { findUserByEmail, markUserLogin } from '@/lib/auth/users-store';
 
 export async function POST(request: Request) {
   try {
@@ -42,18 +42,21 @@ export async function POST(request: Request) {
       );
     }
 
+    const updatedUser = await markUserLogin(user.id);
+    const authUser = updatedUser ?? user;
+
     const response = NextResponse.json({
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        id: authUser.id,
+        name: authUser.name,
+        email: authUser.email,
       },
     });
 
     attachSessionCookie(response, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      id: authUser.id,
+      name: authUser.name,
+      email: authUser.email,
     });
 
     return response;

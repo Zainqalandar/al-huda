@@ -1,0 +1,117 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface SessionResponse {
+  user: {
+    id: string;
+  } | null;
+}
+
+function sendTrackPayload(
+  payload: { sessionSeconds?: number; audioSeconds?: number },
+  beacon = false
+) {
+  if (beacon && typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    navigator.sendBeacon('/api/auth/track', blob);
+    return;
+  }
+
+  void fetch('/api/auth/track', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+    keepalive: beacon,
+  });
+}
+
+export default function ActivityTrackerProvider() {
+  const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadSession = async () => {
+      try {
+        const response = await fetch('/api/auth/session', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          if (!ignore) {
+            setIsAuthenticated(false);
+          }
+          return;
+        }
+
+        const payload = (await response.json()) as SessionResponse;
+        if (!ignore) {
+          setIsAuthenticated(Boolean(payload.user?.id));
+        }
+      } catch {
+        if (!ignore) {
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    void loadSession();
+
+    return () => {
+      ignore = true;
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    let lastTickAt = Date.now();
+
+    const interval = window.setInterval(() => {
+      const now = Date.now();
+      const elapsed = Math.floor((now - lastTickAt) / 1000);
+      lastTickAt = now;
+
+      if (document.hidden || elapsed <= 0) {
+        return;
+      }
+
+      sendTrackPayload({
+        sessionSeconds: Math.min(elapsed, 120),
+      });
+    }, 15000);
+
+    const onBeforeUnload = () => {
+      if (document.hidden) {
+        return;
+      }
+
+      const now = Date.now();
+      const elapsed = Math.floor((now - lastTickAt) / 1000);
+      if (elapsed > 0) {
+        sendTrackPayload(
+          {
+            sessionSeconds: Math.min(elapsed, 120),
+          },
+          true
+        );
+      }
+    };
+
+    window.addEventListener('beforeunload', onBeforeUnload);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+    };
+  }, [isAuthenticated]);
+
+  return null;
+}

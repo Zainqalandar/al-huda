@@ -9,6 +9,23 @@ export interface StoredUser {
   passwordHash: string;
   passwordSalt: string;
   createdAt: string;
+  updatedAt: string;
+  loginCount: number;
+  lastLoginAt: string | null;
+  totalSessionSeconds: number;
+  totalAudioSeconds: number;
+}
+
+export interface AdminUserSummary {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+  loginCount: number;
+  lastLoginAt: string | null;
+  totalSessionSeconds: number;
+  totalAudioSeconds: number;
 }
 
 interface UsersFileShape {
@@ -22,6 +39,55 @@ let writeQueue = Promise.resolve();
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
+}
+
+function normalizeStoredUser(raw: unknown): StoredUser | null {
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+
+  const candidate = raw as Record<string, unknown>;
+  const id = String(candidate.id ?? '').trim();
+  const name = String(candidate.name ?? '').trim();
+  const email = normalizeEmail(String(candidate.email ?? ''));
+  const passwordHash = String(candidate.passwordHash ?? '');
+  const passwordSalt = String(candidate.passwordSalt ?? '');
+  const createdAt = String(candidate.createdAt ?? '');
+
+  if (!id || !name || !email || !passwordHash || !passwordSalt || !createdAt) {
+    return null;
+  }
+
+  return {
+    id,
+    name,
+    email,
+    passwordHash,
+    passwordSalt,
+    createdAt,
+    updatedAt: String(candidate.updatedAt ?? createdAt),
+    loginCount: Number(candidate.loginCount ?? 0) || 0,
+    lastLoginAt:
+      candidate.lastLoginAt === null || candidate.lastLoginAt === undefined
+        ? null
+        : String(candidate.lastLoginAt),
+    totalSessionSeconds: Number(candidate.totalSessionSeconds ?? 0) || 0,
+    totalAudioSeconds: Number(candidate.totalAudioSeconds ?? 0) || 0,
+  };
+}
+
+function toAdminSummary(user: StoredUser): AdminUserSummary {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    loginCount: user.loginCount,
+    lastLoginAt: user.lastLoginAt,
+    totalSessionSeconds: user.totalSessionSeconds,
+    totalAudioSeconds: user.totalAudioSeconds,
+  };
 }
 
 async function ensureUsersFileExists() {
@@ -43,7 +109,12 @@ async function readUsersFile(): Promise<UsersFileShape> {
     if (!parsed || !Array.isArray(parsed.users)) {
       return { ...EMPTY_STORE };
     }
-    return parsed;
+
+    const normalizedUsers = parsed.users
+      .map((entry) => normalizeStoredUser(entry))
+      .filter((entry): entry is StoredUser => entry !== null);
+
+    return { users: normalizedUsers };
   } catch {
     return { ...EMPTY_STORE };
   }
@@ -97,17 +168,85 @@ export async function createUser(input: {
       throw new Error('EMAIL_ALREADY_EXISTS');
     }
 
+    const nowIso = new Date().toISOString();
+
     const user: StoredUser = {
       id: randomUUID(),
       name: input.name.trim(),
       email: normalizedEmail,
       passwordHash: input.passwordHash,
       passwordSalt: input.passwordSalt,
-      createdAt: new Date().toISOString(),
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      loginCount: 1,
+      lastLoginAt: nowIso,
+      totalSessionSeconds: 0,
+      totalAudioSeconds: 0,
     };
 
     store.users.push(user);
     await writeUsersFile(store);
     return user;
   });
+}
+
+export async function markUserLogin(userId: string): Promise<StoredUser | null> {
+  return withWriteLock(async () => {
+    const store = await readUsersFile();
+    const index = store.users.findIndex((user) => user.id === userId);
+    if (index < 0) {
+      return null;
+    }
+
+    const nowIso = new Date().toISOString();
+    store.users[index] = {
+      ...store.users[index],
+      loginCount: store.users[index].loginCount + 1,
+      lastLoginAt: nowIso,
+      updatedAt: nowIso,
+    };
+
+    await writeUsersFile(store);
+    return store.users[index];
+  });
+}
+
+export async function incrementUserUsage(
+  userId: string,
+  input: { sessionSeconds?: number; audioSeconds?: number }
+): Promise<StoredUser | null> {
+  const safeSessionSeconds = Math.max(0, Math.floor(input.sessionSeconds ?? 0));
+  const safeAudioSeconds = Math.max(0, Math.floor(input.audioSeconds ?? 0));
+
+  if (safeSessionSeconds === 0 && safeAudioSeconds === 0) {
+    return findUserById(userId);
+  }
+
+  return withWriteLock(async () => {
+    const store = await readUsersFile();
+    const index = store.users.findIndex((user) => user.id === userId);
+    if (index < 0) {
+      return null;
+    }
+
+    store.users[index] = {
+      ...store.users[index],
+      totalSessionSeconds: store.users[index].totalSessionSeconds + safeSessionSeconds,
+      totalAudioSeconds: store.users[index].totalAudioSeconds + safeAudioSeconds,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await writeUsersFile(store);
+    return store.users[index];
+  });
+}
+
+export async function listUsersForAdmin(): Promise<AdminUserSummary[]> {
+  const store = await readUsersFile();
+
+  return store.users
+    .map((user) => toAdminSummary(user))
+    .sort((left, right) => {
+      return right.createdAt.localeCompare(left.createdAt);
+    });
 }

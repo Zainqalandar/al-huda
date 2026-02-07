@@ -14,6 +14,7 @@ import ScrollProgress from '@/components/ui/ScrollProgress';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppSettingsProvider } from '@/components/providers/app-settings-provider';
 import ServiceWorkerRegister from '@/components/providers/service-worker-register';
+import ActivityTrackerProvider from '@/components/providers/activity-tracker-provider';
 
 const bodyFont = Manrope({
   subsets: ['latin'],
@@ -99,6 +100,7 @@ export default function RootLayout({
             </a>
             <ScrollProgress />
             <ServiceWorkerRegister />
+            <ActivityTrackerProvider />
             <SiteHeader />
             <main id="main-content" className="min-h-[calc(100vh-4rem)]">
               {children}

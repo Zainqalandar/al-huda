@@ -85,6 +85,23 @@ function getQuranComRecitationId(reciterName: string | undefined) {
   return null;
 }
 
+function reportUsageDelta(payload: { audioSeconds?: number }, beacon = false) {
+  if (beacon && typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    navigator.sendBeacon('/api/auth/track', blob);
+    return;
+  }
+
+  void fetch('/api/auth/track', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+    keepalive: beacon,
+  });
+}
+
 function sanitizeTafsirHtml(html: string) {
   return html
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
@@ -261,6 +278,7 @@ export default function QuranReaderPage() {
   const debouncedSearch = useDebouncedValue(searchInput, 280);
   const resumeTargetRef = useRef<HTMLButtonElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUsageLastTimeRef = useRef(0);
 
   const [audioSrc, setAudioSrc] = useState('');
   const [audioReciters, setAudioReciters] = useState<SurahAudioOption[]>([]);
@@ -650,6 +668,69 @@ export default function QuranReaderPage() {
       audio.removeEventListener('error', onEnd);
     };
   }, [loading]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    audioUsageLastTimeRef.current = audio?.currentTime ?? 0;
+  }, [audioSrc]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      const audio = audioRef.current;
+      audioUsageLastTimeRef.current = audio?.currentTime ?? 0;
+      return;
+    }
+
+    const audioNode = audioRef.current;
+    if (!audioNode) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      const currentTime = audioNode.currentTime || 0;
+      const previousTime = audioUsageLastTimeRef.current || 0;
+      const deltaSeconds = Math.floor(currentTime - previousTime);
+      audioUsageLastTimeRef.current = currentTime;
+
+      if (deltaSeconds > 0) {
+        reportUsageDelta({
+          audioSeconds: Math.min(deltaSeconds, 120),
+        });
+      }
+    }, 10000);
+
+    const onBeforeUnload = () => {
+      const currentTime = audioNode.currentTime || 0;
+      const previousTime = audioUsageLastTimeRef.current || 0;
+      const deltaSeconds = Math.floor(currentTime - previousTime);
+      if (deltaSeconds > 0) {
+        reportUsageDelta(
+          {
+            audioSeconds: Math.min(deltaSeconds, 120),
+          },
+          true
+        );
+      }
+    };
+
+    window.addEventListener('beforeunload', onBeforeUnload);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+
+      const currentTime = audioNode.currentTime || 0;
+      const previousTime = audioUsageLastTimeRef.current || 0;
+      const deltaSeconds = Math.floor(currentTime - previousTime);
+      audioUsageLastTimeRef.current = currentTime;
+
+      if (deltaSeconds > 0) {
+        reportUsageDelta({
+          audioSeconds: Math.min(deltaSeconds, 120),
+        });
+      }
+    };
+  }, [isPlaying]);
 
   useEffect(() => {
     if (!isPlaying || ayahs.length === 0) {

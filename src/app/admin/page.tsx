@@ -79,10 +79,22 @@ const TRACK_PAGES: TrackPageItem[] = [
     purpose: 'User registration page with unique email validation.',
   },
   {
+    name: 'Admin Users',
+    path: '/admin/users',
+    category: 'System',
+    purpose: 'Admin table with user login and usage analytics.',
+  },
+  {
     name: 'Admin',
     path: '/admin',
     category: 'System',
     purpose: 'Website tracking dashboard.',
+  },
+  {
+    name: 'Auth Track API',
+    path: '/api/auth/track',
+    category: 'System',
+    purpose: 'Stores user time spent and audio watch duration.',
   },
   {
     name: 'Urdu Tafseer API',
