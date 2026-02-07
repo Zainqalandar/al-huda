@@ -90,6 +90,10 @@ function toAdminSummary(user: StoredUser): AdminUserSummary {
   };
 }
 
+function getLoggedInUsers(users: StoredUser[]) {
+  return users.filter((user) => user.loginCount > 0 && Boolean(user.lastLoginAt));
+}
+
 async function ensureUsersFileExists() {
   await mkdir(path.dirname(USERS_FILE_PATH), { recursive: true });
 
@@ -244,7 +248,7 @@ export async function incrementUserUsage(
 export async function listUsersForAdmin(): Promise<AdminUserSummary[]> {
   const store = await readUsersFile();
 
-  return store.users
+  return getLoggedInUsers(store.users)
     .map((user) => toAdminSummary(user))
     .sort((left, right) => {
       return right.createdAt.localeCompare(left.createdAt);

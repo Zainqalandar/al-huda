@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { LayoutDashboard, RefreshCcw, Users } from 'lucide-react';
+import { Clock3, Headphones, LayoutDashboard, RefreshCcw, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,24 @@ interface AdminUserRecord {
   totalSessionSeconds: number;
   totalAudioSeconds: number;
 }
+
+interface AdminUsageSummary {
+  totalUsers: number;
+  totalSessionSeconds: number;
+  totalAudioSeconds: number;
+}
+
+interface AdminUsersPayload {
+  users?: AdminUserRecord[];
+  summary?: AdminUsageSummary;
+  message?: string;
+}
+
+const EMPTY_SUMMARY: AdminUsageSummary = {
+  totalUsers: 0,
+  totalSessionSeconds: 0,
+  totalAudioSeconds: 0,
+};
 
 function formatDuration(totalSeconds: number) {
   const safe = Math.max(0, Math.floor(totalSeconds));
@@ -53,6 +71,7 @@ function formatDate(value: string | null) {
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUserRecord[]>([]);
+  const [summary, setSummary] = useState<AdminUsageSummary>(EMPTY_SUMMARY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -66,17 +85,31 @@ export default function AdminUsersPage() {
         cache: 'no-store',
       });
 
-      const payload = (await response.json()) as {
-        users?: AdminUserRecord[];
-        message?: string;
-      };
+      const payload = (await response.json()) as AdminUsersPayload;
 
       if (!response.ok) {
         setError(payload.message ?? 'Unable to load users.');
         return;
       }
 
-      setUsers(Array.isArray(payload.users) ? payload.users : []);
+      const nextUsers = Array.isArray(payload.users) ? payload.users : [];
+      setUsers(nextUsers);
+
+      const nextSummary = payload.summary ?? nextUsers.reduce<AdminUsageSummary>(
+        (acc, user) => {
+          acc.totalUsers += 1;
+          acc.totalSessionSeconds += user.totalSessionSeconds;
+          acc.totalAudioSeconds += user.totalAudioSeconds;
+          return acc;
+        },
+        { ...EMPTY_SUMMARY }
+      );
+
+      setSummary({
+        totalUsers: Math.max(0, Number(nextSummary.totalUsers) || 0),
+        totalSessionSeconds: Math.max(0, Number(nextSummary.totalSessionSeconds) || 0),
+        totalAudioSeconds: Math.max(0, Number(nextSummary.totalAudioSeconds) || 0),
+      });
     } catch {
       setError('Unable to load users right now.');
     } finally {
@@ -142,10 +175,24 @@ export default function AdminUsersPage() {
         <section className="space-y-4">
           <Card>
             <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="size-5 text-[var(--color-accent)]" />
-                <p className="text-sm text-[var(--color-text)]">
-                  Total Users: <span className="font-semibold">{users.length}</span>
+              <div className="grid gap-2 text-xs text-[var(--color-text)] sm:grid-cols-3 sm:text-sm">
+                <p className="flex items-center gap-1.5">
+                  <Users className="size-4 text-[var(--color-accent)]" />
+                  Logged-in Users: <span className="font-semibold">{summary.totalUsers}</span>
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <Clock3 className="size-4 text-[var(--color-accent)]" />
+                  Website Time:{' '}
+                  <span className="font-semibold">
+                    {formatDuration(summary.totalSessionSeconds)}
+                  </span>
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <Headphones className="size-4 text-[var(--color-accent)]" />
+                  Audio Time:{' '}
+                  <span className="font-semibold">
+                    {formatDuration(summary.totalAudioSeconds)}
+                  </span>
                 </p>
               </div>
               <div className="flex w-full gap-2 sm:w-auto">
@@ -230,7 +277,7 @@ export default function AdminUsersPage() {
                           colSpan={7}
                           className="px-4 py-5 text-center text-[var(--color-muted-text)]"
                         >
-                          No users found.
+                          No logged-in users found.
                         </td>
                       </tr>
                     )}

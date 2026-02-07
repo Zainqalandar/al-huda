@@ -1,132 +1,119 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Activity,
-  BookOpen,
-  Globe,
+  Clock3,
+  Headphones,
   LayoutDashboard,
-  Settings2,
-  ShieldCheck,
+  RefreshCcw,
+  Users,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface TrackPageItem {
-  name: string;
-  path: string;
-  category: 'Core' | 'Quran' | 'System';
-  purpose: string;
+interface AdminUsageSummary {
+  totalUsers: number;
+  totalSessionSeconds: number;
+  totalAudioSeconds: number;
 }
 
-const TRACK_PAGES: TrackPageItem[] = [
-  {
-    name: 'Home',
-    path: '/',
-    category: 'Core',
-    purpose: 'Landing page and primary entry flow.',
-  },
-  {
-    name: 'Quran Directory',
-    path: '/quran',
-    category: 'Quran',
-    purpose: 'Surah listing, filtering, and quick start.',
-  },
-  {
-    name: 'Quran Reader',
-    path: '/quran/[id]',
-    category: 'Quran',
-    purpose: 'Ayah reading, audio, bookmarks, tafseer, and navigator.',
-  },
-  {
-    name: 'Hadith',
-    path: '/hadith',
-    category: 'Core',
-    purpose: 'Hadith browsing and reading experience.',
-  },
-  {
-    name: 'Practice',
-    path: '/practice',
-    category: 'Core',
-    purpose: 'User practice flow and learning activity.',
-  },
-  {
-    name: 'About',
-    path: '/about',
-    category: 'Core',
-    purpose: 'Product and mission information.',
-  },
-  {
-    name: 'Settings',
-    path: '/settings',
-    category: 'System',
-    purpose: 'Theme, reading, audio, and data preferences.',
-  },
-  {
-    name: 'Sign In',
-    path: '/signin',
-    category: 'System',
-    purpose: 'User login page for existing accounts.',
-  },
-  {
-    name: 'Sign Up',
-    path: '/signup',
-    category: 'System',
-    purpose: 'User registration page with unique email validation.',
-  },
-  {
-    name: 'Admin Users',
-    path: '/admin/users',
-    category: 'System',
-    purpose: 'Admin table with user login and usage analytics.',
-  },
-  {
-    name: 'Admin',
-    path: '/admin',
-    category: 'System',
-    purpose: 'Website tracking dashboard.',
-  },
-  {
-    name: 'Auth Track API',
-    path: '/api/auth/track',
-    category: 'System',
-    purpose: 'Stores user time spent and audio watch duration.',
-  },
-  {
-    name: 'Urdu Tafseer API',
-    path: '/api/tafsir/ur',
-    category: 'System',
-    purpose: 'Backend endpoint used by reader tafseer panel.',
-  },
-];
+interface AdminUserRecord {
+  totalSessionSeconds: number;
+  totalAudioSeconds: number;
+}
 
-const CATEGORY_META = {
-  Core: {
-    icon: Globe,
-    heading: 'Core Pages',
-    description: 'Main user-facing pages that define site journey.',
-  },
-  Quran: {
-    icon: BookOpen,
-    heading: 'Quran Pages',
-    description: 'Surah reading, navigation, and recitation workflows.',
-  },
-  System: {
-    icon: Settings2,
-    heading: 'System & Admin',
-    description: 'Platform settings and API-level tracking points.',
-  },
-} as const;
+interface AdminUsersPayload {
+  users?: AdminUserRecord[];
+  summary?: AdminUsageSummary;
+  message?: string;
+}
+
+const EMPTY_SUMMARY: AdminUsageSummary = {
+  totalUsers: 0,
+  totalSessionSeconds: 0,
+  totalAudioSeconds: 0,
+};
+
+function formatDuration(totalSeconds: number) {
+  const safe = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safe / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
+  const seconds = safe % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+
+  return `${seconds}s`;
+}
+
+function normalizeSummary(payload: AdminUsersPayload): AdminUsageSummary {
+  if (payload.summary) {
+    return {
+      totalUsers: Math.max(0, Number(payload.summary.totalUsers) || 0),
+      totalSessionSeconds: Math.max(
+        0,
+        Number(payload.summary.totalSessionSeconds) || 0
+      ),
+      totalAudioSeconds: Math.max(
+        0,
+        Number(payload.summary.totalAudioSeconds) || 0
+      ),
+    };
+  }
+
+  const users = Array.isArray(payload.users) ? payload.users : [];
+  return users.reduce<AdminUsageSummary>(
+    (acc, user) => {
+      acc.totalUsers += 1;
+      acc.totalSessionSeconds += Math.max(0, Number(user.totalSessionSeconds) || 0);
+      acc.totalAudioSeconds += Math.max(0, Number(user.totalAudioSeconds) || 0);
+      return acc;
+    },
+    { ...EMPTY_SUMMARY }
+  );
+}
 
 export default function AdminPage() {
-  const grouped = useMemo(() => {
-    return {
-      Core: TRACK_PAGES.filter((item) => item.category === 'Core'),
-      Quran: TRACK_PAGES.filter((item) => item.category === 'Quran'),
-      System: TRACK_PAGES.filter((item) => item.category === 'System'),
-    };
+  const [summary, setSummary] = useState<AdminUsageSummary>(EMPTY_SUMMARY);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+
+  const loadSummary = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/admin/users', {
+        cache: 'no-store',
+      });
+
+      const payload = (await response.json()) as AdminUsersPayload;
+
+      if (!response.ok) {
+        setError(payload.message ?? 'Unable to load dashboard data.');
+        return;
+      }
+
+      setSummary(normalizeSummary(payload));
+      setLastUpdatedAt(new Date().toISOString());
+    } catch {
+      setError('Unable to load dashboard data right now.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadSummary();
   }, []);
 
   return (
@@ -135,11 +122,11 @@ export default function AdminPage() {
         <Badge className="mb-2">Admin</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)]">Tracking Dashboard</h1>
         <p className="mt-2 text-sm text-[var(--color-muted-text)]">
-          Website pages, routes, and system endpoints ko ek jagah track karein.
+          Sirf logged-in users ka website usage aur audio watch time tracking.
         </p>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-[290px_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
         <aside className="lg:sticky lg:top-[5rem] lg:h-fit">
           <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface)_94%))]">
             <CardHeader>
@@ -167,83 +154,77 @@ export default function AdminPage() {
         </aside>
 
         <section className="space-y-4">
+          <Card>
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <p className="text-sm text-[var(--color-muted-text)]">
+                Last Updated:{' '}
+                <span className="font-semibold text-[var(--color-text)]">
+                  {lastUpdatedAt ? new Date(lastUpdatedAt).toLocaleString() : 'Not synced yet'}
+                </span>
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void loadSummary()}
+                disabled={loading}
+                className="gap-2"
+              >
+                <RefreshCcw className="size-4" />
+                Refresh
+              </Button>
+            </CardContent>
+          </Card>
+
+          {error ? (
+            <Card>
+              <CardContent className="p-4 text-sm text-[var(--color-danger)]">{error}</CardContent>
+            </Card>
+          ) : null}
+
           <div className="grid gap-3 sm:grid-cols-3">
             <Card>
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                    Total Track Points
+                    Logged-in Users
                   </p>
                   <p className="mt-1 font-display text-3xl text-[var(--color-heading)]">
-                    {TRACK_PAGES.length}
+                    {loading ? '...' : summary.totalUsers}
                   </p>
                 </div>
-                <Activity className="size-5 text-[var(--color-accent)]" />
+                <Users className="size-5 text-[var(--color-accent)]" />
               </CardContent>
             </Card>
+
             <Card>
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                    Category Coverage
+                    Website Time
                   </p>
-                  <p className="mt-1 font-display text-3xl text-[var(--color-heading)]">3</p>
+                  <p className="mt-1 font-display text-xl text-[var(--color-heading)]">
+                    {loading ? '...' : formatDuration(summary.totalSessionSeconds)}
+                  </p>
                 </div>
-                <ShieldCheck className="size-5 text-[var(--color-accent)]" />
+                <Clock3 className="size-5 text-[var(--color-accent)]" />
               </CardContent>
             </Card>
+
             <Card>
-              <CardContent className="p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                  Last Review
-                </p>
-                <p className="mt-1 text-sm text-[var(--color-text)]">
-                  {new Date().toLocaleDateString()}
-                </p>
+              <CardContent className="flex items-center justify-between p-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
+                    Audio Watch Time
+                  </p>
+                  <p className="mt-1 font-display text-xl text-[var(--color-heading)]">
+                    {loading ? '...' : formatDuration(summary.totalAudioSeconds)}
+                  </p>
+                </div>
+                <Headphones className="size-5 text-[var(--color-accent)]" />
               </CardContent>
             </Card>
           </div>
-
-          {(['Core', 'Quran', 'System'] as const).map((category) => {
-            const items = grouped[category];
-            const meta = CATEGORY_META[category];
-            const Icon = meta.icon;
-
-            return (
-              <Card key={category}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <Icon className="size-5 text-[var(--color-accent)]" />
-                    {meta.heading}
-                  </CardTitle>
-                  <CardDescription>{meta.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {items.length > 0 ? (
-                    items.map((item) => (
-                      <div
-                        key={`${category}-${item.path}-${item.name}`}
-                        className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_66%)] bg-[color-mix(in_oklab,var(--color-surface),white_16%)] p-3"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-semibold text-[var(--color-heading)]">{item.name}</p>
-                          <Badge variant="secondary">Active</Badge>
-                        </div>
-                        <p className="mt-1 text-xs font-mono text-[var(--color-muted-text)]">
-                          {item.path}
-                        </p>
-                        <p className="mt-2 text-sm text-[var(--color-text)]">{item.purpose}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-[var(--color-muted-text)]">
-                      Is category me search ke mutabiq koi page nahi mila.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
         </section>
       </div>
     </div>
