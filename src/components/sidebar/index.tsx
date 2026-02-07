@@ -255,7 +255,7 @@ export default function QuranReaderPage() {
             </CardHeader>
           </Card>
 
-          <Card className="sticky top-[4.5rem] z-20 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] bg-[color-mix(in_oklab,var(--color-surface),transparent_12%)] backdrop-blur">
+          <Card className=" z-20 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] bg-[color-mix(in_oklab,var(--color-surface),transparent_12%)] backdrop-blur">
             <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="sm:col-span-2 lg:col-span-1">
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
