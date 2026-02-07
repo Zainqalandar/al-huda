@@ -10,6 +10,7 @@ const navLinks: NavLinkItem[] = [
   { id: 2, name: 'Hadith', link: '/hadith' },
   { id: 3, name: 'About', link: '/about' },
   { id: 4, name: 'Settings', link: '/settings' },
+  { id: 5, name: 'Admin', link: '/admin' },
 ];
 
 export default navLinks;
