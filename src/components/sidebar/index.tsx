@@ -881,35 +881,41 @@ export default function QuranReaderPage() {
                   </div>
                 </div>
 
-                <div className="mt-1 flex items-center justify-center gap-2">
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="outline"
-                    onClick={handlePreviousAudioStep}
-                    aria-label="Previous 10 seconds"
-                  >
-                    <ChevronLeft className="size-5" />
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="min-w-[8.5rem] justify-center"
-                    onClick={toggleAudioPlay}
-                    aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
-                  >
-                    {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
-                    {isPlaying ? 'Pause Audio' : 'Play Audio'}
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="outline"
-                    onClick={handleNextAudioStep}
-                    aria-label="Next 10 seconds"
-                  >
-                    <ChevronRight className="size-5" />
-                  </Button>
+                <div className="mt-2 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] p-2">
+                  <div className="grid grid-cols-3 items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handlePreviousAudioStep}
+                      aria-label="Previous 10 seconds"
+                      className="h-10 justify-center rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)] px-2"
+                    >
+                      <ChevronLeft className="size-4" />
+                      Prev
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="h-10 min-w-0 justify-center rounded-xl px-2 shadow-[var(--shadow-soft)]"
+                      onClick={toggleAudioPlay}
+                      aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+                    >
+                      {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
+                      {isPlaying ? 'Pause' : 'Play'}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleNextAudioStep}
+                      aria-label="Next 10 seconds"
+                      className="h-10 justify-center rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)] px-2"
+                    >
+                      Next
+                      <ChevronRight className="size-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
