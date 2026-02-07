@@ -25,6 +25,7 @@ cp .env.example .env.local
 ```
 
 `NEXT_PUBLIC_SITE_URL` is used for sitemap, robots, and metadata base URL.
+`MONGODB_URI` is used for authentication, tracking, favorites, bookmarks, and admin data (database: `al-huda`).
 
 ## Scripts
 ```bash

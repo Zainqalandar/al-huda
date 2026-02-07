@@ -1,7 +1,8 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
+import mongoose, { Schema, type Model } from 'mongoose';
+
+import { connectToMongoDatabase } from '@/lib/db/mongodb';
 import { buildBookmarkId } from '@/lib/quran-utils';
 
 export interface StoredAyahBookmark {
@@ -42,17 +43,11 @@ export interface AdminUserSummary {
   bookmarkedAyahs: StoredAyahBookmark[];
 }
 
-interface UsersFileShape {
-  users: StoredUser[];
-}
-
-const USERS_FILE_PATH = path.join(process.cwd(), 'data', 'users.json');
-const EMPTY_STORE: UsersFileShape = { users: [] };
-
-let writeQueue = Promise.resolve();
 const MIN_SURAH_ID = 1;
 const MAX_SURAH_ID = 114;
 const MAX_AYAH_NUMBER = 286;
+const USERS_COLLECTION = 'users';
+const USER_MODEL_NAME = 'AuthUser';
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -203,67 +198,87 @@ function getLoggedInUsers(users: StoredUser[]) {
   return users.filter((user) => user.loginCount > 0 && Boolean(user.lastLoginAt));
 }
 
-async function ensureUsersFileExists() {
-  await mkdir(path.dirname(USERS_FILE_PATH), { recursive: true });
-
-  try {
-    await readFile(USERS_FILE_PATH, 'utf8');
-  } catch {
-    await writeFile(USERS_FILE_PATH, JSON.stringify(EMPTY_STORE, null, 2), 'utf8');
+const bookmarkedAyahSchema = new Schema<StoredAyahBookmark>(
+  {
+    id: { type: String, required: true },
+    surahId: { type: Number, required: true, min: MIN_SURAH_ID, max: MAX_SURAH_ID },
+    ayahNumber: { type: Number, required: true, min: 1, max: MAX_AYAH_NUMBER },
+    text: { type: String, default: '' },
+    createdAt: { type: String, required: true },
+  },
+  {
+    _id: false,
   }
+);
+
+const userSchema = new Schema<StoredUser>(
+  {
+    id: { type: String, required: true, unique: true, index: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, index: true, trim: true, lowercase: true },
+    passwordHash: { type: String, required: true },
+    passwordSalt: { type: String, required: true },
+    createdAt: { type: String, required: true },
+    updatedAt: { type: String, required: true },
+    loginCount: { type: Number, default: 0 },
+    lastLoginAt: { type: String, default: null },
+    totalSessionSeconds: { type: Number, default: 0 },
+    totalAudioSeconds: { type: Number, default: 0 },
+    favoriteSurahIds: { type: [Number], default: [] },
+    bookmarkedAyahs: { type: [bookmarkedAyahSchema], default: [] },
+  },
+  {
+    collection: USERS_COLLECTION,
+    versionKey: false,
+  }
+);
+
+function getUserModel(): Model<StoredUser> {
+  return (
+    (mongoose.models[USER_MODEL_NAME] as Model<StoredUser> | undefined) ??
+    mongoose.model<StoredUser>(USER_MODEL_NAME, userSchema)
+  );
 }
 
-async function readUsersFile(): Promise<UsersFileShape> {
-  await ensureUsersFileExists();
-  const raw = await readFile(USERS_FILE_PATH, 'utf8');
-
-  try {
-    const parsed = JSON.parse(raw) as UsersFileShape;
-    if (!parsed || !Array.isArray(parsed.users)) {
-      return { ...EMPTY_STORE };
-    }
-
-    const normalizedUsers = parsed.users
-      .map((entry) => normalizeStoredUser(entry))
-      .filter((entry): entry is StoredUser => entry !== null);
-
-    return { users: normalizedUsers };
-  } catch {
-    return { ...EMPTY_STORE };
+function isDuplicateEmailError(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return false;
   }
+
+  const candidate = error as {
+    code?: number;
+    keyPattern?: Record<string, number>;
+    keyValue?: Record<string, unknown>;
+  };
+
+  if (candidate.code !== 11000) {
+    return false;
+  }
+
+  if (candidate.keyPattern?.email === 1) {
+    return true;
+  }
+
+  return typeof candidate.keyValue?.email === 'string';
 }
 
-async function writeUsersFile(payload: UsersFileShape) {
-  await ensureUsersFileExists();
-  await writeFile(USERS_FILE_PATH, JSON.stringify(payload, null, 2), 'utf8');
-}
-
-async function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
-  const previous = writeQueue;
-  let release: () => void = () => undefined;
-  writeQueue = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-
-  await previous;
-
-  try {
-    return await operation();
-  } finally {
-    release();
-  }
+async function ensureUsersModel() {
+  await connectToMongoDatabase();
+  return getUserModel();
 }
 
 export async function findUserByEmail(email: string): Promise<StoredUser | null> {
-  const normalized = normalizeEmail(email);
-  const store = await readUsersFile();
+  const normalizedEmail = normalizeEmail(email);
+  const User = await ensureUsersModel();
 
-  return store.users.find((user) => user.email === normalized) ?? null;
+  const raw = await User.findOne({ email: normalizedEmail }).lean().exec();
+  return normalizeStoredUser(raw);
 }
 
 export async function findUserById(id: string): Promise<StoredUser | null> {
-  const store = await readUsersFile();
-  return store.users.find((user) => user.id === id) ?? null;
+  const User = await ensureUsersModel();
+  const raw = await User.findOne({ id }).lean().exec();
+  return normalizeStoredUser(raw);
 }
 
 export async function createUser(input: {
@@ -272,58 +287,62 @@ export async function createUser(input: {
   passwordHash: string;
   passwordSalt: string;
 }): Promise<StoredUser> {
+  const User = await ensureUsersModel();
   const normalizedEmail = normalizeEmail(input.email);
+  const nowIso = new Date().toISOString();
 
-  return withWriteLock(async () => {
-    const store = await readUsersFile();
-    const exists = store.users.some((user) => user.email === normalizedEmail);
-    if (exists) {
+  const user: StoredUser = {
+    id: randomUUID(),
+    name: input.name.trim(),
+    email: normalizedEmail,
+    passwordHash: input.passwordHash,
+    passwordSalt: input.passwordSalt,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+    loginCount: 1,
+    lastLoginAt: nowIso,
+    totalSessionSeconds: 0,
+    totalAudioSeconds: 0,
+    favoriteSurahIds: [],
+    bookmarkedAyahs: [],
+  };
+
+  try {
+    await User.create(user);
+  } catch (error) {
+    if (isDuplicateEmailError(error)) {
       throw new Error('EMAIL_ALREADY_EXISTS');
     }
 
-    const nowIso = new Date().toISOString();
+    throw error;
+  }
 
-    const user: StoredUser = {
-      id: randomUUID(),
-      name: input.name.trim(),
-      email: normalizedEmail,
-      passwordHash: input.passwordHash,
-      passwordSalt: input.passwordSalt,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-      loginCount: 1,
-      lastLoginAt: nowIso,
-      totalSessionSeconds: 0,
-      totalAudioSeconds: 0,
-      favoriteSurahIds: [],
-      bookmarkedAyahs: [],
-    };
-
-    store.users.push(user);
-    await writeUsersFile(store);
-    return user;
-  });
+  return user;
 }
 
 export async function markUserLogin(userId: string): Promise<StoredUser | null> {
-  return withWriteLock(async () => {
-    const store = await readUsersFile();
-    const index = store.users.findIndex((user) => user.id === userId);
-    if (index < 0) {
-      return null;
+  const User = await ensureUsersModel();
+  const nowIso = new Date().toISOString();
+
+  const raw = await User.findOneAndUpdate(
+    { id: userId },
+    {
+      $inc: {
+        loginCount: 1,
+      },
+      $set: {
+        lastLoginAt: nowIso,
+        updatedAt: nowIso,
+      },
+    },
+    {
+      new: true,
     }
+  )
+    .lean()
+    .exec();
 
-    const nowIso = new Date().toISOString();
-    store.users[index] = {
-      ...store.users[index],
-      loginCount: store.users[index].loginCount + 1,
-      lastLoginAt: nowIso,
-      updatedAt: nowIso,
-    };
-
-    await writeUsersFile(store);
-    return store.users[index];
-  });
+  return normalizeStoredUser(raw);
 }
 
 export async function incrementUserUsage(
@@ -337,23 +356,27 @@ export async function incrementUserUsage(
     return findUserById(userId);
   }
 
-  return withWriteLock(async () => {
-    const store = await readUsersFile();
-    const index = store.users.findIndex((user) => user.id === userId);
-    if (index < 0) {
-      return null;
+  const User = await ensureUsersModel();
+
+  const raw = await User.findOneAndUpdate(
+    { id: userId },
+    {
+      $inc: {
+        totalSessionSeconds: safeSessionSeconds,
+        totalAudioSeconds: safeAudioSeconds,
+      },
+      $set: {
+        updatedAt: new Date().toISOString(),
+      },
+    },
+    {
+      new: true,
     }
+  )
+    .lean()
+    .exec();
 
-    store.users[index] = {
-      ...store.users[index],
-      totalSessionSeconds: store.users[index].totalSessionSeconds + safeSessionSeconds,
-      totalAudioSeconds: store.users[index].totalAudioSeconds + safeAudioSeconds,
-      updatedAt: new Date().toISOString(),
-    };
-
-    await writeUsersFile(store);
-    return store.users[index];
-  });
+  return normalizeStoredUser(raw);
 }
 
 export async function replaceUserQuranState(
@@ -363,31 +386,48 @@ export async function replaceUserQuranState(
   const nextFavoriteSurahIds = normalizeFavoriteSurahIds(input.favoriteSurahIds);
   const nextBookmarkedAyahs = normalizeBookmarkedAyahs(input.bookmarkedAyahs);
 
-  return withWriteLock(async () => {
-    const store = await readUsersFile();
-    const index = store.users.findIndex((user) => user.id === userId);
-    if (index < 0) {
-      return null;
+  const User = await ensureUsersModel();
+
+  const raw = await User.findOneAndUpdate(
+    { id: userId },
+    {
+      $set: {
+        favoriteSurahIds: nextFavoriteSurahIds,
+        bookmarkedAyahs: nextBookmarkedAyahs,
+        updatedAt: new Date().toISOString(),
+      },
+    },
+    {
+      new: true,
     }
+  )
+    .lean()
+    .exec();
 
-    store.users[index] = {
-      ...store.users[index],
-      favoriteSurahIds: nextFavoriteSurahIds,
-      bookmarkedAyahs: nextBookmarkedAyahs,
-      updatedAt: new Date().toISOString(),
-    };
-
-    await writeUsersFile(store);
-    return store.users[index];
-  });
+  return normalizeStoredUser(raw);
 }
 
 export async function listSurahLikeCounts(): Promise<Record<number, number>> {
-  const store = await readUsersFile();
+  const User = await ensureUsersModel();
   const likesMap: Record<number, number> = {};
 
-  getLoggedInUsers(store.users).forEach((user) => {
-    user.favoriteSurahIds.forEach((surahId) => {
+  const users = await User.find(
+    {
+      loginCount: { $gt: 0 },
+      lastLoginAt: { $nin: [null, ''] },
+    },
+    {
+      _id: 0,
+      favoriteSurahIds: 1,
+    }
+  )
+    .lean()
+    .exec();
+
+  users.forEach((entry) => {
+    const candidate = entry as { favoriteSurahIds?: unknown };
+    const favoriteSurahIds = normalizeFavoriteSurahIds(candidate.favoriteSurahIds);
+    favoriteSurahIds.forEach((surahId) => {
       likesMap[surahId] = (likesMap[surahId] ?? 0) + 1;
     });
   });
@@ -396,11 +436,19 @@ export async function listSurahLikeCounts(): Promise<Record<number, number>> {
 }
 
 export async function listUsersForAdmin(): Promise<AdminUserSummary[]> {
-  const store = await readUsersFile();
+  const User = await ensureUsersModel();
 
-  return getLoggedInUsers(store.users)
-    .map((user) => toAdminSummary(user))
-    .sort((left, right) => {
-      return right.createdAt.localeCompare(left.createdAt);
-    });
+  const users = await User.find({
+    loginCount: { $gt: 0 },
+    lastLoginAt: { $nin: [null, ''] },
+  })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
+
+  const normalizedUsers = users
+    .map((entry) => normalizeStoredUser(entry))
+    .filter((entry): entry is StoredUser => entry !== null);
+
+  return getLoggedInUsers(normalizedUsers).map((user) => toAdminSummary(user));
 }
