@@ -17,6 +17,7 @@ export default function SurahList() {
     filterSurahs,
     favorites,
     toggleFavoriteSurah,
+    getSurahLikesCount,
     lastRead,
   } = useSurahContext();
 
@@ -42,6 +43,7 @@ export default function SurahList() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {filterSurahs.map((surah) => {
         const isFavorite = favorites.includes(surah.id);
+        const likesCount = getSurahLikesCount(surah.id);
         const hasLastRead = lastRead?.surahId === surah.id;
 
         return (
@@ -63,14 +65,19 @@ export default function SurahList() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => toggleFavoriteSurah(surah.id)}
-                  className="rounded-lg border border-[var(--color-border)] p-2 text-[var(--color-muted-text)] transition-colors hover:border-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
-                  aria-label={isFavorite ? 'Remove favorite' : 'Mark as favorite'}
-                >
-                  <Heart className={`size-4 ${isFavorite ? 'fill-current text-[var(--color-accent)]' : ''}`} />
-                </button>
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => toggleFavoriteSurah(surah.id)}
+                    className="rounded-lg border border-[var(--color-border)] p-2 text-[var(--color-muted-text)] transition-colors hover:border-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+                    aria-label={isFavorite ? 'Remove favorite' : 'Mark as favorite'}
+                  >
+                    <Heart className={`size-4 ${isFavorite ? 'fill-current text-[var(--color-accent)]' : ''}`} />
+                  </button>
+                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-text)]">
+                    {likesCount} likes
+                  </p>
+                </div>
               </div>
 
               <div className="mt-4 flex items-center justify-between gap-2">

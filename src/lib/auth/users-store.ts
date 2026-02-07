@@ -2,6 +2,16 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
+import { buildBookmarkId } from '@/lib/quran-utils';
+
+export interface StoredAyahBookmark {
+  id: string;
+  surahId: number;
+  ayahNumber: number;
+  text: string;
+  createdAt: string;
+}
+
 export interface StoredUser {
   id: string;
   name: string;
@@ -14,6 +24,8 @@ export interface StoredUser {
   lastLoginAt: string | null;
   totalSessionSeconds: number;
   totalAudioSeconds: number;
+  favoriteSurahIds: number[];
+  bookmarkedAyahs: StoredAyahBookmark[];
 }
 
 export interface AdminUserSummary {
@@ -26,6 +38,8 @@ export interface AdminUserSummary {
   lastLoginAt: string | null;
   totalSessionSeconds: number;
   totalAudioSeconds: number;
+  favoriteSurahIds: number[];
+  bookmarkedAyahs: StoredAyahBookmark[];
 }
 
 interface UsersFileShape {
@@ -36,9 +50,98 @@ const USERS_FILE_PATH = path.join(process.cwd(), 'data', 'users.json');
 const EMPTY_STORE: UsersFileShape = { users: [] };
 
 let writeQueue = Promise.resolve();
+const MIN_SURAH_ID = 1;
+const MAX_SURAH_ID = 114;
+const MAX_AYAH_NUMBER = 286;
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
+}
+
+function normalizeSurahId(value: unknown) {
+  const surahId = Number(value);
+  if (!Number.isInteger(surahId)) {
+    return null;
+  }
+
+  if (surahId < MIN_SURAH_ID || surahId > MAX_SURAH_ID) {
+    return null;
+  }
+
+  return surahId;
+}
+
+function normalizeAyahNumber(value: unknown) {
+  const ayahNumber = Number(value);
+  if (!Number.isInteger(ayahNumber)) {
+    return null;
+  }
+
+  if (ayahNumber < 1 || ayahNumber > MAX_AYAH_NUMBER) {
+    return null;
+  }
+
+  return ayahNumber;
+}
+
+function normalizeFavoriteSurahIds(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .map((entry) => normalizeSurahId(entry))
+        .filter((entry): entry is number => entry !== null)
+    )
+  ).sort((left, right) => left - right);
+}
+
+function normalizeBookmarkedAyah(raw: unknown): StoredAyahBookmark | null {
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+
+  const candidate = raw as Record<string, unknown>;
+  const surahId = normalizeSurahId(candidate.surahId);
+  const ayahNumber = normalizeAyahNumber(candidate.ayahNumber);
+
+  if (!surahId || !ayahNumber) {
+    return null;
+  }
+
+  const id = buildBookmarkId(surahId, ayahNumber);
+  const createdAt = String(candidate.createdAt ?? new Date().toISOString());
+  const text = String(candidate.text ?? '').trim();
+
+  return {
+    id,
+    surahId,
+    ayahNumber,
+    text,
+    createdAt,
+  };
+}
+
+function normalizeBookmarkedAyahs(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const byId = new Map<string, StoredAyahBookmark>();
+  value.forEach((entry) => {
+    const normalized = normalizeBookmarkedAyah(entry);
+    if (!normalized) {
+      return;
+    }
+
+    byId.set(normalized.id, normalized);
+  });
+
+  return Array.from(byId.values()).sort((left, right) => {
+    return right.createdAt.localeCompare(left.createdAt);
+  });
 }
 
 function normalizeStoredUser(raw: unknown): StoredUser | null {
@@ -73,6 +176,10 @@ function normalizeStoredUser(raw: unknown): StoredUser | null {
         : String(candidate.lastLoginAt),
     totalSessionSeconds: Number(candidate.totalSessionSeconds ?? 0) || 0,
     totalAudioSeconds: Number(candidate.totalAudioSeconds ?? 0) || 0,
+    favoriteSurahIds: normalizeFavoriteSurahIds(candidate.favoriteSurahIds),
+    bookmarkedAyahs: normalizeBookmarkedAyahs(
+      candidate.bookmarkedAyahs ?? candidate.bookmarks
+    ),
   };
 }
 
@@ -87,6 +194,8 @@ function toAdminSummary(user: StoredUser): AdminUserSummary {
     lastLoginAt: user.lastLoginAt,
     totalSessionSeconds: user.totalSessionSeconds,
     totalAudioSeconds: user.totalAudioSeconds,
+    favoriteSurahIds: user.favoriteSurahIds,
+    bookmarkedAyahs: user.bookmarkedAyahs,
   };
 }
 
@@ -186,6 +295,8 @@ export async function createUser(input: {
       lastLoginAt: nowIso,
       totalSessionSeconds: 0,
       totalAudioSeconds: 0,
+      favoriteSurahIds: [],
+      bookmarkedAyahs: [],
     };
 
     store.users.push(user);
@@ -243,6 +354,45 @@ export async function incrementUserUsage(
     await writeUsersFile(store);
     return store.users[index];
   });
+}
+
+export async function replaceUserQuranState(
+  userId: string,
+  input: { favoriteSurahIds: number[]; bookmarkedAyahs: StoredAyahBookmark[] }
+): Promise<StoredUser | null> {
+  const nextFavoriteSurahIds = normalizeFavoriteSurahIds(input.favoriteSurahIds);
+  const nextBookmarkedAyahs = normalizeBookmarkedAyahs(input.bookmarkedAyahs);
+
+  return withWriteLock(async () => {
+    const store = await readUsersFile();
+    const index = store.users.findIndex((user) => user.id === userId);
+    if (index < 0) {
+      return null;
+    }
+
+    store.users[index] = {
+      ...store.users[index],
+      favoriteSurahIds: nextFavoriteSurahIds,
+      bookmarkedAyahs: nextBookmarkedAyahs,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await writeUsersFile(store);
+    return store.users[index];
+  });
+}
+
+export async function listSurahLikeCounts(): Promise<Record<number, number>> {
+  const store = await readUsersFile();
+  const likesMap: Record<number, number> = {};
+
+  getLoggedInUsers(store.users).forEach((user) => {
+    user.favoriteSurahIds.forEach((surahId) => {
+      likesMap[surahId] = (likesMap[surahId] ?? 0) + 1;
+    });
+  });
+
+  return likesMap;
 }
 
 export async function listUsersForAdmin(): Promise<AdminUserSummary[]> {

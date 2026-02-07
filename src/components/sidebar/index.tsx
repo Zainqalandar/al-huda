@@ -252,6 +252,7 @@ export default function QuranReaderPage() {
     loading: surahListLoading,
     toggleFavoriteSurah,
     isFavoriteSurah,
+    getSurahLikesCount,
     bookmarks,
     toggleBookmark,
     isBookmarked,
@@ -810,6 +811,7 @@ export default function QuranReaderPage() {
 
   const highlightQuery = debouncedSearch.trim();
   const favorite = isFavoriteSurah(surahId);
+  const likesCount = getSurahLikesCount(surahId);
   const activeReciterName =
     settings.audioPreference === 'tr'
       ? 'Urdu Translation'
@@ -1057,6 +1059,9 @@ export default function QuranReaderPage() {
                       {favorite ? 'Favorited' : 'Favorite Surah'}
                     </Button>
                   </div>
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-text)]">
+                    {likesCount} likes
+                  </p>
                 </div>
               </div>
 

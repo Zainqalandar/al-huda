@@ -19,6 +19,12 @@ interface AdminUserRecord {
   lastLoginAt: string | null;
   totalSessionSeconds: number;
   totalAudioSeconds: number;
+  favoriteSurahIds: number[];
+  bookmarkedAyahs: Array<{
+    surahId: number;
+    ayahNumber: number;
+    createdAt: string;
+  }>;
 }
 
 interface AdminUsageSummary {
@@ -67,6 +73,33 @@ function formatDate(value: string | null) {
   }
 
   return date.toLocaleString();
+}
+
+function formatFavoriteSurahs(ids: number[]) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return 'None';
+  }
+
+  return ids.join(', ');
+}
+
+function formatBookmarkedAyahs(
+  bookmarks: Array<{ surahId: number; ayahNumber: number }>
+) {
+  if (!Array.isArray(bookmarks) || bookmarks.length === 0) {
+    return 'None';
+  }
+
+  const preview = bookmarks
+    .slice(0, 3)
+    .map((bookmark) => `${bookmark.surahId}:${bookmark.ayahNumber}`)
+    .join(', ');
+  const remaining = bookmarks.length - 3;
+  if (remaining > 0) {
+    return `${preview} +${remaining}`;
+  }
+
+  return preview;
 }
 
 export default function AdminUsersPage() {
@@ -232,6 +265,8 @@ export default function AdminUsersPage() {
                       <th className="px-4 py-3 font-semibold">Logins</th>
                       <th className="px-4 py-3 font-semibold">Time Spent</th>
                       <th className="px-4 py-3 font-semibold">Audio Time</th>
+                      <th className="px-4 py-3 font-semibold">Favorite Surahs</th>
+                      <th className="px-4 py-3 font-semibold">Bookmarked Ayahs</th>
                       <th className="px-4 py-3 font-semibold">Last Login</th>
                       <th className="px-4 py-3 font-semibold">Joined</th>
                     </tr>
@@ -240,7 +275,7 @@ export default function AdminUsersPage() {
                     {loading ? (
                       <tr>
                         <td
-                          colSpan={7}
+                          colSpan={9}
                           className="px-4 py-5 text-center text-[var(--color-muted-text)]"
                         >
                           Users loading...
@@ -264,6 +299,12 @@ export default function AdminUsersPage() {
                             {formatDuration(user.totalAudioSeconds)}
                           </td>
                           <td className="px-4 py-3 text-[var(--color-text)]">
+                            {formatFavoriteSurahs(user.favoriteSurahIds)}
+                          </td>
+                          <td className="px-4 py-3 text-[var(--color-text)]">
+                            {formatBookmarkedAyahs(user.bookmarkedAyahs)}
+                          </td>
+                          <td className="px-4 py-3 text-[var(--color-text)]">
                             {formatDate(user.lastLoginAt)}
                           </td>
                           <td className="px-4 py-3 text-[var(--color-text)]">
@@ -274,7 +315,7 @@ export default function AdminUsersPage() {
                     ) : (
                       <tr>
                         <td
-                          colSpan={7}
+                          colSpan={9}
                           className="px-4 py-5 text-center text-[var(--color-muted-text)]"
                         >
                           No logged-in users found.
