@@ -48,6 +48,43 @@ interface AyahWithTranslation {
   translation?: string;
 }
 
+interface AyahTimingRange {
+  ayahNumber: number;
+  fromMs: number;
+  toMs: number;
+}
+
+interface ChapterRecitationPayload {
+  audio_file?: {
+    timestamps?: Array<{
+      verse_key?: string;
+      timestamp_from?: number;
+      timestamp_to?: number;
+    }>;
+  };
+}
+
+function getQuranComRecitationId(reciterName: string | undefined) {
+  if (!reciterName) {
+    return null;
+  }
+
+  const normalized = reciterName.toLowerCase();
+  if (normalized.includes('mishary') || normalized.includes('afasy')) {
+    return 7;
+  }
+
+  if (normalized.includes('abu bakr') || normalized.includes('shatri')) {
+    return 4;
+  }
+
+  if (normalized.includes('hani') || normalized.includes('rifai')) {
+    return 5;
+  }
+
+  return null;
+}
+
 function sanitizeTafsirHtml(html: string) {
   return html
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
@@ -235,6 +272,8 @@ export default function QuranReaderPage() {
   const [isPlayPending, setIsPlayPending] = useState(false);
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [ayahTimings, setAyahTimings] = useState<AyahTimingRange[]>([]);
+  const [activeAudioAyahNumber, setActiveAudioAyahNumber] = useState<number | null>(null);
 
   const [tafseerOpen, setTafseerOpen] = useState(false);
   const [tafseerAyahNumber, setTafseerAyahNumber] = useState<number | null>(null);
@@ -444,6 +483,80 @@ export default function QuranReaderPage() {
   }, [selectedReciter, settings.audioPreference, surahId]);
 
   useEffect(() => {
+    if (settings.audioPreference !== 'ar') {
+      setAyahTimings([]);
+      return;
+    }
+
+    const reciterName = audioReciters[selectedReciter]?.reciter;
+    const recitationId = getQuranComRecitationId(reciterName);
+    if (!recitationId) {
+      setAyahTimings([]);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const loadTimings = async () => {
+      try {
+        const response = await fetch(
+          `https://api.quran.com/api/v4/chapter_recitations/${recitationId}/${surahId}?segments=true`,
+          {
+            signal: controller.signal,
+            headers: {
+              Accept: 'application/json',
+            },
+          }
+        );
+
+        if (!response.ok) {
+          setAyahTimings([]);
+          return;
+        }
+
+        const payload = (await response.json()) as ChapterRecitationPayload;
+        const parsedTimings = (payload.audio_file?.timestamps ?? [])
+          .map((entry) => {
+            const ayahPart = entry.verse_key?.split(':')?.[1];
+            const ayahNumber = Number(ayahPart);
+            const fromMs = Number(entry.timestamp_from);
+            const toMs = Number(entry.timestamp_to);
+
+            if (
+              !Number.isInteger(ayahNumber) ||
+              ayahNumber < 1 ||
+              !Number.isFinite(fromMs) ||
+              !Number.isFinite(toMs) ||
+              toMs <= fromMs
+            ) {
+              return null;
+            }
+
+            return {
+              ayahNumber,
+              fromMs,
+              toMs,
+            } satisfies AyahTimingRange;
+          })
+          .filter((entry): entry is AyahTimingRange => entry !== null)
+          .sort((left, right) => left.ayahNumber - right.ayahNumber);
+
+        setAyahTimings(parsedTimings);
+      } catch {
+        if (!controller.signal.aborted) {
+          setAyahTimings([]);
+        }
+      }
+    };
+
+    void loadTimings();
+
+    return () => {
+      controller.abort();
+    };
+  }, [audioReciters, selectedReciter, settings.audioPreference, surahId]);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) {
       return;
@@ -537,6 +650,61 @@ export default function QuranReaderPage() {
       audio.removeEventListener('error', onEnd);
     };
   }, [loading]);
+
+  useEffect(() => {
+    if (!isPlaying || ayahs.length === 0) {
+      setActiveAudioAyahNumber(null);
+      return;
+    }
+
+    const currentMs = Math.max(audioCurrentTime, 0) * 1000;
+
+    if (ayahTimings.length > 0) {
+      const matchedTiming =
+        ayahTimings.find(
+          (timing) => currentMs >= timing.fromMs && currentMs < timing.toMs
+        ) ??
+        ayahTimings.find((timing) => currentMs < timing.toMs) ??
+        ayahTimings[ayahTimings.length - 1];
+
+      setActiveAudioAyahNumber(matchedTiming?.ayahNumber ?? null);
+      return;
+    }
+
+    if (audioDuration > 0) {
+      const progress = clampRange(audioCurrentTime / audioDuration, 0, 0.999999);
+      const index = Math.min(
+        ayahs.length - 1,
+        Math.floor(progress * ayahs.length)
+      );
+
+      setActiveAudioAyahNumber(ayahs[index]?.ayah.numberInSurah ?? null);
+      return;
+    }
+
+    setActiveAudioAyahNumber(null);
+  }, [audioCurrentTime, audioDuration, ayahTimings, ayahs, isPlaying]);
+
+  useEffect(() => {
+    if (
+      !isPlaying ||
+      !activeAudioAyahNumber ||
+      settings.readingMode !== 'ayah' ||
+      tafseerOpen ||
+      isNavigatorOpen
+    ) {
+      return;
+    }
+
+    const target = document.getElementById(`ayah-${activeAudioAyahNumber}`);
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [
+    activeAudioAyahNumber,
+    isNavigatorOpen,
+    isPlaying,
+    settings.readingMode,
+    tafseerOpen,
+  ]);
 
   useEffect(() => {
     if (!tafseerOpen) {
@@ -881,6 +1049,12 @@ export default function QuranReaderPage() {
                   </div>
                 </div>
 
+                {isPlaying && activeAudioAyahNumber ? (
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color-mix(in_oklab,var(--color-accent),var(--color-heading)_42%)]">
+                    Now Playing Ayah {activeAudioAyahNumber}
+                  </p>
+                ) : null}
+
                 <div className="mt-2 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] p-2">
                   <div className="grid grid-cols-3 items-center gap-2">
                     <Button
@@ -1021,7 +1195,14 @@ export default function QuranReaderPage() {
                 <p className="arabic-font arabic-reading text-right text-[var(--color-heading)]">
                   {filteredAyahs.map(({ ayah }, index) => (
                     <span key={ayah.number}>
-                      <span id={`ayah-${ayah.numberInSurah}`}>
+                      <span
+                        id={`ayah-${ayah.numberInSurah}`}
+                        className={
+                          isPlaying && activeAudioAyahNumber === ayah.numberInSurah
+                            ? 'rounded-lg bg-[color-mix(in_oklab,var(--color-accent),white_78%)] px-1.5 py-0.5 text-[var(--color-heading)] shadow-[var(--shadow-soft)]'
+                            : undefined
+                        }
+                      >
                         {ayah.text}
                       </span>{' '}
                       <span className="mx-1 text-sm text-[color-mix(in_oklab,var(--color-accent),#c79a42_42%)]">
@@ -1040,12 +1221,19 @@ export default function QuranReaderPage() {
                 const isLastRead = currentLastRead?.ayahNumber === ayah.numberInSurah;
                 const isCurrentTafseerAyah =
                   tafseerOpen && tafseerAyahNumber === ayah.numberInSurah;
+                const isAudioActiveAyah =
+                  isPlaying && activeAudioAyahNumber === ayah.numberInSurah;
+                const ayahHighlightClass = isAudioActiveAyah
+                  ? 'ring-2 ring-[color-mix(in_oklab,var(--color-accent),#c79a42_45%)] shadow-[var(--shadow-soft)]'
+                  : isLastRead
+                    ? 'ring-2 ring-[var(--color-accent)]/20'
+                    : '';
 
                 return (
                   <Card
                     id={`ayah-${ayah.numberInSurah}`}
                     key={ayah.number}
-                    className={`border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_10%),color-mix(in_oklab,#c79a42,var(--color-surface)_96%))] ${isLastRead ? 'ring-2 ring-[var(--color-accent)]/20' : ''}`}
+                    className={`border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_10%),color-mix(in_oklab,#c79a42,var(--color-surface)_96%))] ${ayahHighlightClass}`}
                   >
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1094,13 +1282,15 @@ export default function QuranReaderPage() {
                         </div>
                       </div>
 
-                      <p className="arabic-font arabic-reading mt-4 text-right text-[var(--color-heading)]">
+                      <p
+                        className={`arabic-font arabic-reading mt-4 text-right text-[var(--color-heading)] ${isAudioActiveAyah ? 'rounded-xl bg-[color-mix(in_oklab,var(--color-accent),white_84%)] px-3 py-2' : ''}`}
+                      >
                         <HighlightText text={ayah.text} query={highlightQuery} />
                       </p>
 
                       {translation ? (
                         <p
-                          className={`mt-3 text-sm leading-relaxed text-[var(--color-muted-text)] ${settings.audioPreference === 'tr' ? 'urdu-font text-right text-[1.02rem]' : ''}`}
+                          className={`mt-3 text-sm leading-relaxed text-[var(--color-muted-text)] ${settings.audioPreference === 'tr' ? 'urdu-font text-right text-[1.02rem]' : ''} ${isAudioActiveAyah ? 'text-[var(--color-heading)]' : ''}`}
                           dir={settings.audioPreference === 'tr' ? 'rtl' : 'ltr'}
                         >
                           <HighlightText text={translation} query={highlightQuery} />
