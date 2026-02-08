@@ -1440,7 +1440,7 @@ export default function QuranReaderPage() {
   };
 
   return (
-    <div className="pb-16 pt-6 sm:pt-8" data-slot="page-shell">
+    <div className="pb-36 pt-6 sm:pb-28 sm:pt-8" data-slot="page-shell">
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-5">
           <Card className="animate-fade-up border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(130deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,#c79a42,var(--color-surface)_88%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))] shadow-[var(--shadow-card)]">
@@ -1711,110 +1711,6 @@ export default function QuranReaderPage() {
                   ) : null}
                 </div>
 
-                <div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={audioDuration > 0 ? audioDuration : 1}
-                    step={0.1}
-                    value={
-                      audioDuration > 0
-                        ? clampRange(audioCurrentTime, 0, audioDuration)
-                        : 0
-                    }
-                    onChange={(event) => handleSeekChange(Number(event.target.value))}
-                    onInput={(event) =>
-                      handleSeekChange(Number((event.target as HTMLInputElement).value))
-                    }
-                    className="app-range cursor-pointer"
-                    aria-label="Audio seek"
-                  />
-                  <div className="mt-1 flex items-center justify-between text-xs text-[var(--color-muted-text)]">
-                    <span>{formatAudioTime(audioCurrentTime)}</span>
-                    <span>{formatAudioTime(audioDuration)}</span>
-                  </div>
-                </div>
-
-                {isPlaying && activeAudioAyahNumber ? (
-                  <p className="animate-fade-up rounded-full border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[var(--color-surface-elevated)] px-2 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[color-mix(in_oklab,var(--color-accent),var(--color-heading)_42%)]">
-                    Now Playing Ayah {activeAudioAyahNumber}
-                  </p>
-                ) : null}
-
-                <div className="mt-2 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(150deg,color-mix(in_oklab,var(--color-surface-2),white_16%),color-mix(in_oklab,var(--color-accent),var(--color-surface-2)_95%))] p-2">
-                  <div className="grid grid-cols-3 items-center gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handlePreviousAudioStep}
-                      aria-label="Previous 10 seconds"
-                      className="h-10 justify-center rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)] px-2"
-                    >
-                      <ChevronLeft className="size-4" />
-                      Prev
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="h-10 min-w-0 justify-center rounded-xl px-2 shadow-[var(--shadow-card)]"
-                      onClick={toggleAudioPlay}
-                      aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
-                    >
-                      {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
-                      {isPlaying ? 'Pause' : 'Play'}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handleNextAudioStep}
-                      aria-label="Next 10 seconds"
-                      className="h-10 justify-center rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)] px-2"
-                    >
-                      Next
-                      <ChevronRight className="size-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
-                  <div>
-                    <label htmlFor="reader-reciter-top" className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
-                      Voice
-                    </label>
-                    <div className="relative sm:max-w-sm">
-                      <select
-                        id="reader-reciter-top"
-                        className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium"
-                        value={selectedReciter}
-                        onChange={(event) => setSelectedReciter(Number(event.target.value))}
-                        aria-label="Reciter voice"
-                      >
-                        {audioReciters.map((reciter, index) => (
-                          <option key={`${reciter.reciter}-${index}`} value={index}>
-                            {reciter.reciter ?? `Reciter ${index + 1}`}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-xs text-[var(--color-muted-text)]">
-                    {settings.audioPreference === 'tr'
-                      ? 'Translation mode enabled.'
-                      : 'Arabic recitation voices unavailable for this surah.'}
-                  </p>
-                )}
-
-                {loadingAudioSource ? (
-                  <p className="text-xs text-[var(--color-muted-text)]">Loading audio source...</p>
-                ) : null}
-                {audioSourceError ? (
-                  <p className="text-xs text-[var(--color-danger)]">{audioSourceError}</p>
-                ) : null}
-                <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
               </div>
             </CardHeader>
           </Card>
@@ -2043,6 +1939,107 @@ export default function QuranReaderPage() {
           </Card>
         </aside>
       </div>
+
+      <div className="fixed bottom-2 left-1/2 z-[70] w-[min(46rem,calc(100vw-0.75rem))] -translate-x-1/2">
+        <div className="rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] bg-[linear-gradient(150deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_90%))] p-2 shadow-[var(--shadow-card)] backdrop-blur-xl sm:p-2.5">
+          <div className="mb-1 flex items-center justify-between gap-2 text-[10px] font-medium text-[var(--color-muted-text)] sm:text-[11px]">
+            <span className="truncate">
+              {isPlaying && activeAudioAyahNumber
+                ? `Now Playing Ayah ${activeAudioAyahNumber}`
+                : activeReciterName}
+            </span>
+            <span className="whitespace-nowrap">
+              {formatAudioTime(audioCurrentTime)} / {formatAudioTime(audioDuration)}
+            </span>
+          </div>
+
+          <input
+            type="range"
+            min={0}
+            max={audioDuration > 0 ? audioDuration : 1}
+            step={0.1}
+            value={
+              audioDuration > 0
+                ? clampRange(audioCurrentTime, 0, audioDuration)
+                : 0
+            }
+            onChange={(event) => handleSeekChange(Number(event.target.value))}
+            onInput={(event) =>
+              handleSeekChange(Number((event.target as HTMLInputElement).value))
+            }
+            className="app-range h-1.5 cursor-pointer"
+            aria-label="Audio seek"
+          />
+
+          <div className="mt-2 flex items-center gap-1.5">
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={handlePreviousAudioStep}
+              aria-label="Previous 10 seconds"
+              className="size-8 rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)]"
+            >
+              <ChevronLeft className="size-4" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              className="size-9 rounded-xl shadow-[var(--shadow-soft)]"
+              onClick={toggleAudioPlay}
+              aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+            >
+              {isPlaying ? (
+                <Pause className="size-4" />
+              ) : (
+                <Play className={`size-4 ${isPlayPending ? 'animate-pulse' : ''}`} />
+              )}
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={handleNextAudioStep}
+              aria-label="Next 10 seconds"
+              className="size-8 rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)]"
+            >
+              <ChevronRight className="size-4" />
+            </Button>
+
+            <div className="ml-auto min-w-0">
+              {settings.audioPreference === 'ar' && audioReciters.length > 0 ? (
+                <div className="relative w-[9.8rem] max-w-full sm:w-[12rem]">
+                  <select
+                    id="reader-reciter-top"
+                    className="app-select h-8 w-full appearance-none rounded-xl px-2.5 pr-8 text-[11px] font-medium"
+                    value={selectedReciter}
+                    onChange={(event) => setSelectedReciter(Number(event.target.value))}
+                    aria-label="Reciter voice"
+                  >
+                    {audioReciters.map((reciter, index) => (
+                      <option key={`${reciter.reciter}-${index}`} value={index}>
+                        {reciter.reciter ?? `Reciter ${index + 1}`}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                </div>
+              ) : (
+                <p className="truncate text-[10px] text-[var(--color-muted-text)] sm:text-[11px]">
+                  {settings.audioPreference === 'tr' ? 'Urdu mode' : 'Voice unavailable'}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {(loadingAudioSource || audioSourceError) ? (
+            <p className={`mt-1 text-[10px] sm:text-[11px] ${audioSourceError ? 'text-[var(--color-danger)]' : 'text-[var(--color-muted-text)]'}`}>
+              {audioSourceError || 'Loading audio source...'}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
 
       {isNavigatorOpen ? (
         <div className="fixed inset-0 z-[85]">
