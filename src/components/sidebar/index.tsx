@@ -1735,7 +1735,7 @@ export default function QuranReaderPage() {
                     </>
                   ) : (
                     <p className="mt-2 text-xs text-[var(--color-muted-text)]">
-                      Repeat icon par click karke controls open karein.
+                      Click the Repeat icon to open the controls.
                     </p>
                   )}
 

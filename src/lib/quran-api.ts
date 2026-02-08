@@ -1,46 +1,16 @@
 import type { SurahDetail, SurahMeta, UrduTafsirEntry } from '@/types/quran';
 import { isValidSurahId } from '@/lib/quran-utils';
 
-const SURAH_META_CACHE_PREFIX = 'alhuda.surah.meta.v1.';
-const SURAH_DETAIL_CACHE_PREFIX = 'alhuda.surah.detail.v1.';
-const TAFSIR_URDU_CACHE_PREFIX = 'alhuda.tafsir.ur.v1.';
-
-function getCached<T>(key: string): T | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const raw = window.localStorage.getItem(key);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
-
-function setCached<T>(key: string, value: T) {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // ignore quota errors
-  }
-}
+const surahMetaCache = new Map<number, SurahMeta>();
+const surahDetailCache = new Map<number, SurahDetail>();
+const urduTafsirCache = new Map<string, UrduTafsirEntry>();
 
 export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Promise<SurahMeta> {
   if (!isValidSurahId(surahId)) {
     throw new Error('Invalid surah number');
   }
 
-  const cacheKey = `${SURAH_META_CACHE_PREFIX}${surahId}`;
-  const cached = getCached<SurahMeta>(cacheKey);
+  const cached = surahMetaCache.get(surahId);
   if (cached) {
     return cached;
   }
@@ -54,7 +24,7 @@ export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Pro
   }
 
   const payload = (await response.json()) as SurahMeta;
-  setCached(cacheKey, payload);
+  surahMetaCache.set(surahId, payload);
   return payload;
 }
 
@@ -66,8 +36,7 @@ export async function fetchSurahDetail(
     throw new Error('Invalid surah number');
   }
 
-  const cacheKey = `${SURAH_DETAIL_CACHE_PREFIX}${surahId}`;
-  const cached = getCached<SurahDetail>(cacheKey);
+  const cached = surahDetailCache.get(surahId);
   if (cached) {
     return cached;
   }
@@ -86,7 +55,7 @@ export async function fetchSurahDetail(
     throw new Error('Invalid surah details payload');
   }
 
-  setCached(cacheKey, payload.data);
+  surahDetailCache.set(surahId, payload.data);
   return payload.data;
 }
 
@@ -103,8 +72,8 @@ export async function fetchUrduTafsirByAyah(
     throw new Error('Invalid ayah number');
   }
 
-  const cacheKey = `${TAFSIR_URDU_CACHE_PREFIX}${surahId}:${ayahNumber}`;
-  const cached = getCached<UrduTafsirEntry>(cacheKey);
+  const cacheKey = `${surahId}:${ayahNumber}`;
+  const cached = urduTafsirCache.get(cacheKey);
   if (cached) {
     return cached;
   }
@@ -122,6 +91,6 @@ export async function fetchUrduTafsirByAyah(
     throw new Error('Invalid Urdu tafsir payload');
   }
 
-  setCached(cacheKey, payload);
+  urduTafsirCache.set(cacheKey, payload);
   return payload;
 }

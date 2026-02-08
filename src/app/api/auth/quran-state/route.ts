@@ -13,9 +13,16 @@ const bookmarkSchema = z.object({
   createdAt: z.string().optional(),
 });
 
+const lastReadSchema = z.object({
+  surahId: z.number().int().min(1).max(114),
+  ayahNumber: z.number().int().min(1).max(286),
+  updatedAt: z.string().optional(),
+});
+
 const quranStateSchema = z.object({
   favoriteSurahIds: z.array(z.number().int().min(1).max(114)).max(114),
   bookmarkedAyahs: z.array(bookmarkSchema).max(1000),
+  lastRead: lastReadSchema.nullable().optional(),
 });
 
 function toIsoOrNow(value: string | undefined) {
@@ -61,6 +68,7 @@ export async function GET() {
   return NextResponse.json({
     favoriteSurahIds: user.favoriteSurahIds,
     bookmarkedAyahs: user.bookmarkedAyahs,
+    lastRead: user.lastRead,
   });
 }
 
@@ -115,9 +123,18 @@ export async function PUT(request: Request) {
     return right.createdAt.localeCompare(left.createdAt);
   });
 
+  const lastRead = parsed.data.lastRead
+    ? {
+        surahId: parsed.data.lastRead.surahId,
+        ayahNumber: parsed.data.lastRead.ayahNumber,
+        updatedAt: toIsoOrNow(parsed.data.lastRead.updatedAt),
+      }
+    : null;
+
   const updated = await replaceUserQuranState(userId, {
     favoriteSurahIds,
     bookmarkedAyahs,
+    lastRead,
   });
 
   if (!updated) {
@@ -128,5 +145,6 @@ export async function PUT(request: Request) {
     ok: true,
     favoriteSurahIds: updated.favoriteSurahIds,
     bookmarkedAyahs: updated.bookmarkedAyahs,
+    lastRead: updated.lastRead,
   });
 }

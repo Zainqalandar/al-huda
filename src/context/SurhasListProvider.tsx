@@ -13,7 +13,6 @@ import {
 } from 'react';
 
 import useSurahList from '@/hooks/useSurahList';
-import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import type {
   AyahBookmark,
@@ -63,11 +62,6 @@ interface SurahListContext {
 
 const SurhasList = createContext<SurahListContext | null>(null);
 
-const SORT_STORAGE_KEY = 'alhuda.quran.sort.v1';
-const FAVORITES_STORAGE_KEY = 'alhuda.quran.favorites.v1';
-const BOOKMARKS_STORAGE_KEY = 'alhuda.quran.bookmarks.v1';
-const LAST_READ_STORAGE_KEY = 'alhuda.quran.last-read.v1';
-
 interface PersistedSort {
   sortBy: SurahSortBy;
   order: SortOrder;
@@ -89,6 +83,7 @@ interface SessionPayload {
 interface QuranStatePayload {
   favoriteSurahIds?: number[];
   bookmarkedAyahs?: AyahBookmark[];
+  lastRead?: LastReadEntry | null;
 }
 
 interface SurahLikesPayload {
@@ -163,7 +158,40 @@ function normalizeBookmarks(input: AyahBookmark[]) {
   });
 }
 
-function serializeQuranState(favorites: number[], bookmarks: AyahBookmark[]) {
+function normalizeLastReadEntry(input: LastReadEntry | null | undefined) {
+  if (!input) {
+    return null;
+  }
+
+  if (
+    !Number.isInteger(input.surahId) ||
+    input.surahId < MIN_SURAH_ID ||
+    input.surahId > MAX_SURAH_ID ||
+    !Number.isInteger(input.ayahNumber) ||
+    input.ayahNumber < 1 ||
+    input.ayahNumber > MAX_AYAH_NUMBER
+  ) {
+    return null;
+  }
+
+  const updatedAtRaw = String(input.updatedAt ?? new Date().toISOString());
+  const updatedAtDate = new Date(updatedAtRaw);
+  const updatedAt = Number.isNaN(updatedAtDate.getTime())
+    ? new Date().toISOString()
+    : updatedAtDate.toISOString();
+
+  return {
+    surahId: input.surahId,
+    ayahNumber: input.ayahNumber,
+    updatedAt,
+  } satisfies LastReadEntry;
+}
+
+function serializeQuranState(
+  favorites: number[],
+  bookmarks: AyahBookmark[],
+  lastRead: LastReadEntry | null
+) {
   return JSON.stringify({
     favoriteSurahIds: normalizeFavoriteSurahIds(favorites),
     bookmarkedAyahs: normalizeBookmarks(bookmarks).map((bookmark) => ({
@@ -173,6 +201,7 @@ function serializeQuranState(favorites: number[], bookmarks: AyahBookmark[]) {
       text: bookmark.text,
       createdAt: bookmark.createdAt,
     })),
+    lastRead: normalizeLastReadEntry(lastRead),
   });
 }
 
@@ -182,22 +211,10 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
   const [pageNo, setPageNo] = useState<number>(1);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const [sortState, setSortState] = useLocalStorageState<PersistedSort>(
-    SORT_STORAGE_KEY,
-    defaultSort
-  );
-  const [favorites, setFavorites, favoritesLoaded] = useLocalStorageState<number[]>(
-    FAVORITES_STORAGE_KEY,
-    []
-  );
-  const [bookmarks, setBookmarks, bookmarksLoaded] = useLocalStorageState<AyahBookmark[]>(
-    BOOKMARKS_STORAGE_KEY,
-    []
-  );
-  const [lastRead, saveLastRead] = useLocalStorageState<LastReadEntry | null>(
-    LAST_READ_STORAGE_KEY,
-    null
-  );
+  const [sortState, setSortState] = useState<PersistedSort>(defaultSort);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [bookmarks, setBookmarks] = useState<AyahBookmark[]>([]);
+  const [lastRead, setLastReadState] = useState<LastReadEntry | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [didLoadSession, setDidLoadSession] = useState(false);
   const [didHydrateRemoteState, setDidHydrateRemoteState] = useState(false);
@@ -337,7 +354,7 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   useEffect(() => {
-    if (!favoritesLoaded || !bookmarksLoaded || !didLoadSession || didHydrateRemoteState) {
+    if (!didLoadSession || didHydrateRemoteState) {
       return;
     }
 
@@ -345,7 +362,12 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
 
     const hydrateQuranState = async () => {
       if (!isAuthenticated) {
-        syncedQuranStateRef.current = serializeQuranState(favorites, bookmarks);
+        if (!ignore) {
+          setFavorites([]);
+          setBookmarks([]);
+          setLastReadState(null);
+        }
+        syncedQuranStateRef.current = serializeQuranState([], [], null);
         if (!ignore) {
           setDidHydrateRemoteState(true);
         }
@@ -358,7 +380,7 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
         });
 
         if (!response.ok) {
-          syncedQuranStateRef.current = serializeQuranState(favorites, bookmarks);
+          syncedQuranStateRef.current = serializeQuranState(favorites, bookmarks, lastRead);
           return;
         }
 
@@ -369,14 +391,20 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
         const nextBookmarks = normalizeBookmarks(
           Array.isArray(payload.bookmarkedAyahs) ? payload.bookmarkedAyahs : []
         );
+        const nextLastRead = normalizeLastReadEntry(payload.lastRead ?? null);
 
         if (!ignore) {
           setFavorites(nextFavorites);
           setBookmarks(nextBookmarks);
+          setLastReadState(nextLastRead);
         }
-        syncedQuranStateRef.current = serializeQuranState(nextFavorites, nextBookmarks);
+        syncedQuranStateRef.current = serializeQuranState(
+          nextFavorites,
+          nextBookmarks,
+          nextLastRead
+        );
       } catch {
-        syncedQuranStateRef.current = serializeQuranState(favorites, bookmarks);
+        syncedQuranStateRef.current = serializeQuranState(favorites, bookmarks, lastRead);
       } finally {
         if (!ignore) {
           setDidHydrateRemoteState(true);
@@ -391,27 +419,19 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
     };
   }, [
     bookmarks,
-    bookmarksLoaded,
     didHydrateRemoteState,
     didLoadSession,
     favorites,
-    favoritesLoaded,
     isAuthenticated,
-    setBookmarks,
-    setFavorites,
+    lastRead,
   ]);
 
   useEffect(() => {
-    if (
-      !favoritesLoaded ||
-      !bookmarksLoaded ||
-      !didHydrateRemoteState ||
-      !isAuthenticated
-    ) {
+    if (!didHydrateRemoteState || !isAuthenticated) {
       return;
     }
 
-    const snapshot = serializeQuranState(favorites, bookmarks);
+    const snapshot = serializeQuranState(favorites, bookmarks, lastRead);
     if (snapshot === syncedQuranStateRef.current) {
       return;
     }
@@ -429,6 +449,7 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
           body: JSON.stringify({
             favoriteSurahIds: normalizeFavoriteSurahIds(favorites),
             bookmarkedAyahs: normalizeBookmarks(bookmarks),
+            lastRead: normalizeLastReadEntry(lastRead),
           }),
         });
 
@@ -444,13 +465,15 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
         const nextBookmarks = normalizeBookmarks(
           Array.isArray(payload.bookmarkedAyahs) ? payload.bookmarkedAyahs : bookmarks
         );
-        const nextSnapshot = serializeQuranState(nextFavorites, nextBookmarks);
+        const nextLastRead = normalizeLastReadEntry(payload.lastRead ?? lastRead);
+        const nextSnapshot = serializeQuranState(nextFavorites, nextBookmarks, nextLastRead);
 
         syncedQuranStateRef.current = nextSnapshot;
 
         if (!ignore) {
           setFavorites(nextFavorites);
           setBookmarks(nextBookmarks);
+          setLastReadState(nextLastRead);
         }
 
         await loadSurahLikes();
@@ -466,14 +489,11 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
     };
   }, [
     bookmarks,
-    bookmarksLoaded,
     didHydrateRemoteState,
     favorites,
-    favoritesLoaded,
     isAuthenticated,
+    lastRead,
     loadSurahLikes,
-    setBookmarks,
-    setFavorites,
   ]);
 
   const filterSurahs = useMemo(() => {
@@ -571,9 +591,14 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
         return;
       }
 
-      saveLastRead(entry);
+      const normalizedEntry = normalizeLastReadEntry(entry);
+      if (!normalizedEntry) {
+        return;
+      }
+
+      setLastReadState(normalizedEntry);
     },
-    [requireAuthentication, saveLastRead]
+    [requireAuthentication]
   );
 
   const addLanguage = useCallback(

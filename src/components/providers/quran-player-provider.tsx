@@ -12,14 +12,12 @@ import {
 } from 'react';
 
 import { useAppSettings } from '@/components/providers/app-settings-provider';
-import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { useSurahContext } from '@/hooks/useSurahContext';
 import { fetchSurahMeta } from '@/lib/quran-api';
 import { clampRange, isValidSurahId } from '@/lib/quran-utils';
 import type { QuranPlayerContextValue, QuranPlayerPrefs, LoadSurahOptions } from '@/types/player';
 import type { SurahAudioOption } from '@/types/quran';
 
-const PLAYER_PREFS_KEY = 'alhuda.player.prefs.v1';
 const DEFAULT_PREFS: QuranPlayerPrefs = {
   volume: 0.9,
   playbackRate: 1,
@@ -43,10 +41,7 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
   const pendingStartAyahRef = useRef<number | null>(null);
   const ayahCountRef = useRef<number>(0);
 
-  const [prefs, setPrefs] = useLocalStorageState<QuranPlayerPrefs>(
-    PLAYER_PREFS_KEY,
-    DEFAULT_PREFS
-  );
+  const [prefs, setPrefs] = useState<QuranPlayerPrefs>(DEFAULT_PREFS);
 
   const { settings } = useAppSettings();
   const { surahs, pageNo, setPageNo } = useSurahContext();

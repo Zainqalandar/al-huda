@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import {
   ArrowRight,
   BookMarked,
@@ -14,31 +15,100 @@ import {
   Timer,
 } from 'lucide-react';
 
-import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import type { AyahBookmark, LastReadEntry } from '@/types/quran';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-const FAVORITES_STORAGE_KEY = 'alhuda.quran.favorites.v1';
-const BOOKMARKS_STORAGE_KEY = 'alhuda.quran.bookmarks.v1';
-const LAST_READ_STORAGE_KEY = 'alhuda.quran.last-read.v1';
-
 export default function HomeRoot() {
-  const [favorites, , favoritesLoaded] = useLocalStorageState<number[]>(
-    FAVORITES_STORAGE_KEY,
-    []
-  );
-  const [bookmarks, , bookmarksLoaded] = useLocalStorageState<AyahBookmark[]>(
-    BOOKMARKS_STORAGE_KEY,
-    []
-  );
-  const [lastRead, , lastReadLoaded] = useLocalStorageState<LastReadEntry | null>(
-    LAST_READ_STORAGE_KEY,
-    null
-  );
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [bookmarks, setBookmarks] = useState<AyahBookmark[]>([]);
+  const [lastRead, setLastRead] = useState<LastReadEntry | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const isLoaded = favoritesLoaded && bookmarksLoaded && lastReadLoaded;
+  useEffect(() => {
+    let ignore = false;
+
+    const loadQuranState = async () => {
+      try {
+        const sessionResponse = await fetch('/api/auth/session', {
+          cache: 'no-store',
+        });
+
+        if (!sessionResponse.ok) {
+          if (!ignore) {
+            setFavorites([]);
+            setBookmarks([]);
+            setLastRead(null);
+          }
+          return;
+        }
+
+        const sessionPayload = (await sessionResponse.json()) as {
+          user?: { id?: string | null } | null;
+        };
+
+        if (!sessionPayload.user?.id) {
+          if (!ignore) {
+            setFavorites([]);
+            setBookmarks([]);
+            setLastRead(null);
+          }
+          return;
+        }
+
+        const quranStateResponse = await fetch('/api/auth/quran-state', {
+          cache: 'no-store',
+        });
+
+        if (!quranStateResponse.ok) {
+          if (!ignore) {
+            setFavorites([]);
+            setBookmarks([]);
+            setLastRead(null);
+          }
+          return;
+        }
+
+        const quranStatePayload = (await quranStateResponse.json()) as {
+          favoriteSurahIds?: number[];
+          bookmarkedAyahs?: AyahBookmark[];
+          lastRead?: LastReadEntry | null;
+        };
+
+        if (!ignore) {
+          setFavorites(
+            Array.isArray(quranStatePayload.favoriteSurahIds)
+              ? quranStatePayload.favoriteSurahIds
+              : []
+          );
+          setBookmarks(
+            Array.isArray(quranStatePayload.bookmarkedAyahs)
+              ? quranStatePayload.bookmarkedAyahs
+              : []
+          );
+          setLastRead(quranStatePayload.lastRead ?? null);
+        }
+      } catch {
+        if (!ignore) {
+          setFavorites([]);
+          setBookmarks([]);
+          setLastRead(null);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoaded(true);
+        }
+      }
+    };
+
+    void loadQuranState();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   const hasLastRead = Boolean(lastRead?.surahId && lastRead?.ayahNumber);
   const firstFavoriteSurahId = favorites[0] ?? null;
   const latestBookmark = bookmarks[0] ?? null;

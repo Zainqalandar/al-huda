@@ -13,6 +13,12 @@ export interface StoredAyahBookmark {
   createdAt: string;
 }
 
+export interface StoredLastReadEntry {
+  surahId: number;
+  ayahNumber: number;
+  updatedAt: string;
+}
+
 export interface StoredUser {
   id: string;
   name: string;
@@ -27,6 +33,7 @@ export interface StoredUser {
   totalAudioSeconds: number;
   favoriteSurahIds: number[];
   bookmarkedAyahs: StoredAyahBookmark[];
+  lastRead: StoredLastReadEntry | null;
 }
 
 export interface AdminUserSummary {
@@ -41,6 +48,7 @@ export interface AdminUserSummary {
   totalAudioSeconds: number;
   favoriteSurahIds: number[];
   bookmarkedAyahs: StoredAyahBookmark[];
+  lastRead: StoredLastReadEntry | null;
 }
 
 const MIN_SURAH_ID = 1;
@@ -139,6 +147,32 @@ function normalizeBookmarkedAyahs(value: unknown) {
   });
 }
 
+function normalizeLastRead(value: unknown): StoredLastReadEntry | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const surahId = normalizeSurahId(candidate.surahId);
+  const ayahNumber = normalizeAyahNumber(candidate.ayahNumber);
+
+  if (!surahId || !ayahNumber) {
+    return null;
+  }
+
+  const updatedAtRaw = String(candidate.updatedAt ?? new Date().toISOString());
+  const updatedAtDate = new Date(updatedAtRaw);
+  const updatedAt = Number.isNaN(updatedAtDate.getTime())
+    ? new Date().toISOString()
+    : updatedAtDate.toISOString();
+
+  return {
+    surahId,
+    ayahNumber,
+    updatedAt,
+  };
+}
+
 function normalizeStoredUser(raw: unknown): StoredUser | null {
   if (!raw || typeof raw !== 'object') {
     return null;
@@ -175,6 +209,7 @@ function normalizeStoredUser(raw: unknown): StoredUser | null {
     bookmarkedAyahs: normalizeBookmarkedAyahs(
       candidate.bookmarkedAyahs ?? candidate.bookmarks
     ),
+    lastRead: normalizeLastRead(candidate.lastRead),
   };
 }
 
@@ -191,6 +226,7 @@ function toAdminSummary(user: StoredUser): AdminUserSummary {
     totalAudioSeconds: user.totalAudioSeconds,
     favoriteSurahIds: user.favoriteSurahIds,
     bookmarkedAyahs: user.bookmarkedAyahs,
+    lastRead: user.lastRead,
   };
 }
 
@@ -205,6 +241,17 @@ const bookmarkedAyahSchema = new Schema<StoredAyahBookmark>(
     ayahNumber: { type: Number, required: true, min: 1, max: MAX_AYAH_NUMBER },
     text: { type: String, default: '' },
     createdAt: { type: String, required: true },
+  },
+  {
+    _id: false,
+  }
+);
+
+const lastReadSchema = new Schema<StoredLastReadEntry>(
+  {
+    surahId: { type: Number, required: true, min: MIN_SURAH_ID, max: MAX_SURAH_ID },
+    ayahNumber: { type: Number, required: true, min: 1, max: MAX_AYAH_NUMBER },
+    updatedAt: { type: String, required: true },
   },
   {
     _id: false,
@@ -226,6 +273,7 @@ const userSchema = new Schema<StoredUser>(
     totalAudioSeconds: { type: Number, default: 0 },
     favoriteSurahIds: { type: [Number], default: [] },
     bookmarkedAyahs: { type: [bookmarkedAyahSchema], default: [] },
+    lastRead: { type: lastReadSchema, default: null },
   },
   {
     collection: USERS_COLLECTION,
@@ -305,6 +353,7 @@ export async function createUser(input: {
     totalAudioSeconds: 0,
     favoriteSurahIds: [],
     bookmarkedAyahs: [],
+    lastRead: null,
   };
 
   try {
@@ -381,10 +430,15 @@ export async function incrementUserUsage(
 
 export async function replaceUserQuranState(
   userId: string,
-  input: { favoriteSurahIds: number[]; bookmarkedAyahs: StoredAyahBookmark[] }
+  input: {
+    favoriteSurahIds: number[];
+    bookmarkedAyahs: StoredAyahBookmark[];
+    lastRead: StoredLastReadEntry | null;
+  }
 ): Promise<StoredUser | null> {
   const nextFavoriteSurahIds = normalizeFavoriteSurahIds(input.favoriteSurahIds);
   const nextBookmarkedAyahs = normalizeBookmarkedAyahs(input.bookmarkedAyahs);
+  const nextLastRead = normalizeLastRead(input.lastRead);
 
   const User = await ensureUsersModel();
 
@@ -394,6 +448,7 @@ export async function replaceUserQuranState(
       $set: {
         favoriteSurahIds: nextFavoriteSurahIds,
         bookmarkedAyahs: nextBookmarkedAyahs,
+        lastRead: nextLastRead,
         updatedAt: new Date().toISOString(),
       },
     },

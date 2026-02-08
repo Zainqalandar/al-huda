@@ -6,13 +6,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useState,
   type PropsWithChildren,
 } from 'react';
 
-import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import type { AppSettings, ArabicFont, AudioPreference, ReadingMode } from '@/types/settings';
-
-const SETTINGS_STORAGE_KEY = 'alhuda.settings.v1';
 
 const DEFAULT_SETTINGS: AppSettings = {
   readingMode: 'ayah',
@@ -40,10 +38,8 @@ function clampScale(value: number): number {
 }
 
 export function AppSettingsProvider({ children }: PropsWithChildren) {
-  const [settings, setSettings, isLoaded] = useLocalStorageState<AppSettings>(
-    SETTINGS_STORAGE_KEY,
-    DEFAULT_SETTINGS
-  );
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const isLoaded = true;
 
   useEffect(() => {
     if (!isLoaded) return;

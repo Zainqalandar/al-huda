@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 import type { SurahListItem } from '@/types/quran';
 
-const SURAH_LIST_CACHE_KEY = 'alhuda.surah-list.v1';
 let cachedSurahs: SurahListItem[] | null = null;
 
 interface UseSurahListResult {
@@ -61,20 +60,6 @@ export default function useSurahList(): UseSurahListResult {
       return;
     }
 
-    const localCached = window.localStorage.getItem(SURAH_LIST_CACHE_KEY);
-    if (localCached) {
-      try {
-        const parsed = normalizeSurahList(JSON.parse(localCached));
-        if (parsed.length > 0) {
-          cachedSurahs = parsed;
-          setSurahList(parsed);
-          setLoading(false);
-        }
-      } catch {
-        // keep fetching
-      }
-    }
-
     const controller = new AbortController();
 
     const fetchData = async () => {
@@ -93,7 +78,6 @@ export default function useSurahList(): UseSurahListResult {
 
         cachedSurahs = normalized;
         setSurahList(normalized);
-        window.localStorage.setItem(SURAH_LIST_CACHE_KEY, JSON.stringify(normalized));
         setError(null);
       } catch (fetchError) {
         if ((fetchError as Error).name === 'AbortError') {
