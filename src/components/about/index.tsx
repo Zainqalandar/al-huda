@@ -28,7 +28,7 @@ export default function AboutRoot() {
         <h1 className="font-display text-4xl text-[var(--color-heading)]">Our Mission & Vision</h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--color-muted-text)] sm:text-base">
           Al-Huda is built to make authentic Islamic content easier to read and revisit.
-          We focus on a respectful user experience so Quran recitation and hadith stay
+          We focus on a respectful user experience so Quran recitation and reflection stay
           accessible on every device.
         </p>
       </section>

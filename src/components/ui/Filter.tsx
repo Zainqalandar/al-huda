@@ -23,24 +23,22 @@ export default function Filter() {
   } = useSurahContext();
 
   const [queryInput, setQueryInput] = useState(searchQuery);
-const debouncedQuery = useDebouncedValue(queryInput, 300);
+  const debouncedQuery = useDebouncedValue(queryInput, 300);
 
-useEffect(() => {
-  if (debouncedQuery !== searchQuery) {
-    setSearchQuery(debouncedQuery);
-  }
-}, [debouncedQuery, searchQuery, setSearchQuery]);
+  useEffect(() => {
+    if (debouncedQuery !== searchQuery) {
+      setSearchQuery(debouncedQuery);
+    }
+  }, [debouncedQuery, searchQuery, setSearchQuery]);
 
-useEffect(() => {
-  setQueryInput(searchQuery);
-}, [searchQuery]);
+  useEffect(() => {
+    setQueryInput(searchQuery);
+  }, [searchQuery]);
 
-const handleReset = () => {
-  resetFilters();
-  setQueryInput('');
-};
-
-  console.log('FilterSurahs:', filterSurahs);
+  const handleReset = () => {
+    resetFilters();
+    setQueryInput('');
+  };
 
   return (
     <Card className="mb-6">

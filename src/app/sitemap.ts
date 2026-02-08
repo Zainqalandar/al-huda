@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://al-huda.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ['', '/quran', '/hadith', '/about', '/settings'];
+  const routes = ['', '/quran', '/about', '/admin'];
 
   const now = new Date();
 

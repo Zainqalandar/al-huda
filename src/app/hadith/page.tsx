@@ -1,12 +1,5 @@
-import HadithCard from '@/components/ui/HadithCard';
-import React from 'react';
+import { redirect } from 'next/navigation';
 
-const HadithPage = () => {
-	return (
-		<>
-			<HadithCard />
-		</>
-	);
-};
-
-export default HadithPage;
+export default function HadithPage() {
+  redirect('/quran');
+}

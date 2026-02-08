@@ -1,4 +1,5 @@
 import SurahList from '@/components/quran';
+import QuranSettingsPanel from '@/components/quran/quran-settings-panel';
 import Filter from '@/components/ui/Filter';
 import { Badge } from '@/components/ui/badge';
 
@@ -12,8 +13,9 @@ export default function QuranPage() {
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--color-muted-text)] sm:text-base">
           Search and sort all surahs, continue from your last read ayah, and keep your
-          favorites in one place.
+          favorites in one place. Settings icon se yahin se reading preferences control karein.
         </p>
+        <QuranSettingsPanel />
       </section>
 
       <Filter />
