@@ -360,6 +360,7 @@ export default function QuranReaderPage() {
   const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
   const [navigatorSearch, setNavigatorSearch] = useState('');
   const [expandedSurahId, setExpandedSurahId] = useState<number>(surahId);
+  const navigatorListRef = useRef<HTMLDivElement | null>(null);
 
   const debouncedSearch = useDebouncedValue(searchInput, 280);
   const resumeTargetRef = useRef<HTMLButtonElement | null>(null);
@@ -548,6 +549,38 @@ export default function QuranReaderPage() {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [isNavigatorOpen, tafseerOpen]);
+
+  useEffect(() => {
+    if (!isNavigatorOpen || surahListLoading) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      const listElement = navigatorListRef.current;
+      if (!listElement) {
+        return;
+      }
+
+      const currentSurahCard = listElement.querySelector<HTMLElement>(
+        `[data-surah-id="${surahId}"]`
+      );
+      if (!currentSurahCard) {
+        return;
+      }
+
+      const targetTop =
+        currentSurahCard.offsetTop - listElement.clientHeight / 2 + currentSurahCard.clientHeight / 2;
+
+      listElement.scrollTo({
+        top: Math.max(targetTop, 0),
+        behavior: 'smooth',
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [filteredNavigatorSurahs, isNavigatorOpen, surahId, surahListLoading]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -2090,7 +2123,7 @@ export default function QuranReaderPage() {
                 </div>
               </div>
 
-              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+              <div ref={navigatorListRef} className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
                 {surahListLoading ? (
                   <p className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3 text-sm text-[var(--color-muted-text)]">
                     Surah list load ho rahi hai...
@@ -2119,6 +2152,7 @@ export default function QuranReaderPage() {
                       return (
                         <div
                           key={surah.id}
+                          data-surah-id={surah.id}
                           className={`rounded-xl border p-3 ${isCurrentSurah ? 'border-[color-mix(in_oklab,var(--color-accent),#c79a42_48%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)]' : 'border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_68%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)]'}`}
                         >
                           <div className="flex items-start gap-2">
