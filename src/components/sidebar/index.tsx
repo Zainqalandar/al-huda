@@ -1314,6 +1314,7 @@ export default function QuranReaderPage() {
                   tafseerOpen && tafseerAyahNumber === ayah.numberInSurah;
                 const isAudioActiveAyah =
                   isPlaying && activeAudioAyahNumber === ayah.numberInSurah;
+                const isUrduTranslation = settings.audioPreference === 'tr';
                 const ayahHighlightClass = isAudioActiveAyah
                   ? 'ring-2 ring-[color-mix(in_oklab,var(--color-accent),#c79a42_45%)] shadow-[var(--shadow-soft)]'
                   : isLastRead
@@ -1380,15 +1381,15 @@ export default function QuranReaderPage() {
                       </div>
 
                       <p
-                        className={`arabic-font arabic-reading mt-4 text-right text-[var(--color-heading)] ${isAudioActiveAyah ? 'rounded-xl bg-[color-mix(in_oklab,var(--color-accent),white_84%)] px-3 py-2' : ''}`}
+                        className={`arabic-font arabic-reading mt-4 text-right text-[var(--color-heading)] ${isAudioActiveAyah ? 'rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_44%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_84%),color-mix(in_oklab,var(--color-highlight),white_88%))] px-3 py-2 shadow-[var(--shadow-soft)] dark:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_26%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_42%),color-mix(in_oklab,var(--color-surface-2),black_8%))] dark:text-[var(--color-heading)]' : ''}`}
                       >
                         <HighlightText text={ayah.text} query={highlightQuery} />
                       </p>
 
                       {translation ? (
                         <p
-                          className={`mt-3 text-sm leading-relaxed text-[var(--color-muted-text)] ${settings.audioPreference === 'tr' ? 'urdu-font text-right text-[1.02rem]' : ''} ${isAudioActiveAyah ? 'text-[var(--color-heading)]' : ''}`}
-                          dir={settings.audioPreference === 'tr' ? 'rtl' : 'ltr'}
+                          className={`mt-3 text-sm leading-relaxed text-[var(--color-muted-text)] ${isUrduTranslation ? 'urdu-font text-right text-[1.06rem]' : ''} ${isAudioActiveAyah ? isUrduTranslation ? 'rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_48%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_86%),color-mix(in_oklab,var(--color-accent-soft),white_90%))] px-3 py-2 text-[color-mix(in_oklab,var(--color-heading),var(--color-accent)_16%)] shadow-[var(--shadow-soft)] dark:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_28%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_44%),color-mix(in_oklab,var(--color-surface-2),black_8%))] dark:text-[var(--color-heading)]' : 'text-[var(--color-heading)]' : ''}`}
+                          dir={isUrduTranslation ? 'rtl' : 'ltr'}
                         >
                           <HighlightText text={translation} query={highlightQuery} />
                         </p>
