@@ -4,6 +4,7 @@ import {
   Cormorant_Garamond,
   Amiri,
   Noto_Naskh_Arabic,
+  Noto_Nastaliq_Urdu,
   Scheherazade_New,
 } from 'next/font/google';
 
@@ -51,6 +52,13 @@ const arabicScheherazade = Scheherazade_New({
   display: 'swap',
 });
 
+const urduNastaliq = Noto_Nastaliq_Urdu({
+  subsets: ['arabic'],
+  variable: '--font-urdu-nastaliq',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || 'https://al-huda.vercel.app'
@@ -88,7 +96,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${bodyFont.variable} ${displayFont.variable} ${arabicAmiri.variable} ${arabicNaskh.variable} ${arabicScheherazade.variable} font-body`}
+        className={`${bodyFont.variable} ${displayFont.variable} ${arabicAmiri.variable} ${arabicNaskh.variable} ${arabicScheherazade.variable} ${urduNastaliq.variable} font-body`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AppSettingsProvider>

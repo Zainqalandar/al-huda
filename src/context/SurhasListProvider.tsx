@@ -98,6 +98,12 @@ interface SurahLikesPayload {
 const MIN_SURAH_ID = 1;
 const MAX_SURAH_ID = 114;
 const MAX_AYAH_NUMBER = 286;
+const OPEN_AUTH_MODAL_EVENT = 'alhuda:open-auth-modal';
+
+interface OpenAuthModalDetail {
+  tab?: 'signin' | 'signup';
+  reason?: string;
+}
 
 function sortSurahs(list: SurahListItem[], sortBy: SurahSortBy, order: SortOrder) {
   return [...list].sort((a, b) => {
@@ -227,6 +233,33 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
   const resetFilters = useCallback(() => {
     setSortState(defaultSort);
   }, [setSortState]);
+
+  const openAuthModal = useCallback((detail: OpenAuthModalDetail) => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent<OpenAuthModalDetail>(OPEN_AUTH_MODAL_EVENT, {
+        detail,
+      })
+    );
+  }, []);
+
+  const requireAuthentication = useCallback(
+    (actionLabel: string) => {
+      if (isAuthenticated) {
+        return true;
+      }
+
+      openAuthModal({
+        tab: 'signin',
+        reason: didLoadSession ? actionLabel : 'access your Quran library',
+      });
+      return false;
+    },
+    [didLoadSession, isAuthenticated, openAuthModal]
+  );
 
   const loadSurahLikes = useCallback(async () => {
     try {
@@ -461,13 +494,17 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
 
   const toggleFavoriteSurah = useCallback(
     (surahId: number) => {
+      if (!requireAuthentication('like this surah')) {
+        return;
+      }
+
       setFavorites((prev) =>
         prev.includes(surahId)
           ? prev.filter((id) => id !== surahId)
           : [...prev, surahId]
       );
     },
-    [setFavorites]
+    [requireAuthentication, setFavorites]
   );
 
   const isFavoriteSurah = useCallback(
@@ -482,6 +519,10 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
 
   const toggleBookmark = useCallback(
     ({ surahId, ayahNumber, text }: Omit<AyahBookmark, 'id' | 'createdAt'>) => {
+      if (!requireAuthentication('save ayah bookmarks')) {
+        return;
+      }
+
       const id = buildBookmarkId(surahId, ayahNumber);
       setBookmarks((prev) => {
         const exists = prev.some((bookmark) => bookmark.id === id);
@@ -501,7 +542,7 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
         ];
       });
     },
-    [setBookmarks]
+    [requireAuthentication, setBookmarks]
   );
 
   const isBookmarked = useCallback(
@@ -515,16 +556,24 @@ const SurhasListProvider = ({ children }: PropsWithChildren) => {
 
   const removeBookmark = useCallback(
     (bookmarkId: string) => {
+      if (!requireAuthentication('manage saved bookmarks')) {
+        return;
+      }
+
       setBookmarks((prev) => prev.filter((bookmark) => bookmark.id !== bookmarkId));
     },
-    [setBookmarks]
+    [requireAuthentication, setBookmarks]
   );
 
   const setLastRead = useCallback(
     (entry: LastReadEntry) => {
+      if (!requireAuthentication('save reading progress')) {
+        return;
+      }
+
       saveLastRead(entry);
     },
-    [saveLastRead]
+    [requireAuthentication, saveLastRead]
   );
 
   const addLanguage = useCallback(

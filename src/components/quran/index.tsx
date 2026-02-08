@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BookmarkPlus, Clock3, Heart } from 'lucide-react';
+import { BookmarkPlus, Clock3, Heart, Sparkles } from 'lucide-react';
 
 import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
@@ -41,7 +41,7 @@ export default function SurahList() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {filterSurahs.map((surah) => {
+      {filterSurahs.map((surah, index) => {
         const isFavorite = favorites.includes(surah.id);
         const likesCount = getSurahLikesCount(surah.id);
         const hasLastRead = lastRead?.surahId === surah.id;
@@ -49,7 +49,8 @@ export default function SurahList() {
         return (
           <Card
             key={surah.id}
-            className="group transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
+            className="group animate-fade-up border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_96%))] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
+            style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
@@ -65,17 +66,17 @@ export default function SurahList() {
                   </p>
                 </div>
 
-                <div className="text-right">
+                <div className="flex flex-col items-center">
                   <button
                     type="button"
                     onClick={() => toggleFavoriteSurah(surah.id)}
-                    className="rounded-lg border border-[var(--color-border)] p-2 text-[var(--color-muted-text)] transition-colors hover:border-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+                    className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 text-[var(--color-muted-text)] transition-colors hover:border-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
                     aria-label={isFavorite ? 'Remove favorite' : 'Mark as favorite'}
                   >
                     <Heart className={`size-4 ${isFavorite ? 'fill-current text-[var(--color-accent)]' : ''}`} />
                   </button>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-text)]">
-                    {likesCount} likes
+                  <p className="mt-1 text-xs font-semibold leading-none text-[var(--color-muted-text)]">
+                    {likesCount}
                   </p>
                 </div>
               </div>
@@ -84,7 +85,13 @@ export default function SurahList() {
                 <p className="arabic-font text-xl text-[var(--color-heading)]" dir="rtl">
                   {surah.surahNameArabic}
                 </p>
-                <Badge variant="secondary">Ayahs {surah.totalAyah}</Badge>
+                <Badge
+                  variant="secondary"
+                  className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_52%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_76%),color-mix(in_oklab,var(--color-accent-soft),white_82%))] text-[color-mix(in_oklab,var(--color-heading),var(--color-accent)_34%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_20%),color-mix(in_oklab,var(--color-accent-soft),black_14%))] dark:text-[var(--color-accent-foreground)]"
+                >
+                  <Sparkles className="mr-1 size-3.5" />
+                  Ayahs {surah.totalAyah}
+                </Badge>
               </div>
 
               <div className="mt-5 flex flex-wrap items-center gap-2">

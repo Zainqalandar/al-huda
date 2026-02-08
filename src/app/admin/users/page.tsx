@@ -2,7 +2,15 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { Clock3, Headphones, LayoutDashboard, RefreshCcw, Users } from 'lucide-react';
+import {
+  Clock3,
+  Headphones,
+  LayoutDashboard,
+  Mail,
+  RefreshCcw,
+  Search,
+  Users,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -170,7 +178,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="pb-16 pt-10" data-slot="page-shell">
-      <section className="mb-6">
+      <section className="mb-6 animate-fade-up">
         <Badge className="mb-2">Admin</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)]">Users Table</h1>
         <p className="mt-2 text-sm text-[var(--color-muted-text)]">
@@ -180,7 +188,7 @@ export default function AdminUsersPage() {
 
       <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
         <aside className="lg:sticky lg:top-[5rem] lg:h-fit">
-          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface)_94%))]">
+          <Card className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_56%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <LayoutDashboard className="size-5 text-[var(--color-accent)]" />
@@ -206,35 +214,39 @@ export default function AdminUsersPage() {
         </aside>
 
         <section className="space-y-4">
-          <Card>
-            <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <Card className="animate-fade-up">
+            <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="grid gap-2 text-xs text-[var(--color-text)] sm:grid-cols-3 sm:text-sm">
                 <p className="flex items-center gap-1.5">
                   <Users className="size-4 text-[var(--color-accent)]" />
                   Logged-in Users: <span className="font-semibold">{summary.totalUsers}</span>
                 </p>
                 <p className="flex items-center gap-1.5">
-                  <Clock3 className="size-4 text-[var(--color-accent)]" />
+                  <Clock3 className="size-4 text-[var(--color-info)]" />
                   Website Time:{' '}
                   <span className="font-semibold">
                     {formatDuration(summary.totalSessionSeconds)}
                   </span>
                 </p>
                 <p className="flex items-center gap-1.5">
-                  <Headphones className="size-4 text-[var(--color-accent)]" />
+                  <Headphones className="size-4 text-[var(--color-highlight)]" />
                   Audio Time:{' '}
                   <span className="font-semibold">
                     {formatDuration(summary.totalAudioSeconds)}
                   </span>
                 </p>
               </div>
-              <div className="flex w-full gap-2 sm:w-auto">
-                <Input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search user name or email"
-                  className="sm:min-w-[16rem]"
-                />
+
+              <div className="flex w-full gap-2 lg:w-auto">
+                <div className="relative w-full lg:min-w-[18rem]">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search user name or email"
+                    className="pl-9"
+                  />
+                </div>
                 <Button
                   type="button"
                   variant="outline"
@@ -254,11 +266,82 @@ export default function AdminUsersPage() {
             </Card>
           ) : null}
 
-          <Card>
+          <div className="grid gap-3 md:hidden">
+            {loading ? (
+              <Card>
+                <CardContent className="p-4 text-sm text-[var(--color-muted-text)]">
+                  Users loading...
+                </CardContent>
+              </Card>
+            ) : filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <Card key={user.id} className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_66%)]">
+                  <CardContent className="space-y-3 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-[var(--color-heading)]">{user.name}</p>
+                        <p className="mt-1 inline-flex items-center gap-1 text-xs text-[var(--color-muted-text)]">
+                          <Mail className="size-3.5" />
+                          {user.email}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-text)]">
+                        Logins {user.loginCount}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2">
+                        <p className="text-[var(--color-muted-text)]">Time Spent</p>
+                        <p className="mt-1 font-semibold text-[var(--color-heading)]">
+                          {formatDuration(user.totalSessionSeconds)}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2">
+                        <p className="text-[var(--color-muted-text)]">Audio Time</p>
+                        <p className="mt-1 font-semibold text-[var(--color-heading)]">
+                          {formatDuration(user.totalAudioSeconds)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 text-xs text-[var(--color-muted-text)]">
+                      <p>
+                        Favorite Surahs:{' '}
+                        <span className="font-semibold text-[var(--color-text)]">
+                          {formatFavoriteSurahs(user.favoriteSurahIds)}
+                        </span>
+                      </p>
+                      <p>
+                        Bookmarks:{' '}
+                        <span className="font-semibold text-[var(--color-text)]">
+                          {formatBookmarkedAyahs(user.bookmarkedAyahs)}
+                        </span>
+                      </p>
+                      <p>
+                        Last Login:{' '}
+                        <span className="font-semibold text-[var(--color-text)]">
+                          {formatDate(user.lastLoginAt)}
+                        </span>
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card>
+                <CardContent className="p-4 text-sm text-[var(--color-muted-text)]">
+                  No logged-in users found.
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <Card className="hidden md:block animate-fade-up-delay-1 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_66%)]">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] text-xs uppercase tracking-[0.16em] text-[var(--color-muted-text)]">
+                <table className="min-w-[980px] w-full text-left text-sm">
+                  <thead className="bg-[linear-gradient(90deg,color-mix(in_oklab,var(--color-surface-2),white_12%),color-mix(in_oklab,var(--color-highlight),var(--color-surface-2)_94%))] text-xs uppercase tracking-[0.14em] text-[var(--color-muted-text)]">
                     <tr>
                       <th className="px-4 py-3 font-semibold">Name</th>
                       <th className="px-4 py-3 font-semibold">Email</th>
@@ -266,16 +349,15 @@ export default function AdminUsersPage() {
                       <th className="px-4 py-3 font-semibold">Time Spent</th>
                       <th className="px-4 py-3 font-semibold">Audio Time</th>
                       <th className="px-4 py-3 font-semibold">Favorite Surahs</th>
-                      <th className="px-4 py-3 font-semibold">Bookmarked Ayahs</th>
+                      <th className="px-4 py-3 font-semibold">Bookmarks</th>
                       <th className="px-4 py-3 font-semibold">Last Login</th>
-                      <th className="px-4 py-3 font-semibold">Joined</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       <tr>
                         <td
-                          colSpan={9}
+                          colSpan={8}
                           className="px-4 py-5 text-center text-[var(--color-muted-text)]"
                         >
                           Users loading...
@@ -285,10 +367,13 @@ export default function AdminUsersPage() {
                       filteredUsers.map((user) => (
                         <tr
                           key={user.id}
-                          className="border-t border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_74%)]"
+                          className="border-t border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_74%)] align-top transition-colors hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)]"
                         >
                           <td className="px-4 py-3 font-semibold text-[var(--color-heading)]">
                             {user.name}
+                            <p className="mt-0.5 text-xs font-normal text-[var(--color-muted-text)]">
+                              Joined: {formatDate(user.createdAt)}
+                            </p>
                           </td>
                           <td className="px-4 py-3 text-[var(--color-text)]">{user.email}</td>
                           <td className="px-4 py-3 text-[var(--color-text)]">{user.loginCount}</td>
@@ -307,15 +392,12 @@ export default function AdminUsersPage() {
                           <td className="px-4 py-3 text-[var(--color-text)]">
                             {formatDate(user.lastLoginAt)}
                           </td>
-                          <td className="px-4 py-3 text-[var(--color-text)]">
-                            {formatDate(user.createdAt)}
-                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
                         <td
-                          colSpan={9}
+                          colSpan={8}
                           className="px-4 py-5 text-center text-[var(--color-muted-text)]"
                         >
                           No logged-in users found.

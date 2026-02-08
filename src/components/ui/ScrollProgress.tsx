@@ -28,7 +28,7 @@ export default function ScrollProgress() {
       aria-hidden="true"
     >
       <div
-        className="h-full bg-[var(--color-accent)] transition-[width] duration-200"
+        className="h-full bg-[linear-gradient(90deg,var(--color-accent),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_72%))] transition-[width] duration-200"
         style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
       />
     </div>

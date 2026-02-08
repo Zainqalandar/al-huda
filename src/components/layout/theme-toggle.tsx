@@ -1,6 +1,6 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { MoonStar, SunMedium } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
@@ -17,7 +17,7 @@ export default function ThemeToggle() {
   if (!mounted) {
     return (
       <Button variant="outline" size="icon" aria-label="Toggle theme" disabled>
-        <Sun className="size-4" />
+        <SunMedium className="size-4" />
       </Button>
     );
   }
@@ -28,10 +28,11 @@ export default function ThemeToggle() {
     <Button
       variant="outline"
       size="icon"
+      className="animate-pulse-border"
       aria-label="Toggle theme"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
     >
-      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      {isDark ? <SunMedium className="size-4" /> : <MoonStar className="size-4" />}
     </Button>
   );
 }

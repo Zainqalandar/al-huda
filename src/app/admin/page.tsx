@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
+  BarChart3,
   Clock3,
+  Gauge,
   Headphones,
   LayoutDashboard,
   RefreshCcw,
@@ -116,9 +118,28 @@ export default function AdminPage() {
     void loadSummary();
   }, []);
 
+  const graphStats = useMemo(() => {
+    const maxTime = Math.max(summary.totalSessionSeconds, summary.totalAudioSeconds, 1);
+    const sessionPercent = Math.round((summary.totalSessionSeconds / maxTime) * 100);
+    const audioPercent = Math.round((summary.totalAudioSeconds / maxTime) * 100);
+    const audioSharePercent =
+      summary.totalSessionSeconds > 0
+        ? Math.min(
+            100,
+            Math.max(0, Math.round((summary.totalAudioSeconds / summary.totalSessionSeconds) * 100))
+          )
+        : 0;
+
+    return {
+      sessionPercent,
+      audioPercent,
+      audioSharePercent,
+    };
+  }, [summary.totalAudioSeconds, summary.totalSessionSeconds]);
+
   return (
     <div className="pb-16 pt-10" data-slot="page-shell">
-      <section className="mb-6">
+      <section className="mb-6 animate-fade-up">
         <Badge className="mb-2">Admin</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)]">Tracking Dashboard</h1>
         <p className="mt-2 text-sm text-[var(--color-muted-text)]">
@@ -128,7 +149,7 @@ export default function AdminPage() {
 
       <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
         <aside className="lg:sticky lg:top-[5rem] lg:h-fit">
-          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface)_94%))]">
+          <Card className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_56%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <LayoutDashboard className="size-5 text-[var(--color-accent)]" />
@@ -154,7 +175,7 @@ export default function AdminPage() {
         </aside>
 
         <section className="space-y-4">
-          <Card>
+          <Card className="animate-fade-up">
             <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
               <p className="text-sm text-[var(--color-muted-text)]">
                 Last Updated:{' '}
@@ -183,7 +204,7 @@ export default function AdminPage() {
           ) : null}
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <Card>
+            <Card className="animate-fade-up">
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
@@ -197,7 +218,7 @@ export default function AdminPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="animate-fade-up-delay-1">
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
@@ -207,11 +228,11 @@ export default function AdminPage() {
                     {loading ? '...' : formatDuration(summary.totalSessionSeconds)}
                   </p>
                 </div>
-                <Clock3 className="size-5 text-[var(--color-accent)]" />
+                <Clock3 className="size-5 text-[var(--color-info)]" />
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="animate-fade-up-delay-2">
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
@@ -221,10 +242,81 @@ export default function AdminPage() {
                     {loading ? '...' : formatDuration(summary.totalAudioSeconds)}
                   </p>
                 </div>
-                <Headphones className="size-5 text-[var(--color-accent)]" />
+                <Headphones className="size-5 text-[var(--color-highlight)]" />
               </CardContent>
             </Card>
           </div>
+
+          <Card className="animate-fade-up-delay-1 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(150deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]">
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2">
+                <BarChart3 className="size-5 text-[var(--color-accent)]" />
+                Usage Graph
+              </CardTitle>
+              <CardDescription>
+                Website aur audio usage ka visual comparison
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-5 lg:grid-cols-[1.45fr_1fr]">
+              <div className="space-y-4">
+                <div>
+                  <div className="mb-1 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted-text)]">
+                    <span>Website Time</span>
+                    <span>{formatDuration(summary.totalSessionSeconds)}</span>
+                  </div>
+                  <div className="h-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-[2px]">
+                    <div
+                      className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-accent),color-mix(in_oklab,var(--color-info),var(--color-accent)_64%))] transition-all duration-700"
+                      style={{ width: `${graphStats.sessionPercent}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-1 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted-text)]">
+                    <span>Audio Watch Time</span>
+                    <span>{formatDuration(summary.totalAudioSeconds)}</span>
+                  </div>
+                  <div className="h-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-[2px]">
+                    <div
+                      className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-highlight),color-mix(in_oklab,var(--color-accent),var(--color-highlight)_62%))] transition-all duration-700"
+                      style={{ width: `${graphStats.audioPercent}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_64%)] bg-[color-mix(in_oklab,var(--color-surface),white_10%)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted-text)]">
+                  Audio Share
+                </p>
+                <div className="mt-3 grid place-items-center">
+                  <div
+                    className="grid size-32 place-items-center rounded-full border border-[var(--color-border)]"
+                    style={{
+                      background: `conic-gradient(var(--color-highlight) ${graphStats.audioSharePercent}%, color-mix(in_oklab,var(--color-surface-3),var(--color-border)_75%) ${graphStats.audioSharePercent}% 100%)`,
+                    }}
+                  >
+                    <div className="grid size-24 place-items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-center">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted-text)]">
+                        Audio
+                      </p>
+                      <p className="font-display text-2xl text-[var(--color-heading)]">
+                        {graphStats.audioSharePercent}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="animate-fade-up-delay-2 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_15%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))]">
+            <CardContent className="flex items-center gap-2 p-4 text-sm text-[var(--color-muted-text)]">
+              <Gauge className="size-4 text-[var(--color-accent)]" />
+              Usage data sirf authenticated users ke liye track hota hai.
+            </CardContent>
+          </Card>
         </section>
       </div>
     </div>

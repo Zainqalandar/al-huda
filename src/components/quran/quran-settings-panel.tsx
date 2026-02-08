@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { ChevronDown, Settings2, Trash2, X } from 'lucide-react';
+import {
+  ChevronDown,
+  Paintbrush,
+  Settings2,
+  SlidersHorizontal,
+  Trash2,
+  Volume2,
+  X,
+} from 'lucide-react';
 
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import { useSurahContext } from '@/hooks/useSurahContext';
@@ -39,6 +47,7 @@ export default function QuranSettingsPanel() {
           type="button"
           size="icon"
           variant={open ? 'default' : 'outline'}
+          className="animate-pulse-border"
           onClick={() => setOpen((prev) => !prev)}
           aria-expanded={open}
           aria-controls="quran-settings"
@@ -50,7 +59,10 @@ export default function QuranSettingsPanel() {
       </div>
 
       {open ? (
-        <Card id="quran-settings" className="mt-3 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_56%)]">
+        <Card
+          id="quran-settings"
+          className="mt-3 animate-fade-up border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_56%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]"
+        >
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -74,9 +86,12 @@ export default function QuranSettingsPanel() {
 
           <CardContent className="space-y-5">
             <div className="grid gap-4 xl:grid-cols-2">
-              <Card>
+              <Card className="bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]">
                 <CardHeader>
-                  <CardTitle>Appearance</CardTitle>
+                  <CardTitle className="inline-flex items-center gap-2">
+                    <Paintbrush className="size-5 text-[var(--color-accent)]" />
+                    Appearance
+                  </CardTitle>
                   <CardDescription>Theme and Arabic typography</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -130,15 +145,18 @@ export default function QuranSettingsPanel() {
                       step={0.05}
                       value={settings.arabicFontScale}
                       onChange={(event) => setArabicFontScale(Number(event.target.value))}
-                      className="w-full accent-[var(--color-accent)]"
+                      className="app-range"
                     />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))]">
                 <CardHeader>
-                  <CardTitle>Quran Reading</CardTitle>
+                  <CardTitle className="inline-flex items-center gap-2">
+                    <SlidersHorizontal className="size-5 text-[var(--color-accent)]" />
+                    Quran Reading
+                  </CardTitle>
                   <CardDescription>Reading and audio defaults</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -187,7 +205,8 @@ export default function QuranSettingsPanel() {
                   </div>
 
                   <label className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2">
-                    <span className="text-sm text-[var(--color-text)]">
+                    <span className="inline-flex items-center gap-2 text-sm text-[var(--color-text)]">
+                      <Volume2 className="size-4 text-[var(--color-info)]" />
                       Autoplay when Surah changes
                     </span>
                     <input
@@ -203,7 +222,7 @@ export default function QuranSettingsPanel() {
             </div>
 
             <div className="grid gap-4 xl:grid-cols-2">
-              <Card>
+              <Card className="bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]">
                 <CardHeader>
                   <CardTitle>Saved Data</CardTitle>
                   <CardDescription>
@@ -235,7 +254,7 @@ export default function QuranSettingsPanel() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))]">
                 <CardHeader>
                   <CardTitle>Reset</CardTitle>
                   <CardDescription>Restore Quran preferences to default values.</CardDescription>

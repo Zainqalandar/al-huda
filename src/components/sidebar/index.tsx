@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Hash,
   Heart,
   Menu,
   Pause,
@@ -1016,7 +1017,7 @@ export default function QuranReaderPage() {
     <div className="pb-16 pt-6 sm:pt-8" data-slot="page-shell">
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-5">
-          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(130deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,#c79a42,var(--color-surface)_88%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))]">
+          <Card className="animate-fade-up border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(130deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,#c79a42,var(--color-surface)_88%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))] shadow-[var(--shadow-card)]">
             <CardHeader>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
@@ -1029,7 +1030,7 @@ export default function QuranReaderPage() {
                       setIsNavigatorOpen(true);
                     }}
                     aria-label="Open Surah navigator"
-                    className="mt-0.5"
+                    className="mt-0.5 animate-pulse-border"
                   >
                     <Menu className="size-4" />
                   </Button>
@@ -1059,14 +1060,18 @@ export default function QuranReaderPage() {
                       {favorite ? 'Favorited' : 'Favorite Surah'}
                     </Button>
                   </div>
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-text)]">
-                    {likesCount} likes
-                  </p>
+                  <Badge
+                    variant="secondary"
+                    className="mt-2 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_48%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_75%),color-mix(in_oklab,var(--color-accent-soft),white_80%))] px-2.5 py-1 text-[color-mix(in_oklab,var(--color-heading),var(--color-accent)_34%)] tracking-normal dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_24%),color-mix(in_oklab,var(--color-accent-soft),black_18%))] dark:text-[var(--color-accent-foreground)]"
+                  >
+                    <Heart className={`mr-1 size-3.5 ${favorite ? 'fill-current' : ''}`} />
+                    {likesCount}
+                  </Badge>
                 </div>
               </div>
 
               {currentLastRead ? (
-                <div className="mt-4 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(125deg,color-mix(in_oklab,var(--color-surface-2),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface-2)_90%))] p-3 text-sm text-[var(--color-muted-text)]">
+                <div className="mt-4 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(125deg,color-mix(in_oklab,var(--color-surface-2),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface-2)_90%))] p-3 text-sm text-[var(--color-muted-text)] shadow-[var(--shadow-soft)]">
                   Last read: Ayah {currentLastRead.ayahNumber}
                   <Button
                     ref={resumeTargetRef}
@@ -1083,7 +1088,7 @@ export default function QuranReaderPage() {
                 </div>
               ) : null}
 
-              <div className="mt-4 space-y-3 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3">
+              <div className="mt-4 space-y-3 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))] p-3 shadow-[var(--shadow-soft)]">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
@@ -1126,7 +1131,7 @@ export default function QuranReaderPage() {
                     onInput={(event) =>
                       handleSeekChange(Number((event.target as HTMLInputElement).value))
                     }
-                    className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[color-mix(in_oklab,var(--color-surface-3),#c79a42_24%)] accent-[var(--color-accent)]"
+                    className="app-range cursor-pointer"
                     aria-label="Audio seek"
                   />
                   <div className="mt-1 flex items-center justify-between text-xs text-[var(--color-muted-text)]">
@@ -1136,12 +1141,12 @@ export default function QuranReaderPage() {
                 </div>
 
                 {isPlaying && activeAudioAyahNumber ? (
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color-mix(in_oklab,var(--color-accent),var(--color-heading)_42%)]">
+                  <p className="animate-fade-up rounded-full border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[var(--color-surface-elevated)] px-2 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[color-mix(in_oklab,var(--color-accent),var(--color-heading)_42%)]">
                     Now Playing Ayah {activeAudioAyahNumber}
                   </p>
                 ) : null}
 
-                <div className="mt-2 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] p-2">
+                <div className="mt-2 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(150deg,color-mix(in_oklab,var(--color-surface-2),white_16%),color-mix(in_oklab,var(--color-accent),var(--color-surface-2)_95%))] p-2">
                   <div className="grid grid-cols-3 items-center gap-2">
                     <Button
                       type="button"
@@ -1157,7 +1162,7 @@ export default function QuranReaderPage() {
                     <Button
                       type="button"
                       size="sm"
-                      className="h-10 min-w-0 justify-center rounded-xl px-2 shadow-[var(--shadow-soft)]"
+                      className="h-10 min-w-0 justify-center rounded-xl px-2 shadow-[var(--shadow-card)]"
                       onClick={toggleAudioPlay}
                       aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
                     >
@@ -1186,7 +1191,7 @@ export default function QuranReaderPage() {
                     <div className="relative sm:max-w-sm">
                       <select
                         id="reader-reciter-top"
-                        className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium dark:bg-gray-500/50"
+                        className="app-select h-10 w-full appearance-none rounded-xl px-3 pr-9 text-sm font-medium"
                         value={selectedReciter}
                         onChange={(event) => setSelectedReciter(Number(event.target.value))}
                         aria-label="Reciter voice"
@@ -1219,7 +1224,7 @@ export default function QuranReaderPage() {
             </CardHeader>
           </Card>
 
-          <Card className="z-20 overflow-hidden border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_90%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))] shadow-[var(--shadow-card)] backdrop-blur">
+          <Card className="z-20 animate-fade-up-delay-1 overflow-hidden border-[color-mix(in_oklab,var(--color-accent),#c79a42_55%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_90%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%))] shadow-[var(--shadow-card)] backdrop-blur">
             <CardContent className="grid gap-3 p-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
@@ -1267,7 +1272,7 @@ export default function QuranReaderPage() {
           </Card>
 
           {settings.readingMode === 'continuous' ? (
-            <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_50%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_93%))]">
+            <Card className="animate-fade-up border-[color-mix(in_oklab,var(--color-accent),#c79a42_50%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_93%))]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Sparkles className="size-5 text-[var(--color-accent)]" />
@@ -1323,7 +1328,13 @@ export default function QuranReaderPage() {
                   >
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <Badge variant="secondary">Ayah {ayah.numberInSurah}</Badge>
+                        <Badge
+                          variant="secondary"
+                          className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_52%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_76%),color-mix(in_oklab,var(--color-accent-soft),white_82%))] text-[color-mix(in_oklab,var(--color-heading),var(--color-accent)_34%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_20%),color-mix(in_oklab,var(--color-accent-soft),black_14%))] dark:text-[var(--color-accent-foreground)]"
+                        >
+                          <Hash className="mr-1 size-3.5" />
+                          Ayah {ayah.numberInSurah}
+                        </Badge>
                         <div className="flex flex-wrap items-center gap-2">
                           <Button
                             variant={bookmarked ? 'default' : 'outline'}
@@ -1399,7 +1410,7 @@ export default function QuranReaderPage() {
         </div>
 
         <aside className="space-y-4 xl:sticky xl:top-[5rem] xl:self-start">
-          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_92%))]">
+          <Card className="animate-fade-up border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_92%))]">
             <CardHeader>
               <CardTitle className="text-xl">Bookmarks</CardTitle>
               <CardDescription>
@@ -1425,7 +1436,7 @@ export default function QuranReaderPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_93%))]">
+          <Card className="animate-fade-up-delay-1 border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_93%))]">
             <CardHeader>
               <CardTitle className="text-xl">Word-by-word</CardTitle>
             </CardHeader>
@@ -1441,11 +1452,11 @@ export default function QuranReaderPage() {
         <div className="fixed inset-0 z-[85]">
           <button
             type="button"
-            className="absolute inset-0 bg-black/45"
+            className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
             onClick={() => setIsNavigatorOpen(false)}
             aria-label="Close surah navigator"
           />
-          <aside className="absolute left-0 top-0 h-full w-full max-w-md border-r border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] shadow-2xl">
+          <aside className="absolute left-0 top-0 h-full w-full max-w-md animate-fade-up border-r border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] shadow-2xl">
             <div className="flex h-full flex-col">
               <div className="border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] p-4">
                 <div className="mb-3 flex items-start justify-between gap-3">
@@ -1585,11 +1596,11 @@ export default function QuranReaderPage() {
         <div className="fixed inset-0 z-[90]">
           <button
             type="button"
-            className="absolute inset-0 bg-black/45"
+            className="absolute inset-0 bg-black/58 backdrop-blur-[2px]"
             onClick={() => setTafseerOpen(false)}
             aria-label="Close tafseer panel"
           />
-          <aside className="absolute right-0 top-0 h-full w-full max-w-2xl border-l border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(160deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] shadow-2xl">
+          <aside className="absolute right-0 top-0 h-full w-full max-w-2xl animate-fade-up border-l border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(160deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,#c79a42,var(--color-surface)_95%))] shadow-2xl">
             <div className="flex h-full flex-col">
               <div className="flex items-start justify-between gap-4 border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] p-4 sm:p-5">
                 <div>
