@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Download,
   Hash,
   Heart,
   Menu,
@@ -214,6 +215,80 @@ function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function slugifyForFileName(input: string) {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64);
+}
+
+function clickFileDownloadLink(
+  href: string,
+  fileName: string,
+  openInNewTab = false
+) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+
+  const anchor = document.createElement('a');
+  anchor.href = href;
+  if (openInNewTab) {
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+  }
+  anchor.download = fileName;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+}
+
+function getAudioFileExtension(url: string) {
+  const normalizedUrl = url.toLowerCase();
+  if (normalizedUrl.includes('.ogg')) {
+    return 'ogg';
+  }
+
+  if (normalizedUrl.includes('.m4a')) {
+    return 'm4a';
+  }
+
+  return 'mp3';
+}
+
+async function downloadAudioFromUrl(fileNameBase: string, audioUrl: string) {
+  if (!audioUrl) {
+    throw new globalThis.Error('Audio source unavailable for download.');
+  }
+
+  if (typeof window === 'undefined') {
+    throw new globalThis.Error('Download is only available in browser.');
+  }
+
+  const fileName = `${fileNameBase}.${getAudioFileExtension(audioUrl)}`;
+  let objectUrl: string | null = null;
+
+  try {
+    const response = await fetch(audioUrl, { mode: 'cors' });
+    if (!response.ok) {
+      throw new globalThis.Error(`Audio request failed (${response.status}).`);
+    }
+
+    const blob = await response.blob();
+    objectUrl = window.URL.createObjectURL(blob);
+    clickFileDownloadLink(objectUrl, fileName);
+  } catch {
+    clickFileDownloadLink(audioUrl, fileName, true);
+  } finally {
+    if (objectUrl) {
+      window.setTimeout(() => {
+        window.URL.revokeObjectURL(objectUrl);
+      }, 0);
+    }
+  }
+}
+
 function HighlightText({ text, query }: { text: string; query: string }) {
   const normalizedQuery = query.trim();
   if (!normalizedQuery) {
@@ -294,6 +369,10 @@ export default function QuranReaderPage() {
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [ayahTimings, setAyahTimings] = useState<AyahTimingRange[]>([]);
   const [activeAudioAyahNumber, setActiveAudioAyahNumber] = useState<number | null>(null);
+  const [downloadingAudioVariant, setDownloadingAudioVariant] = useState<'ar' | 'tr' | null>(
+    null
+  );
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const [tafseerOpen, setTafseerOpen] = useState(false);
   const [tafseerAyahNumber, setTafseerAyahNumber] = useState<number | null>(null);
@@ -416,6 +495,8 @@ export default function QuranReaderPage() {
 
   useEffect(() => {
     setExpandedSurahId(surahId);
+    setDownloadingAudioVariant(null);
+    setDownloadError(null);
   }, [surahId]);
 
   useEffect(() => {
@@ -817,6 +898,14 @@ export default function QuranReaderPage() {
     settings.audioPreference === 'tr'
       ? 'Urdu Translation'
       : audioReciters[selectedReciter]?.reciter ?? 'Arabic Recitation';
+  const arabicAudioSources = useMemo(
+    () =>
+      Object.values(surahMeta?.audio ?? {}).filter(
+        (item) => (item.originalUrl ?? item.url ?? '').trim().length > 0
+      ),
+    [surahMeta?.audio]
+  );
+  const hasArabicAudioSource = arabicAudioSources.length > 0;
   const formattedTafsirHtml = useMemo(
     () => (tafseerData?.textHtml ? formatTafsirHtml(tafseerData.textHtml) : ''),
     [tafseerData?.textHtml]
@@ -836,6 +925,63 @@ export default function QuranReaderPage() {
   }
 
   const showWordByWord = false;
+  const downloadSurahAudio = async (variant: 'ar' | 'tr') => {
+    if (!surahDetail) {
+      return;
+    }
+    if (downloadingAudioVariant) {
+      return;
+    }
+
+    setDownloadError(null);
+    setDownloadingAudioVariant(variant);
+
+    const surahNumber = String(surahDetail.number).padStart(3, '0');
+    const surahSlug = slugifyForFileName(surahDetail.englishName || `surah-${surahNumber}`);
+
+    try {
+      if (variant === 'ar') {
+        if (!hasArabicAudioSource) {
+          throw new globalThis.Error('Arabic audio source is unavailable for this surah.');
+        }
+
+        const reciterIndex = clampRange(
+          selectedReciter,
+          0,
+          Math.max(arabicAudioSources.length - 1, 0)
+        );
+        const source =
+          arabicAudioSources[reciterIndex]?.originalUrl ??
+          arabicAudioSources[reciterIndex]?.url ??
+          arabicAudioSources[0]?.originalUrl ??
+          arabicAudioSources[0]?.url ??
+          '';
+        if (!source) {
+          throw new globalThis.Error('Arabic audio source is unavailable for this surah.');
+        }
+
+        await downloadAudioFromUrl(
+          `surah-${surahNumber}-${surahSlug}-arabic-audio`,
+          source
+        );
+        return;
+      }
+
+      await downloadAudioFromUrl(
+        `surah-${surahNumber}-${surahSlug}-urdu-translation-audio`,
+        getTranslationAudioUrl(surahId)
+      );
+    } catch (downloadAudioError) {
+      const message =
+        downloadAudioError instanceof globalThis.Error && downloadAudioError.message
+          ? downloadAudioError.message
+          : 'Unable to download audio right now.';
+      setDownloadError(message);
+    } finally {
+      setDownloadingAudioVariant(null);
+    }
+  };
+
   const openTafseer = async (ayahNumber: number, ayahText: string) => {
     setTafseerOpen(true);
     setTafseerAyahNumber(ayahNumber);
@@ -1114,6 +1260,41 @@ export default function QuranReaderPage() {
                       Urdu Translation
                     </Button>
                   </div>
+                </div>
+
+                <div className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface-2),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface-2)_96%))] p-2.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
+                    Download Audio
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => void downloadSurahAudio('ar')}
+                      disabled={!hasArabicAudioSource || Boolean(downloadingAudioVariant)}
+                      className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_16%)]"
+                    >
+                      <Download className="size-4" />
+                      {downloadingAudioVariant === 'ar' ? 'Downloading...' : 'Arabic Audio'}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => void downloadSurahAudio('tr')}
+                      disabled={Boolean(downloadingAudioVariant)}
+                      className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_16%)]"
+                    >
+                      <Download className="size-4" />
+                      {downloadingAudioVariant === 'tr'
+                        ? 'Downloading...'
+                        : 'Urdu Translation Audio'}
+                    </Button>
+                  </div>
+                  {downloadError ? (
+                    <p className="mt-2 text-xs text-[var(--color-danger)]">{downloadError}</p>
+                  ) : null}
                 </div>
 
                 <div>
