@@ -962,7 +962,7 @@ export default function QuranReaderPage() {
   const totalAyahCount = surahDetail?.numberOfAyahs ?? 0;
   const activeReciterName =
     settings.audioPreference === 'tr'
-      ? 'Urdu Translation'
+      ? 'Arabic + Urdu'
       : audioReciters[selectedReciter]?.reciter ?? 'Arabic Recitation';
   const arabicAudioSources = useMemo(
     () =>
@@ -973,7 +973,7 @@ export default function QuranReaderPage() {
   );
   const hasArabicAudioSource = arabicAudioSources.length > 0;
   const selectedDownloadLabel =
-    downloadAudioSelection === 'ar' ? 'Arabic Audio' : 'Urdu Translation Audio';
+    downloadAudioSelection === 'ar' ? 'Arabic Audio' : 'Arabic + Urdu Audio';
   const isSelectedDownloadBusy = downloadingAudioVariant === downloadAudioSelection;
   const isSelectedDownloadDisabled =
     Boolean(downloadingAudioVariant) ||
@@ -1574,14 +1574,14 @@ export default function QuranReaderPage() {
                       variant={settings.audioPreference === 'ar' ? 'default' : 'outline'}
                       onClick={() => setAudioPreference('ar')}
                     >
-                      Arabic Voice
+                      Arabic + English
                     </Button>
                     <Button
                       size="sm"
                       variant={settings.audioPreference === 'tr' ? 'default' : 'outline'}
                       onClick={() => setAudioPreference('tr')}
                     >
-                      Urdu Translation
+                      Arabic + Urdu
                     </Button>
                   </div>
                 </div>
@@ -1615,7 +1615,7 @@ export default function QuranReaderPage() {
                           aria-label="Select audio download type"
                         >
                           <option value="ar">Arabic Audio</option>
-                          <option value="tr">Urdu Translation Audio</option>
+                          <option value="tr">Arabic + Urdu Audio</option>
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-[var(--color-muted-text)]" />
                       </div>
@@ -1910,7 +1910,7 @@ export default function QuranReaderPage() {
                             onClick={() => openTafseer(ayah.numberInSurah, ayah.text)}
                           >
                             <BookOpen className="size-4" />
-                            Tafseer
+                            Urdu Tafseer
                           </Button>
                         </div>
                       </div>
