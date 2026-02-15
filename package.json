@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "seo:generate": "node scripts/generate-surah-index.mjs",
+    "seo:generate-tafsir": "node scripts/generate-tafsir-availability.mjs",
+    "build:seo": "npm run seo:generate && npm run seo:generate-tafsir && npm run build",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

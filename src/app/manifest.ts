@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Al-Huda',
     description:
       'Quran-first app for reading, listening, Urdu translation, bookmarks, and progress tracking.',
-    start_url: '/',
+    start_url: '/surah',
     scope: '/',
     display: 'standalone',
     background_color: '#071610',

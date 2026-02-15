@@ -19,6 +19,21 @@ import type { AyahBookmark, LastReadEntry } from '@/types/quran';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { getSurahById } from '@/lib/quran-index';
+import { buildSurahPath } from '@/lib/quran-routing';
+
+function resolveSurahPath(surahId: number | null | undefined) {
+  if (!surahId || !Number.isInteger(surahId)) {
+    return '/surah';
+  }
+
+  const surah = getSurahById(surahId);
+  if (!surah) {
+    return `/surah/${surahId}`;
+  }
+
+  return buildSurahPath(surah.id, surah.surahName);
+}
 
 export default function HomeRoot() {
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -112,6 +127,13 @@ export default function HomeRoot() {
   const hasLastRead = Boolean(lastRead?.surahId && lastRead?.ayahNumber);
   const firstFavoriteSurahId = favorites[0] ?? null;
   const latestBookmark = bookmarks[0] ?? null;
+  const lastReadPath = hasLastRead
+    ? `${resolveSurahPath(lastRead.surahId)}#ayah-${lastRead.ayahNumber}`
+    : '/surah';
+  const firstFavoritePath = resolveSurahPath(firstFavoriteSurahId);
+  const latestBookmarkPath = latestBookmark
+    ? `${resolveSurahPath(latestBookmark.surahId)}#ayah-${latestBookmark.ayahNumber}`
+    : '/surah';
 
   return (
     <div className="pb-20 pt-10 sm:pt-14">
@@ -135,18 +157,14 @@ export default function HomeRoot() {
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Button asChild size="lg">
                 <Link
-                  href={
-                    hasLastRead
-                      ? `/quran/${lastRead.surahId}#ayah-${lastRead.ayahNumber}`
-                      : '/quran'
-                  }
+                  href={lastReadPath}
                 >
                   {hasLastRead ? 'Continue Reading' : 'Open Quran'}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/quran#quran-settings">
+                <Link href="/surah">
                   <Settings2 className="size-4" />
                   Quran Settings
                 </Link>
@@ -214,13 +232,7 @@ export default function HomeRoot() {
                 className="w-full"
                 variant={hasLastRead ? 'default' : 'outline'}
               >
-                <Link
-                  href={
-                    hasLastRead
-                      ? `/quran/${lastRead.surahId}#ayah-${lastRead.ayahNumber}`
-                      : '/quran'
-                  }
-                >
+                <Link href={lastReadPath}>
                   {hasLastRead ? 'Resume Now' : 'Start Reading'}
                 </Link>
               </Button>
@@ -244,7 +256,7 @@ export default function HomeRoot() {
                 className="w-full"
                 variant={firstFavoriteSurahId ? 'default' : 'outline'}
               >
-                <Link href={firstFavoriteSurahId ? `/quran/${firstFavoriteSurahId}` : '/quran'}>
+                <Link href={firstFavoritePath}>
                   {firstFavoriteSurahId ? 'Open Favorite' : 'Pick Favorite'}
                 </Link>
               </Button>
@@ -264,13 +276,7 @@ export default function HomeRoot() {
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full" variant={latestBookmark ? 'default' : 'outline'}>
-                <Link
-                  href={
-                    latestBookmark
-                      ? `/quran/${latestBookmark.surahId}#ayah-${latestBookmark.ayahNumber}`
-                      : '/quran'
-                  }
-                >
+                <Link href={latestBookmarkPath}>
                   {latestBookmark ? 'Open Bookmark' : 'Create Bookmark'}
                 </Link>
               </Button>

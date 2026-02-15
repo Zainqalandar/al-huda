@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSurahContext } from '@/hooks/useSurahContext';
+import { buildSurahPath } from '@/lib/quran-routing';
 
 export default function SurahList() {
   const {
@@ -45,6 +46,7 @@ export default function SurahList() {
         const isFavorite = favorites.includes(surah.id);
         const likesCount = getSurahLikesCount(surah.id);
         const hasLastRead = lastRead?.surahId === surah.id;
+        const surahPath = buildSurahPath(surah.id, surah.surahName);
 
         return (
           <Card
@@ -96,14 +98,14 @@ export default function SurahList() {
 
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <Button asChild className="flex-1 min-w-[8.5rem]">
-                  <Link href={`/quran/${surah.id}`}>
+                  <Link href={surahPath}>
                     <BookmarkPlus className="size-4" />
                     Read now
                   </Link>
                 </Button>
                 {hasLastRead ? (
                   <Button asChild variant="outline" className="min-w-[8.5rem] flex-1">
-                    <Link href={`/quran/${surah.id}#ayah-${lastRead.ayahNumber}`}>
+                    <Link href={`${surahPath}#ayah-${lastRead.ayahNumber}`}>
                       <Clock3 className="size-4" />
                       Resume {lastRead.ayahNumber}
                     </Link>

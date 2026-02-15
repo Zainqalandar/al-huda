@@ -17,6 +17,8 @@ import { fetchSurahMeta } from '@/lib/quran-api';
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import type { SurahAudioOption } from '@/types/quran';
 import { clampRange, formatAudioTime } from '@/lib/quran-utils';
+import { getSurahById } from '@/lib/quran-index';
+import { buildSurahPath } from '@/lib/quran-routing';
 
 const TOTAL_SURAHS = 114;
 
@@ -166,7 +168,9 @@ export default function QuranAudioBottomBar({
   const changeSurah = (next: number) => {
     const target = clampRange(next, 1, TOTAL_SURAHS);
     setPageNo(target);
-    router.push(`/quran/${target}`);
+    const surah = getSurahById(target);
+    const targetPath = surah ? buildSurahPath(surah.id, surah.surahName) : `/surah/${target}`;
+    router.push(targetPath);
   };
 
   const togglePlay = async () => {

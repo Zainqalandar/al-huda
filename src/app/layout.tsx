@@ -25,6 +25,7 @@ const siteName = 'Al-Huda Quran';
 const siteDescription =
   'Al-Huda is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
 const ogImage = '/logos/logo3.png';
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 const bodyFont = Manrope({
   subsets: ['latin'],
@@ -87,7 +88,12 @@ export const metadata: Metadata = {
   ],
   category: 'education',
   alternates: {
-    canonical: '/',
+    canonical: siteOriginString,
+    languages: {
+      'ur-PK': siteOriginString,
+      ar: siteOriginString,
+      'x-default': siteOriginString,
+    },
   },
   icons: {
     icon: [
@@ -97,6 +103,9 @@ export const metadata: Metadata = {
     apple: [{ url: '/logos/logo1.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.webmanifest',
+  verification: {
+    google: googleSiteVerification || undefined,
+  },
   openGraph: {
     title: 'Al-Huda Quran',
     description: siteDescription,
@@ -156,7 +165,7 @@ const websiteJsonLd = {
   inLanguage: ['en', 'ur', 'ar'],
   potentialAction: {
     '@type': 'SearchAction',
-    target: `${siteOriginString}/quran?search={search_term_string}`,
+    target: `${siteOriginString}/surah?search={search_term_string}`,
     'query-input': 'required name=search_term_string',
   },
 };

@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsPage() {
-  redirect('/quran#quran-settings');
+  redirect('/surah');
 }

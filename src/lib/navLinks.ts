@@ -6,7 +6,7 @@ export interface NavLinkItem {
 
 const navLinks: NavLinkItem[] = [
   { id: 0, name: 'Home', link: '/' },
-  { id: 1, name: 'Quran', link: '/quran' },
+  { id: 1, name: 'Quran', link: '/surah' },
   { id: 2, name: 'About', link: '/about' },
   { id: 3, name: 'Admin', link: '/admin' },
 ];

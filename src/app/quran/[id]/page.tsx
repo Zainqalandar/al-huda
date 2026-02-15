@@ -1,61 +1,24 @@
-import QuranReaderPage from '@/components/sidebar';
-import type { Metadata } from 'next';
+import { permanentRedirect } from 'next/navigation';
 
-const MIN_SURAH_ID = 1;
-const MAX_SURAH_ID = 114;
+import { getCanonicalSurahPathById } from '@/lib/quran-index';
+import { parseSurahIdFromParam } from '@/lib/quran-routing';
 
-function normalizeSurahId(value: string) {
-  const surahNumber = Number(value);
-  if (!Number.isInteger(surahNumber)) {
-    return MIN_SURAH_ID;
-  }
-
-  if (surahNumber < MIN_SURAH_ID || surahNumber > MAX_SURAH_ID) {
-    return MIN_SURAH_ID;
-  }
-
-  return surahNumber;
-}
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return Array.from({ length: MAX_SURAH_ID }, (_, index) => ({
-    id: String(index + 1),
-  }));
-}
-
-export default function QuranChildPage() {
-  return <QuranReaderPage />;
-}
-
-interface QuranChildPageProps {
+interface LegacyQuranSurahPageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({
+export default async function LegacyQuranSurahPage({
   params,
-}: QuranChildPageProps): Promise<Metadata> {
+}: LegacyQuranSurahPageProps) {
   const { id } = await params;
-  const normalized = normalizeSurahId(id);
-  const title = `Surah ${normalized} Reader`;
-  const description = `Read Surah ${normalized} with ayah-by-ayah navigation, audio recitation, Urdu translation, tafseer, and bookmarks.`;
+  const surahId = parseSurahIdFromParam(id);
 
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: `/quran/${normalized}`,
-    },
-    openGraph: {
-      title: `${title} | Al-Huda Quran`,
-      description,
-      url: `/quran/${normalized}`,
-      type: 'article',
-    },
-    twitter: {
-      title: `${title} | Al-Huda Quran`,
-      description,
-    },
-  };
+  if (surahId) {
+    const canonicalPath = getCanonicalSurahPathById(surahId);
+    if (canonicalPath) {
+      permanentRedirect(canonicalPath);
+    }
+  }
+
+  permanentRedirect('/surah');
 }

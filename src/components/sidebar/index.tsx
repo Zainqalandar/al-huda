@@ -45,6 +45,7 @@ import type {
 } from '@/types/quran';
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import { clampRange, formatAudioTime, isValidSurahId } from '@/lib/quran-utils';
+import { buildSurahPath, parseSurahIdFromParam } from '@/lib/quran-routing';
 
 interface AyahWithTranslation {
   ayah: SurahAyah;
@@ -326,10 +327,12 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 }
 
 export default function QuranReaderPage() {
-  const params = useParams<{ id?: string | string[] }>();
+  const params = useParams<{ id?: string | string[]; surah?: string | string[] }>();
   const router = useRouter();
-  const idParam = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const surahId = Number(idParam ?? 1);
+  const rawParam = Array.isArray(params?.surah)
+    ? params.surah[0]
+    : params?.surah ?? (Array.isArray(params?.id) ? params.id[0] : params?.id);
+  const surahId = parseSurahIdFromParam(rawParam) ?? 1;
 
   const {
     setPageNo,
@@ -1407,7 +1410,11 @@ export default function QuranReaderPage() {
       return;
     }
 
-    router.push(`/quran/${targetSurahId}`);
+    const targetSurah = surahs.find((entry) => entry.id === targetSurahId);
+    const targetPath = targetSurah
+      ? buildSurahPath(targetSurah.id, targetSurah.surahName)
+      : `/surah/${targetSurahId}`;
+    router.push(targetPath);
   };
 
   const handleAyahNavigation = (targetSurahId: number, ayahNumber: number) => {
@@ -1416,7 +1423,11 @@ export default function QuranReaderPage() {
     setIsNavigatorOpen(false);
 
     if (targetSurahId !== surahId) {
-      router.push(`/quran/${targetSurahId}#${anchor}`);
+      const targetSurah = surahs.find((entry) => entry.id === targetSurahId);
+      const targetPath = targetSurah
+        ? buildSurahPath(targetSurah.id, targetSurah.surahName)
+        : `/surah/${targetSurahId}`;
+      router.push(`${targetPath}#${anchor}`);
       return;
     }
 

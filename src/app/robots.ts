@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/quran', '/quran/', '/about'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about'],
         disallow: [
           '/admin',
           '/admin/',
@@ -17,6 +17,11 @@ export default function robots(): MetadataRoute.Robots {
           '/settings',
           '/practice',
           '/hadith',
+          '/quran',
+          '/quran/',
+          '/*?*search=*',
+          '/*?*q=*',
+          '/*?*filter=*',
         ],
       },
     ],

@@ -11,6 +11,25 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/quran',
+        destination: '/surah',
+        permanent: true,
+      },
+      {
+        source: '/quran/:id',
+        destination: '/surah/:id',
+        permanent: true,
+      },
+      {
+        source: '/quran/:id/ayah/:ayah',
+        destination: '/surah/:id/ayah/:ayah',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
