@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BookMarked,
   BookOpenText,
+  ChevronRight,
   Heart,
   Headphones,
   Languages,
@@ -20,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getSurahById } from '@/lib/quran-index';
-import { buildSurahPath } from '@/lib/quran-routing';
+import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 
 function resolveSurahPath(surahId: number | null | undefined) {
   if (!surahId || !Number.isInteger(surahId)) {
@@ -34,6 +35,68 @@ function resolveSurahPath(surahId: number | null | undefined) {
 
   return buildSurahPath(surah.id, surah.surahName);
 }
+
+function resolveAyahPath(surahId: number, ayahNumber: number) {
+  const surah = getSurahById(surahId);
+  if (!surah) {
+    return `/surah/${surahId}/ayah/${ayahNumber}`;
+  }
+
+  return buildAyahPath(surah.id, surah.surahName, ayahNumber);
+}
+
+function resolveTafsirPath(surahId: number, ayahNumber: number) {
+  const surah = getSurahById(surahId);
+  if (!surah) {
+    return `/tafsir/${surahId}/${ayahNumber}`;
+  }
+
+  return buildTafsirPath(surah.id, surah.surahName, ayahNumber);
+}
+
+const POPULAR_SEARCH_PHRASES = [
+  'quran online read',
+  'read quran online',
+  'quran with urdu translation',
+  'listen quran online',
+  'quran audio download',
+  'quran tafseer urdu',
+  'surah yasin read online',
+  'surah rahman with urdu translation',
+  'surah kahf friday read',
+  'surah mulk read before sleep',
+  'surah waqiah with urdu tarjuma',
+  'ayat ul kursi urdu translation',
+];
+
+const QUICK_SURAH_LINKS = [
+  { label: 'Surah Yaseen', surahId: 36 },
+  { label: 'Surah Rahman', surahId: 55 },
+  { label: 'Surah Kahf', surahId: 18 },
+  { label: 'Surah Mulk', surahId: 67 },
+  { label: 'Surah Waqiah', surahId: 56 },
+  { label: 'Surah Fatiha', surahId: 1 },
+];
+
+const QUICK_AYAH_LINKS = [
+  {
+    label: 'Ayat ul Kursi (2:255)',
+    ayahPath: resolveAyahPath(2, 255),
+  },
+  {
+    label: 'Last 2 Ayat of Baqarah (2:285-286)',
+    ayahPath: resolveAyahPath(2, 285),
+  },
+  {
+    label: '3 Qul (Ikhlas, Falaq, Naas)',
+    ayahPath: resolveSurahPath(112),
+  },
+  {
+    label: 'Surah Fatiha Ayah 1 Tafseer',
+    ayahPath: resolveAyahPath(1, 1),
+    tafsirPath: resolveTafsirPath(1, 1),
+  },
+];
 
 export default function HomeRoot() {
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -167,6 +230,12 @@ export default function HomeRoot() {
                 <Link href="/surah">
                   <Settings2 className="size-4" />
                   Quran Settings
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/read-quran-online">
+                  Read Quran Online
+                  <ChevronRight className="size-4" />
                 </Link>
               </Button>
             </div>
@@ -319,6 +388,93 @@ export default function HomeRoot() {
             </CardHeader>
             <CardContent className="text-sm text-[var(--color-muted-text)]">
               Resume markers, bookmark list, and session continuity for better daily routine.
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <section className="mt-10" data-slot="page-shell">
+        <h2 className="mb-4 font-display text-3xl text-[var(--color-heading)]">
+          Popular Quran Searches
+        </h2>
+        <p className="mb-4 max-w-3xl text-sm text-[var(--color-muted-text)] sm:text-base">
+          These are common search intents for Quran online reading, Urdu translation,
+          tilawat audio, ayah tafseer, and daily surah recitation.
+        </p>
+
+        <Card className="animate-fade-up">
+          <CardContent className="flex flex-wrap gap-2 p-5">
+            {POPULAR_SEARCH_PHRASES.map((phrase) => (
+              <span
+                key={phrase}
+                className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-1 text-xs font-medium text-[var(--color-muted-text)]"
+              >
+                {phrase}
+              </span>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mt-10" data-slot="page-shell">
+        <h2 className="mb-4 font-display text-3xl text-[var(--color-heading)]">
+          Quick Links for High-Intent Queries
+        </h2>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card className="animate-fade-up">
+            <CardHeader>
+              <CardTitle className="text-xl">Popular Surahs</CardTitle>
+              <CardDescription>
+                Open surah pages with Arabic text, Urdu/English translation, audio, and
+                tafseer actions.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {QUICK_SURAH_LINKS.map((item) => (
+                <Link
+                  key={item.label}
+                  href={resolveSurahPath(item.surahId)}
+                  className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-sm text-[var(--color-text)] transition-colors hover:border-[var(--color-accent-soft)]"
+                >
+                  <span>{item.label}</span>
+                  <ChevronRight className="size-4 text-[var(--color-muted-text)]" />
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="animate-fade-up-delay-1">
+            <CardHeader>
+              <CardTitle className="text-xl">Ayah & Tafseer Access</CardTitle>
+              <CardDescription>
+                Direct entry points for Ayat ul Kursi, last ayahs, and tafseer pages.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {QUICK_AYAH_LINKS.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-3"
+                >
+                  <p className="text-sm font-semibold text-[var(--color-heading)]">{item.label}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Link
+                      href={item.ayahPath}
+                      className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-border)] px-2.5 py-1 text-xs text-[var(--color-text)] transition-colors hover:border-[var(--color-accent-soft)]"
+                    >
+                      Open Ayah
+                    </Link>
+                    {item.tafsirPath ? (
+                      <Link
+                        href={item.tafsirPath}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-border)] px-2.5 py-1 text-xs text-[var(--color-text)] transition-colors hover:border-[var(--color-accent-soft)]"
+                      >
+                        Open Tafseer
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>

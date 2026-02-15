@@ -16,6 +16,7 @@ import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppSettingsProvider } from '@/components/providers/app-settings-provider';
 import ServiceWorkerRegister from '@/components/providers/service-worker-register';
 import ActivityTrackerProvider from '@/components/providers/activity-tracker-provider';
+import { GLOBAL_QURAN_SEO_KEYWORDS } from '@/lib/seo-keywords';
 
 const defaultSiteUrl = 'https://al-huda.vercel.app';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
@@ -78,13 +79,7 @@ export const metadata: Metadata = {
   description: siteDescription,
   applicationName: 'Al-Huda Quran',
   keywords: [
-    'Quran',
-    'Read Quran online',
-    'Urdu Quran translation',
-    'Quran tafseer Urdu',
-    'Quran audio recitation',
-    'Surah bookmarks',
-    'Islamic learning app',
+    ...GLOBAL_QURAN_SEO_KEYWORDS,
   ],
   category: 'education',
   alternates: {

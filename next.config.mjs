@@ -28,6 +28,11 @@ const nextConfig = {
         destination: '/surah/:id/ayah/:ayah',
         permanent: true,
       },
+      {
+        source: '/sitemaps/:name.xml',
+        destination: '/sitemaps/:name',
+        permanent: true,
+      },
     ];
   },
   async headers() {

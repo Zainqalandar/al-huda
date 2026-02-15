@@ -2277,7 +2277,7 @@ export default function QuranReaderPage() {
                 {tafseerLoading ? (
                   <Card className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)]">
                     <CardContent className="p-5 text-sm text-[var(--color-muted-text)]">
-                      Tafseer load ho rahi hai...
+                      Tafseer is Loading...
                     </CardContent>
                   </Card>
                 ) : null}

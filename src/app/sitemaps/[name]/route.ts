@@ -77,6 +77,7 @@ export async function GET(
   context: { params: Promise<{ name: string }> }
 ) {
   const { name } = await context.params;
+  const normalizedName = name.endsWith('.xml') ? name.slice(0, -4) : name;
   const surahs = getAllSurahs();
   const origin = getSiteOrigin();
 
@@ -84,10 +85,11 @@ export async function GET(
     return new Response('Sitemap data unavailable.', { status: 500 });
   }
 
-  if (name === 'surah') {
+  if (normalizedName === 'surah') {
     const surahUrls = [
       `${origin}/`,
       `${origin}/surah`,
+      `${origin}/read-quran-online`,
       ...surahs.map((surah) => `${origin}${buildSurahPath(surah.id, surah.surahName)}`),
     ];
 
@@ -99,7 +101,7 @@ export async function GET(
     });
   }
 
-  const ayahChunk = getAyahChunk(name);
+  const ayahChunk = getAyahChunk(normalizedName);
   if (ayahChunk) {
     const refs = buildAllAyahRefs();
     const start = (ayahChunk - 1) * AYAH_SITEMAP_CHUNK_SIZE;
@@ -121,7 +123,7 @@ export async function GET(
     });
   }
 
-  const tafsirChunk = getTafsirChunk(name);
+  const tafsirChunk = getTafsirChunk(normalizedName);
   if (tafsirChunk) {
     const refs = getAllTafsirRefs();
     const start = (tafsirChunk - 1) * TAFSIR_SITEMAP_CHUNK_SIZE;
