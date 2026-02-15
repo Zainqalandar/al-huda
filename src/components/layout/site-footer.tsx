@@ -19,7 +19,7 @@ export default function SiteFooter() {
             Read with Khushu, Learn with Clarity
           </h2>
           <p className="max-w-md text-sm text-[var(--color-muted-text)]">
-            Al-Huda provides Quran reading, recitation audio, and study tools in a
+            Al-Quran provides Quran reading, recitation audio, and study tools in a
             focused and respectful interface.
           </p>
           <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-[var(--color-muted-text)]">
@@ -54,7 +54,7 @@ export default function SiteFooter() {
             ))}
           </div>
           <p className="text-xs text-[var(--color-muted-text)]">
-            © {new Date().getFullYear()} Al-Huda. All rights reserved.
+            © {new Date().getFullYear()} Al-Quran. All rights reserved.
           </p>
         </div>
       </div>

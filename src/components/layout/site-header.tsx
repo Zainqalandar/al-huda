@@ -280,7 +280,7 @@ export default function SiteHeader() {
               <span className="absolute -bottom-4 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-white/30 blur-sm" />
             </span>
             <span className="font-display text-[1.37rem] font-semibold tracking-wide text-[var(--color-heading)]">
-              Al-Huda
+              Al-Quran
             </span>
           </Link>
 
@@ -423,7 +423,7 @@ export default function SiteHeader() {
                     Account Access
                   </p>
                   <h3 className="mt-1 font-display text-2xl text-[var(--color-heading)]">
-                    Welcome to Al-Huda
+                    Welcome to Al-Quran
                   </h3>
                   <p className="mt-1 text-sm text-[var(--color-muted-text)]">
                     {authReason

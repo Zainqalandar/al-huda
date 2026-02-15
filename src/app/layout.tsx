@@ -61,28 +61,28 @@ const urduNastaliq = Noto_Nastaliq_Urdu({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://al-huda.vercel.app'
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://al-quran.vercel.app'
   ),
   title: {
-    default: 'Al-Huda | Quran Learning App',
-    template: '%s | Al-Huda',
+    default: 'Al-Quran | Quran Learning App',
+    template: '%s | Al-Quran',
   },
   description:
     'A modern Quran learning app with focused recitation, bookmarks, resume, and audio study tools.',
-  applicationName: 'Al-Huda',
+  applicationName: 'Al-Quran',
   icons: {
     icon: '/logos/logo2.png',
   },
   openGraph: {
-    title: 'Al-Huda',
+    title: 'Al-Quran - Quran Learning App',
     description:
       'Read, resume, and listen to the Quran with a focused mobile-first learning experience.',
-    siteName: 'Al-Huda',
+    siteName: 'Al-Quran',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Al-Huda',
+    title: 'Al-Quran',
     description:
       'Quran-first app for recitation, audio, bookmarks, and learning progression.',
   },

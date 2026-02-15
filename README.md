@@ -1,4 +1,4 @@
-# Al-Huda
+# Al-Quran
 
 A modern Islamic web app built with Next.js App Router, TypeScript, Tailwind CSS, and shadcn-style UI components.
 
