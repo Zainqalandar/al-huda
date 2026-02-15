@@ -1,9 +1,19 @@
 import { Compass, Search, SlidersHorizontal } from 'lucide-react';
+import type { Metadata } from 'next';
 
 import SurahList from '@/components/quran';
 import QuranSettingsPanel from '@/components/quran/quran-settings-panel';
 import Filter from '@/components/ui/Filter';
 import { Badge } from '@/components/ui/badge';
+
+export const metadata: Metadata = {
+  title: 'Quran Directory',
+  description:
+    'Browse all 114 surahs, search quickly, change reading settings, and continue from your saved progress.',
+  alternates: {
+    canonical: '/quran',
+  },
+};
 
 export default function QuranPage() {
   return (

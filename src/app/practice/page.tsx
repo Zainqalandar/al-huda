@@ -1,8 +1,18 @@
 import Link from 'next/link';
 import { Wrench } from 'lucide-react';
+import type { Metadata } from 'next';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+
+export const metadata: Metadata = {
+  title: 'Practice Sandbox',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
 
 export default function PracticePage() {
   return (

@@ -125,7 +125,7 @@ export default function SiteHeader() {
     return () => {
       ignore = true;
     };
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     if (!authModalOpen) {

@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface SessionResponse {
@@ -30,7 +29,6 @@ function sendTrackPayload(
 }
 
 export default function ActivityTrackerProvider() {
-  const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -65,7 +63,7 @@ export default function ActivityTrackerProvider() {
     return () => {
       ignore = true;
     };
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {

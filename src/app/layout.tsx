@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import {
   Manrope,
   Cormorant_Garamond,
@@ -16,6 +16,15 @@ import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppSettingsProvider } from '@/components/providers/app-settings-provider';
 import ServiceWorkerRegister from '@/components/providers/service-worker-register';
 import ActivityTrackerProvider from '@/components/providers/activity-tracker-provider';
+
+const defaultSiteUrl = 'https://al-huda.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
+const siteOrigin = new URL(siteUrl);
+const siteOriginString = siteOrigin.toString().replace(/\/$/, '');
+const siteName = 'Al-Huda Quran';
+const siteDescription =
+  'Al-Huda is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
+const ogImage = '/logos/logo3.png';
 
 const bodyFont = Manrope({
   subsets: ['latin'],
@@ -60,31 +69,95 @@ const urduNastaliq = Noto_Nastaliq_Urdu({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://al-quran.vercel.app'
-  ),
+  metadataBase: siteOrigin,
   title: {
-    default: 'Al-Quran | Quran Learning App',
-    template: '%s | Al-Quran',
+    default: 'Al-Huda Quran | Read, Listen, and Learn',
+    template: '%s | Al-Huda Quran',
   },
-  description:
-    'A modern Quran learning app with focused recitation, bookmarks, resume, and audio study tools.',
-  applicationName: 'Al-Quran',
+  description: siteDescription,
+  applicationName: 'Al-Huda Quran',
+  keywords: [
+    'Quran',
+    'Read Quran online',
+    'Urdu Quran translation',
+    'Quran tafseer Urdu',
+    'Quran audio recitation',
+    'Surah bookmarks',
+    'Islamic learning app',
+  ],
+  category: 'education',
+  alternates: {
+    canonical: '/',
+  },
   icons: {
-    icon: '/logos/logo2.png',
+    icon: [
+      { url: '/logos/logo1.png', type: 'image/png' },
+      { url: '/logos/logo1.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: [{ url: '/logos/logo1.png', sizes: '180x180', type: 'image/png' }],
   },
+  manifest: '/manifest.webmanifest',
   openGraph: {
-    title: 'Al-Quran - Quran Learning App',
-    description:
-      'Read, resume, and listen to the Quran with a focused mobile-first learning experience.',
-    siteName: 'Al-Quran',
+    title: 'Al-Huda Quran',
+    description: siteDescription,
+    url: '/',
+    siteName,
     type: 'website',
+    locale: 'en_US',
+    images: [
+      {
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: 'Al-Huda Quran app preview',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Al-Quran',
-    description:
-      'Quran-first app for recitation, audio, bookmarks, and learning progression.',
+    title: 'Al-Huda Quran',
+    description: siteDescription,
+    images: [ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+};
+
+export const viewport: Viewport = {
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f6efe2' },
+    { media: '(prefers-color-scheme: dark)', color: '#071610' },
+  ],
+};
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: siteName,
+  url: siteOriginString,
+  logo: `${siteOriginString}/logos/logo1.png`,
+};
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: siteName,
+  url: siteOriginString,
+  inLanguage: ['en', 'ur', 'ar'],
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${siteOriginString}/quran?search={search_term_string}`,
+    'query-input': 'required name=search_term_string',
   },
 };
 
@@ -95,9 +168,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="dns-prefetch" href="//quranapi.pages.dev" />
+        <link rel="dns-prefetch" href="//api.alquran.cloud" />
+        <link rel="dns-prefetch" href="//api.quran.com" />
+        <link rel="dns-prefetch" href="//ia801503.us.archive.org" />
+        <link rel="preconnect" href="https://quranapi.pages.dev" crossOrigin="" />
+        <link rel="preconnect" href="https://api.alquran.cloud" crossOrigin="" />
+        <link rel="preconnect" href="https://api.quran.com" crossOrigin="" />
+        <link rel="preconnect" href="https://ia801503.us.archive.org" crossOrigin="" />
+      </head>
       <body
         className={`${bodyFont.variable} ${displayFont.variable} ${arabicAmiri.variable} ${arabicNaskh.variable} ${arabicScheherazade.variable} ${urduNastaliq.variable} font-body`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AppSettingsProvider>
             <a

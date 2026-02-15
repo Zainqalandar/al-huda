@@ -4,6 +4,9 @@ import { isValidSurahId } from '@/lib/quran-utils';
 const surahMetaCache = new Map<number, SurahMeta>();
 const surahDetailCache = new Map<number, SurahDetail>();
 const urduTafsirCache = new Map<string, UrduTafsirEntry>();
+const surahMetaInFlight = new Map<number, Promise<SurahMeta>>();
+const surahDetailInFlight = new Map<number, Promise<SurahDetail>>();
+const urduTafsirInFlight = new Map<string, Promise<UrduTafsirEntry>>();
 
 export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Promise<SurahMeta> {
   if (!isValidSurahId(surahId)) {
@@ -15,17 +18,30 @@ export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Pro
     return cached;
   }
 
-  const response = await fetch(`https://quranapi.pages.dev/api/${surahId}.json`, {
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Unable to load surah meta (${response.status})`);
+  const inFlight = surahMetaInFlight.get(surahId);
+  if (inFlight) {
+    return inFlight;
   }
 
-  const payload = (await response.json()) as SurahMeta;
-  surahMetaCache.set(surahId, payload);
-  return payload;
+  const request = fetch(`https://quranapi.pages.dev/api/${surahId}.json`, {
+    signal,
+    cache: 'force-cache',
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Unable to load surah meta (${response.status})`);
+      }
+
+      const payload = (await response.json()) as SurahMeta;
+      surahMetaCache.set(surahId, payload);
+      return payload;
+    })
+    .finally(() => {
+      surahMetaInFlight.delete(surahId);
+    });
+
+  surahMetaInFlight.set(surahId, request);
+  return request;
 }
 
 export async function fetchSurahDetail(
@@ -41,22 +57,35 @@ export async function fetchSurahDetail(
     return cached;
   }
 
-  const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}`, {
+  const inFlight = surahDetailInFlight.get(surahId);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = fetch(`https://api.alquran.cloud/v1/surah/${surahId}`, {
     signal,
-  });
+    cache: 'force-cache',
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Unable to load surah ayahs (${response.status})`);
+      }
 
-  if (!response.ok) {
-    throw new Error(`Unable to load surah ayahs (${response.status})`);
-  }
+      const payload = (await response.json()) as { data: SurahDetail };
 
-  const payload = (await response.json()) as { data: SurahDetail };
+      if (!payload?.data?.ayahs) {
+        throw new Error('Invalid surah details payload');
+      }
 
-  if (!payload?.data?.ayahs) {
-    throw new Error('Invalid surah details payload');
-  }
+      surahDetailCache.set(surahId, payload.data);
+      return payload.data;
+    })
+    .finally(() => {
+      surahDetailInFlight.delete(surahId);
+    });
 
-  surahDetailCache.set(surahId, payload.data);
-  return payload.data;
+  surahDetailInFlight.set(surahId, request);
+  return request;
 }
 
 export async function fetchUrduTafsirByAyah(
@@ -78,19 +107,32 @@ export async function fetchUrduTafsirByAyah(
     return cached;
   }
 
-  const response = await fetch(`/api/tafsir/ur?surah=${surahId}&ayah=${ayahNumber}`, {
+  const inFlight = urduTafsirInFlight.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = fetch(`/api/tafsir/ur?surah=${surahId}&ayah=${ayahNumber}`, {
     signal,
-  });
+    cache: 'force-cache',
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Unable to load Urdu tafsir (${response.status})`);
+      }
 
-  if (!response.ok) {
-    throw new Error(`Unable to load Urdu tafsir (${response.status})`);
-  }
+      const payload = (await response.json()) as UrduTafsirEntry;
+      if (!payload?.textHtml) {
+        throw new Error('Invalid Urdu tafsir payload');
+      }
 
-  const payload = (await response.json()) as UrduTafsirEntry;
-  if (!payload?.textHtml) {
-    throw new Error('Invalid Urdu tafsir payload');
-  }
+      urduTafsirCache.set(cacheKey, payload);
+      return payload;
+    })
+    .finally(() => {
+      urduTafsirInFlight.delete(cacheKey);
+    });
 
-  urduTafsirCache.set(cacheKey, payload);
-  return payload;
+  urduTafsirInFlight.set(cacheKey, request);
+  return request;
 }

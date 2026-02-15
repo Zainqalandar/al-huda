@@ -31,12 +31,23 @@ function isApiRequest(requestUrl) {
   );
 }
 
+function isInternalApiRequest(requestUrl) {
+  return (
+    requestUrl.origin === self.location.origin &&
+    requestUrl.pathname.startsWith('/api/')
+  );
+}
+
+function isCacheableInternalApiRequest(requestUrl) {
+  return requestUrl.pathname === '/api/tafsir/ur';
+}
+
 function isNextAsset(requestUrl) {
   return requestUrl.pathname.startsWith('/_next/');
 }
 
 function cacheResponse(cacheName, request, response) {
-  if (!response || !response.ok) {
+  if (!response || !response.ok || response.type === 'opaque') {
     return;
   }
 
@@ -56,19 +67,49 @@ self.addEventListener('fetch', (event) => {
   if (isApiRequest(requestUrl.href)) {
     event.respondWith(
       caches.open(API_CACHE).then(async (cache) => {
-        try {
-          const response = await fetch(request);
-          cache.put(request, response.clone());
-          return response;
-        } catch (error) {
-          const cachedResponse = await cache.match(request);
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          throw error;
+        const cached = await cache.match(request);
+        const network = fetch(request)
+          .then((response) => {
+            cacheResponse(API_CACHE, request, response);
+            return response;
+          })
+          .catch(() => cached);
+
+        if (cached) {
+          void network;
+          return cached;
         }
+
+        return network;
       })
     );
+    return;
+  }
+
+  if (isInternalApiRequest(requestUrl)) {
+    if (isCacheableInternalApiRequest(requestUrl)) {
+      event.respondWith(
+        caches.open(API_CACHE).then(async (cache) => {
+          const cached = await cache.match(request);
+          const network = fetch(request)
+            .then((response) => {
+              cacheResponse(API_CACHE, request, response);
+              return response;
+            })
+            .catch(() => cached);
+
+          if (cached) {
+            void network;
+            return cached;
+          }
+
+          return network;
+        })
+      );
+      return;
+    }
+
+    event.respondWith(fetch(request));
     return;
   }
 
@@ -101,7 +142,7 @@ self.addEventListener('fetch', (event) => {
 
   if (requestUrl.origin === self.location.origin && isNextAsset(requestUrl)) {
     event.respondWith(
-      fetch(request, { cache: 'no-store' })
+      fetch(request)
         .then((response) => {
           cacheResponse(STATIC_CACHE, request, response);
           return response;

@@ -67,6 +67,7 @@ export default function useSurahList(): UseSurahListResult {
         setLoading(true);
         const res = await fetch('https://quranapi.pages.dev/api/surah.json', {
           signal: controller.signal,
+          cache: 'force-cache',
         });
 
         if (!res.ok) {

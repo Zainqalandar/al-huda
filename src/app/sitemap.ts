@@ -1,16 +1,40 @@
 import type { MetadataRoute } from 'next';
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://al-huda.vercel.app';
+const TOTAL_SURAHS = 114;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ['', '/quran', '/about', '/admin'];
-
   const now = new Date();
+  const staticRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/quran`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.65,
+    },
+  ];
 
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: now,
-    changeFrequency: route === '/quran' ? 'daily' : 'weekly',
-    priority: route === '' ? 1 : 0.7,
-  }));
+  const surahRoutes: MetadataRoute.Sitemap = Array.from(
+    { length: TOTAL_SURAHS },
+    (_, index) => ({
+      url: `${baseUrl}/quran/${index + 1}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    })
+  );
+
+  return [...staticRoutes, ...surahRoutes];
 }

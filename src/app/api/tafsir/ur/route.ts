@@ -88,6 +88,10 @@ export async function GET(request: NextRequest) {
       surahId,
       ayahNumber,
       ...tafsir,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=259200',
+      },
     });
   } catch {
     return NextResponse.json(

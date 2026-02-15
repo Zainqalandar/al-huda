@@ -1,12 +1,20 @@
-import AboutRoot from '@/components/about';
-import React from 'react';
+import type { Metadata } from 'next';
 
-const About = () => {
-	return (
-		<>
-			<AboutRoot />
-		</>
-	);
+import AboutRoot from '@/components/about';
+
+export const metadata: Metadata = {
+  title: 'About',
+  description:
+    'Learn the mission, values, and vision behind the Al-Huda Quran platform.',
+  alternates: {
+    canonical: '/about',
+  },
 };
 
-export default About;
+export default function About() {
+  return (
+    <>
+      <AboutRoot />
+    </>
+  );
+}
