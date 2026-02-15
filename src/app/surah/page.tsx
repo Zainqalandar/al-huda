@@ -23,7 +23,7 @@ export async function generateMetadata({
     return buildPageMetadata({
       title: 'Surah Index – Read Quran by Surah',
       description:
-        'Browse all 114 surahs with Arabic text, Urdu translation, ayah links, tafseer access, and recitation audio.',
+        'Browse all 114 surahs with Arabic text, Urdu and English translation, ayah links, tafseer access, and recitation audio.',
       path: '/surah',
       ogType: 'website',
       imageUrl: '/og?kind=surah-index',

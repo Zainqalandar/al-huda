@@ -24,6 +24,7 @@ export function buildLanguageAlternates(path: string) {
   const absolute = toAbsoluteUrl(path);
 
   return {
+    en: absolute,
     'ur-PK': absolute,
     ar: absolute,
     'x-default': absolute,

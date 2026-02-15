@@ -3,8 +3,8 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 import QuranReaderPage from '@/components/sidebar';
 import { getAllSurahs, resolveSurahParam } from '@/lib/quran-index';
-import { buildSurahPath, buildSurahSlug } from '@/lib/quran-routing';
-import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
+import { buildAyahPath, buildSurahPath, buildSurahSlug } from '@/lib/quran-routing';
+import { buildBreadcrumbJsonLd, buildPageMetadata, getSiteOrigin } from '@/lib/seo';
 
 interface SurahPageProps {
   params: Promise<{
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: SurahPageProps): Promise<Meta
   }
 
   const surah = resolved.surah;
-  const title = `Surah ${surah.surahName} (${surah.surahNameArabic}) – Urdu Tarjuma, Tilawat Audio`;
+  const title = `Surah ${surah.surahName} (${surah.surahNameArabic}) – Urdu & English Translation, Tilawat Audio`;
   const description = `Surah ${surah.surahName} (${surah.surahNameTranslation}) read karein: Arabic text, Urdu/English translation tabs, tafseer panel, bookmarks, likes, aur audio playback/download options.`;
   const canonicalPath = buildSurahPath(surah.id, surah.surahName);
 
@@ -63,8 +63,22 @@ export default async function SurahDetailPage({ params }: SurahPageProps) {
   const breadcrumbs = buildBreadcrumbJsonLd([
     { name: 'Home', item: '/' },
     { name: 'Surah Index', item: '/surah' },
-    { name: `Surah ${surah.id} ${surah.surahName}`, item: buildSurahPath(surah.id, surah.surahName) },
+    {
+      name: `Surah ${surah.id} ${surah.surahName}`,
+      item: buildSurahPath(surah.id, surah.surahName),
+    },
   ]);
+  const canonicalPath = buildSurahPath(surah.id, surah.surahName);
+  const surahJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: `Surah ${surah.surahName}`,
+    alternateName: [surah.surahNameArabic, surah.surahNameTranslation],
+    inLanguage: ['ar', 'ur', 'en'],
+    url: `${getSiteOrigin()}${canonicalPath}`,
+    about: `Quran Surah ${surah.id}`,
+  };
+  const firstAyahPath = buildAyahPath(surah.id, surah.surahName, 1);
 
   return (
     <>
@@ -72,6 +86,30 @@ export default async function SurahDetailPage({ params }: SurahPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(surahJsonLd) }}
+      />
+      <section className="sr-only">
+        <h1>{`Surah ${surah.surahName} (${surah.surahNameArabic})`}</h1>
+        <p>
+          Surah page with Arabic text, Urdu and English translation, ayah links, audio
+          recitation, bookmarks, likes, and Urdu tafseer access.
+        </p>
+      </section>
+      <noscript>
+        <section className="pb-2 pt-6" data-slot="page-shell">
+          <h1 className="font-display text-3xl text-[var(--color-heading)] sm:text-4xl">
+            {`Surah ${surah.surahName} (${surah.surahNameArabic})`}
+          </h1>
+          <p className="mt-2 max-w-3xl text-sm text-[var(--color-muted-text)] sm:text-base">
+            {`Surah ${surah.surahNameTranslation} with Arabic text, Urdu and English translations, audio, and tafseer.`}
+          </p>
+          <p className="mt-2 text-sm text-[var(--color-muted-text)]">
+            <a href={firstAyahPath}>Open Ayah 1</a>
+          </p>
+        </section>
+      </noscript>
       <QuranReaderPage />
     </>
   );

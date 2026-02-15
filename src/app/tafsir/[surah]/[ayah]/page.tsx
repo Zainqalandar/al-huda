@@ -72,7 +72,7 @@ export async function generateMetadata({
   }
 
   const canonicalPath = buildTafsirPath(surah.id, surah.surahName, ayahNumber);
-  const title = `Tafseer of Ayah ${surah.id}:${ayahNumber} – Urdu Tafseer, Arabic Text, Audio`;
+  const title = `Tafseer of Ayah ${surah.id}:${ayahNumber} (${surah.surahName}) – Urdu Tafseer, Arabic, Urdu & English Translation, Audio`;
   const description = stripHtml(tafsir.textHtml).slice(0, 155);
 
   return buildPageMetadata({
@@ -135,7 +135,7 @@ export default async function TafsirDetailPage({
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     name: `Urdu Tafseer - Surah ${surah.id} Ayah ${ayahNumber}`,
-    inLanguage: 'ur',
+    inLanguage: ['ur', 'en', 'ar'],
     isPartOf: {
       '@type': 'CreativeWork',
       name: `Surah ${surah.surahName}`,
@@ -192,14 +192,14 @@ export default async function TafsirDetailPage({
       <section className="mb-6">
         <Badge className="mb-2">Urdu Tafseer</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)] sm:text-5xl">
-          Tafseer of Ayah {surah.id}:{ayahNumber}
+          Tafseer of Ayah {surah.id}:{ayahNumber} • Surah {surah.surahName}
         </h1>
       </section>
 
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-xl text-[var(--color-heading)]">
-            Arabic + Urdu Reference
+            Arabic + Urdu + English Reference
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 p-5">
@@ -208,6 +208,9 @@ export default async function TafsirDetailPage({
           </p>
           <p lang="ur" dir="rtl" className="urdu-font text-right text-[var(--color-text)]">
             {ayah.urduTranslation}
+          </p>
+          <p lang="en" dir="ltr" className="text-left text-[var(--color-text)]">
+            {ayah.englishTranslation || 'English translation unavailable.'}
           </p>
         </CardContent>
       </Card>

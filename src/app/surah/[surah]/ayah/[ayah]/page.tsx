@@ -59,14 +59,22 @@ export async function generateMetadata({
   const canonicalPath = buildAyahPath(surah.id, surah.surahName, ayahNumber);
 
   const title = canOpenTafsir
-    ? `Ayah ${surah.id}:${ayahNumber} – Arabic, Urdu Translation, Audio, Tafseer`
-    : `Ayah ${surah.id}:${ayahNumber} – Arabic, Urdu Translation, Audio`;
+    ? `Ayah ${surah.id}:${ayahNumber} (${surah.surahName}) – Arabic, Urdu & English Translation, Audio, Tafseer`
+    : `Ayah ${surah.id}:${ayahNumber} (${surah.surahName}) – Arabic, Urdu & English Translation, Audio`;
   const fallbackDescription = canOpenTafsir
-    ? `Ayah ${surah.id}:${ayahNumber} ka Arabic text, Urdu tarjuma, Arabic + Urdu audio, aur tafseer link.`
-    : `Ayah ${surah.id}:${ayahNumber} ka Arabic text, Urdu tarjuma, aur Arabic + Urdu audio.`;
+    ? `Ayah ${surah.id}:${ayahNumber} ka Arabic text, Urdu aur English translation, Arabic + Urdu audio, aur tafseer link.`
+    : `Ayah ${surah.id}:${ayahNumber} ka Arabic text, Urdu aur English translation, aur Arabic + Urdu audio.`;
+  const translationSnippet = [ayah?.urduTranslation, ayah?.englishTranslation]
+    .map((value) => String(value ?? '').trim())
+    .filter(Boolean)
+    .join(' ');
+  const normalizedTranslationSnippet =
+    translationSnippet.length > 170
+      ? `${translationSnippet.slice(0, 167).trim()}...`
+      : translationSnippet;
   const description = tafsir
     ? `${stripHtml(tafsir.textHtml).slice(0, 150)}...`
-    : ayah?.urduTranslation || fallbackDescription;
+    : normalizedTranslationSnippet || fallbackDescription;
 
   return buildPageMetadata({
     title,
@@ -170,11 +178,11 @@ export default async function AyahDetailPage({
       <section className="mb-6">
         <Badge className="mb-2">Ayah {surah.id}:{ayahNumber}</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)] sm:text-5xl">
-          Ayah {surah.id}:{ayahNumber}
+          Ayah {surah.id}:{ayahNumber} • Surah {surah.surahName}
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--color-muted-text)] sm:text-base">
-          Arabic matn, Urdu tarjuma, downloadable audio, aur tafseer link is page par
-          available hai.
+          Arabic matn, Urdu aur English translation, downloadable audio, aur tafseer link
+          is page par available hai.
         </p>
       </section>
 
@@ -185,6 +193,9 @@ export default async function AyahDetailPage({
           </p>
           <p lang="ur" dir="rtl" className="urdu-font text-right text-[var(--color-text)]">
             {ayah.urduTranslation || 'Urdu translation unavailable.'}
+          </p>
+          <p lang="en" dir="ltr" className="text-left text-[var(--color-text)]">
+            {ayah.englishTranslation || 'English translation unavailable.'}
           </p>
         </CardContent>
       </Card>

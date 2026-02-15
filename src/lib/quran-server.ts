@@ -9,6 +9,7 @@ const QURAN_COM_TAFSIR_IDS = [160, 159, 818, 157] as const;
 export interface AyahContentEntry {
   ayahNumber: number;
   arabicText: string;
+  englishTranslation: string;
   urduTranslation: string;
 }
 
@@ -41,11 +42,13 @@ export const getAyahRowsForSurah = cache(async (surahId: number): Promise<AyahCo
   const surahMeta = await getSurahMetaById(surahId);
   const totalAyahs = Math.max(0, Number(surahMeta.totalAyah ?? 0));
   const arabic = Array.isArray(surahMeta.arabic1) ? surahMeta.arabic1 : [];
+  const english = Array.isArray(surahMeta.english) ? surahMeta.english : [];
   const urdu = Array.isArray(surahMeta.urdu) ? surahMeta.urdu : [];
 
   return Array.from({ length: totalAyahs }, (_, index) => ({
     ayahNumber: index + 1,
     arabicText: String(arabic[index] ?? '').trim(),
+    englishTranslation: String(english[index] ?? '').trim(),
     urduTranslation: String(urdu[index] ?? '').trim(),
   }));
 });

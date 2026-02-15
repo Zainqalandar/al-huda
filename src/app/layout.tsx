@@ -90,6 +90,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteOriginString,
     languages: {
+      en: siteOriginString,
       'ur-PK': siteOriginString,
       ar: siteOriginString,
       'x-default': siteOriginString,
