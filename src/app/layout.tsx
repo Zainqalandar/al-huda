@@ -7,6 +7,7 @@ import {
   Noto_Nastaliq_Urdu,
   Scheherazade_New,
 } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 
 import './globals.css';
 import SiteHeader from '@/components/layout/site-header';
@@ -212,6 +213,7 @@ export default function RootLayout({
             <SiteFooter />
           </AppSettingsProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
