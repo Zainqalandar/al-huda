@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { GoogleAnalytics } from '@next/third-parties/google'
 import {
   Manrope,
   Cormorant_Garamond,
@@ -213,6 +214,7 @@ export default function RootLayout({
           </AppSettingsProvider>
         </ThemeProvider>
       </body>
+      <GoogleAnalytics gaId="G-HZJ0Z0MFBP" />
     </html>
   );
 }

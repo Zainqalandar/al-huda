@@ -211,7 +211,7 @@ export default function HomeRoot() {
               Quran First
             </Badge>
             <h1 className="font-display text-4xl leading-tight text-[var(--color-heading)] sm:text-5xl lg:text-6xl">
-              Read Quran with focus, resume fast, and stay consistent.
+              Read Quran with focus, resume fast, and stay consistent
             </h1>
             <p className="mt-5 max-w-2xl text-base text-[var(--color-muted-text)] sm:text-lg">
               Start recitation quickly, continue from your last ayah, and keep your
