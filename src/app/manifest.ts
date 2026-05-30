@@ -12,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/surah',
     scope: '/',
     display: 'standalone',
-    background_color: '#071610',
-    theme_color: '#0f8a6f',
+    background_color: '#09090b',
+    theme_color: '#c9a227',
     lang: 'en',
     id: siteUrl,
     icons: [

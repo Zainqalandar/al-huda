@@ -5,9 +5,9 @@ import navLinks from '@/lib/navLinks';
 
 export default function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden border-t border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-surface),white_8%),var(--color-surface))]">
-      <div className="pointer-events-none absolute -left-16 top-4 size-56 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent),transparent_78%)_0%,transparent_72%)] blur-2xl" />
-      <div className="pointer-events-none absolute -right-16 bottom-0 size-64 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-highlight),transparent_84%)_0%,transparent_74%)] blur-2xl" />
+    <footer className="relative overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+      <div className="pointer-events-none absolute -left-16 top-4 size-56 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent),transparent_92%)_0%,transparent_72%)] blur-2xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 size-64 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent-soft),transparent_94%)_0%,transparent_74%)] blur-2xl" />
 
       <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2">
         <div className="space-y-3">

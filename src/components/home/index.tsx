@@ -199,18 +199,18 @@ export default function HomeRoot() {
     : '/surah';
 
   return (
-    <div className="pb-20 pt-10 sm:pt-14">
+    <div className="pb-20 pt-10 sm:pt-16">
       <section className="relative overflow-hidden" data-slot="page-shell">
-        <div className="pointer-events-none absolute -top-16 right-[-10%] size-60 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent),transparent_64%)_0%,transparent_72%)] opacity-35 blur-3xl animate-float" />
-        <div className="pointer-events-none absolute -bottom-16 left-[-8%] size-64 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-highlight),transparent_70%)_0%,transparent_72%)] opacity-35 blur-3xl animate-float" />
+        <div className="pointer-events-none absolute -top-16 right-[-10%] size-60 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent),transparent_88%)_0%,transparent_72%)] opacity-60 blur-3xl animate-float" />
+        <div className="pointer-events-none absolute -bottom-16 left-[-8%] size-64 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent-soft),transparent_90%)_0%,transparent_72%)] opacity-40 blur-3xl animate-float" />
 
-        <Card className="relative overflow-hidden border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_54%)] bg-[linear-gradient(130deg,color-mix(in_oklab,var(--color-surface),white_18%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_93%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_92%))] animate-fade-up">
+        <Card className="relative overflow-hidden border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_35%)] bg-[linear-gradient(135deg,var(--color-surface),color-mix(in_oklab,var(--color-accent),var(--color-surface)_94%))] shadow-[var(--shadow-glow)] animate-fade-up">
           <CardContent className="p-6 sm:p-10 lg:p-14">
             <Badge className="mb-4 w-fit">
               <Sparkles className="mr-1 size-3.5" />
               Quran First
             </Badge>
-            <h1 className="font-display text-4xl leading-tight text-[var(--color-heading)] sm:text-5xl lg:text-6xl">
+            <h1 className="font-display text-4xl leading-tight tracking-tight text-[var(--color-heading)] sm:text-5xl lg:text-6xl">
               Read Quran with focus, resume fast, and stay consistent.
             </h1>
             <p className="mt-5 max-w-2xl text-base text-[var(--color-muted-text)] sm:text-lg">
@@ -278,8 +278,8 @@ export default function HomeRoot() {
         </Card>
       </section>
 
-      <section className="mt-10" data-slot="page-shell">
-        <h2 className="mb-4 font-display text-3xl text-[var(--color-heading)]">
+      <section className="mt-12" data-slot="page-shell">
+        <h2 className="mb-5 font-display text-3xl tracking-tight text-[var(--color-heading)]">
           Quick Quran Actions
         </h2>
 
@@ -354,8 +354,8 @@ export default function HomeRoot() {
         </div>
       </section>
 
-      <section className="mt-10" data-slot="page-shell">
-        <h2 className="mb-4 font-display text-3xl text-[var(--color-heading)]">Core Quran Tools</h2>
+      <section className="mt-12" data-slot="page-shell">
+        <h2 className="mb-5 font-display text-3xl tracking-tight text-[var(--color-heading)]">Core Quran Tools</h2>
 
         <div className="grid gap-4 lg:grid-cols-3">
           <Card className="animate-fade-up">

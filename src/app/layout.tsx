@@ -139,10 +139,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-	colorScheme: 'light dark',
+	colorScheme: 'dark light',
 	themeColor: [
-		{ media: '(prefers-color-scheme: light)', color: '#f6efe2' },
-		{ media: '(prefers-color-scheme: dark)', color: '#071610' },
+		{ media: '(prefers-color-scheme: light)', color: '#fafafa' },
+		{ media: '(prefers-color-scheme: dark)', color: '#09090b' },
 	],
 };
 
@@ -217,7 +217,7 @@ export default function RootLayout({
 				/>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="dark"
 					enableSystem
 				>
 					<AppSettingsProvider>

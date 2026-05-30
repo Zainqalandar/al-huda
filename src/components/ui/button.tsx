@@ -10,13 +10,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_52%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_12%),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_84%))] text-[var(--color-accent-foreground)] shadow-[0_14px_30px_-20px_color-mix(in_oklab,var(--color-accent),transparent_24%)] hover:brightness-110 focus-visible:ring-[var(--color-accent)]',
+          'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[linear-gradient(135deg,var(--color-accent-soft),var(--color-accent))] text-[var(--color-accent-foreground)] shadow-[0_14px_30px_-20px_color-mix(in_oklab,var(--color-accent),transparent_30%)] hover:brightness-110 focus-visible:ring-[var(--color-accent)]',
         secondary:
-          'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface-2),white_12%),color-mix(in_oklab,var(--color-highlight),var(--color-surface-2)_95%))] text-[var(--color-text)] hover:border-[var(--color-accent-soft)] hover:bg-[var(--color-surface-3)] focus-visible:ring-[var(--color-accent)]',
+          'border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:border-[var(--color-accent-soft)] hover:bg-[var(--color-surface-3)] focus-visible:ring-[var(--color-accent)]',
         ghost:
-          'text-[var(--color-text)] hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] focus-visible:ring-[var(--color-accent)]',
+          'text-[var(--color-text)] hover:bg-[var(--color-surface-2)] focus-visible:ring-[var(--color-accent)]',
         outline:
-          'border border-[var(--color-border)] bg-[linear-gradient(150deg,color-mix(in_oklab,var(--color-surface),white_18%),var(--color-surface))] text-[var(--color-text)] hover:border-[var(--color-accent-soft)] hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] focus-visible:ring-[var(--color-accent)]',
+          'border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:border-[var(--color-accent-soft)] hover:bg-[var(--color-surface-2)] focus-visible:ring-[var(--color-accent)]',
         danger:
           'border border-[color-mix(in_oklab,var(--color-danger),var(--color-border)_50%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-danger),white_8%),color-mix(in_oklab,#8f2a23,var(--color-danger)_70%))] text-white hover:brightness-110 focus-visible:ring-[var(--color-danger)]',
       },

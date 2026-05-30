@@ -1,57 +1,57 @@
 @import 'tailwindcss';
 
 :root {
-  --color-bg: #f6efe2;
-  --color-bg-alt: #efe5d4;
-  --color-surface: #fffdf8;
-  --color-surface-2: #f4ecdd;
-  --color-surface-3: #e9ddc9;
-  --color-surface-elevated: #fffaf0;
-  --color-text: #193024;
-  --color-heading: #0f281f;
-  --color-muted-text: #4d6459;
-  --color-border: #d7cab3;
-  --color-accent: #0f8a6f;
-  --color-accent-soft: #20a184;
-  --color-accent-foreground: #ecfff8;
-  --color-highlight: #c8872d;
-  --color-info: #2d6bb5;
-  --color-danger: #ba3f35;
-  --color-ring: #1ca084;
+  --color-bg: #fafafa;
+  --color-bg-alt: #f4f4f5;
+  --color-surface: #ffffff;
+  --color-surface-2: #f4f4f5;
+  --color-surface-3: #e4e4e7;
+  --color-surface-elevated: #ffffff;
+  --color-text: #27272a;
+  --color-heading: #09090b;
+  --color-muted-text: #71717a;
+  --color-border: #e4e4e7;
+  --color-accent: #a67c00;
+  --color-accent-soft: #c9a227;
+  --color-accent-foreground: #fafafa;
+  --color-highlight: #92400e;
+  --color-info: #2563eb;
+  --color-danger: #dc2626;
+  --color-ring: #c9a227;
 
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --radius-2xl: 1.5rem;
 
-  --shadow-soft: 0 16px 38px -24px rgb(10 46 34 / 0.33);
-  --shadow-card: 0 22px 55px -30px rgb(11 34 26 / 0.44);
-  --shadow-glow: 0 0 0 1px rgb(15 138 111 / 0.18), 0 24px 48px -30px rgb(15 138 111 / 0.42);
+  --shadow-soft: 0 16px 38px -24px rgb(9 9 11 / 0.12);
+  --shadow-card: 0 22px 55px -30px rgb(9 9 11 / 0.18);
+  --shadow-glow: 0 0 0 1px rgb(201 162 39 / 0.22), 0 24px 48px -30px rgb(201 162 39 / 0.28);
 
   --arabic-font-scale: 1.1;
 }
 
 .dark {
-  --color-bg: #071610;
-  --color-bg-alt: #0f241c;
-  --color-surface: #11231c;
-  --color-surface-2: #183127;
-  --color-surface-3: #214037;
-  --color-surface-elevated: #173127;
-  --color-text: #ecf8f1;
-  --color-heading: #f4fff8;
-  --color-muted-text: #9ebdad;
-  --color-border: #2a4d3f;
-  --color-accent: #42bc97;
-  --color-accent-soft: #61d4b0;
-  --color-accent-foreground: #062319;
-  --color-highlight: #e0a75b;
-  --color-info: #7db3ff;
-  --color-danger: #f07b6f;
-  --color-ring: #5fd6b0;
+  --color-bg: #09090b;
+  --color-bg-alt: #0f0f12;
+  --color-surface: #141419;
+  --color-surface-2: #1c1c24;
+  --color-surface-3: #252530;
+  --color-surface-elevated: #18181f;
+  --color-text: #e4e4e7;
+  --color-heading: #fafafa;
+  --color-muted-text: #71717a;
+  --color-border: #27272a;
+  --color-accent: #c9a227;
+  --color-accent-soft: #dbb84a;
+  --color-accent-foreground: #09090b;
+  --color-highlight: #a67c00;
+  --color-info: #60a5fa;
+  --color-danger: #f87171;
+  --color-ring: #c9a227;
 
-  --shadow-soft: 0 18px 42px -24px rgb(2 10 7 / 0.74);
-  --shadow-card: 0 28px 62px -34px rgb(0 7 4 / 0.88);
-  --shadow-glow: 0 0 0 1px rgb(95 214 176 / 0.2), 0 22px 46px -26px rgb(95 214 176 / 0.34);
+  --shadow-soft: 0 18px 42px -24px rgb(0 0 0 / 0.55);
+  --shadow-card: 0 28px 62px -34px rgb(0 0 0 / 0.72);
+  --shadow-glow: 0 0 0 1px rgb(201 162 39 / 0.24), 0 22px 46px -26px rgb(201 162 39 / 0.22);
 }
 
 * {
@@ -69,10 +69,9 @@ html {
 
 body {
   background:
-    radial-gradient(1120px 420px at 50% -180px, color-mix(in oklab, var(--color-accent), transparent 82%), transparent),
-    radial-gradient(700px 330px at 103% 0%, color-mix(in oklab, var(--color-highlight), transparent 80%), transparent),
-    radial-gradient(630px 290px at -4% 0%, color-mix(in oklab, #2d6bb5, transparent 90%), transparent),
-    linear-gradient(180deg, color-mix(in oklab, var(--color-bg), white 2%), var(--color-bg));
+    radial-gradient(900px 380px at 50% -120px, color-mix(in oklab, var(--color-accent), transparent 92%), transparent),
+    radial-gradient(600px 280px at 100% 0%, color-mix(in oklab, var(--color-accent), transparent 96%), transparent),
+    linear-gradient(180deg, var(--color-bg), var(--color-bg-alt));
   color: var(--color-text);
   font-family: var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   text-rendering: optimizeLegibility;
@@ -215,7 +214,7 @@ body {
 }
 
 .tafseer-rich {
-  color: color-mix(in oklab, var(--color-text), #def4e8 18%);
+  color: var(--color-text);
   line-height: 2.08;
   text-wrap: pretty;
 }
@@ -233,7 +232,7 @@ body {
   text-align: right;
   font-size: 1rem;
   font-weight: 700;
-  color: color-mix(in oklab, #f7e1ad, var(--color-heading) 56%);
+  color: color-mix(in oklab, var(--color-accent-soft), var(--color-heading) 40%);
 }
 
 .tafseer-rich .tafseer-urdu-block {
@@ -247,7 +246,7 @@ body {
 .tafseer-rich .tafseer-urdu-paragraph,
 .tafseer-rich .tafseer-body-paragraph {
   margin-bottom: 0.85rem;
-  color: color-mix(in oklab, var(--color-text), #def2e6 15%);
+  color: var(--color-text);
 }
 
 .tafseer-rich .tafseer-page-number {
@@ -258,21 +257,21 @@ body {
   border-radius: 999px;
   border: 1px dashed color-mix(in oklab, var(--color-accent), var(--color-highlight) 40%);
   background: color-mix(in oklab, var(--color-surface-3), var(--color-highlight) 14%);
-  color: color-mix(in oklab, #e2f9ec, var(--color-text) 70%);
+  color: color-mix(in oklab, var(--color-accent-soft), var(--color-text) 72%);
   padding: 0.2rem 0.66rem;
   font-size: 0.82rem;
   white-space: nowrap;
 }
 
 .tafseer-rich .tafseer-translation {
-  color: color-mix(in oklab, #9fe0c2, var(--color-text) 48%);
+  color: color-mix(in oklab, var(--color-muted-text), var(--color-text) 55%);
   font-style: italic;
 }
 
 .tafseer-rich .tafseer-arabic-inline {
   font-family: 'Amiri Quran', 'Noto Naskh Arabic', 'Scheherazade New', serif;
   font-weight: 700;
-  color: color-mix(in oklab, #f9e5b7, var(--color-heading) 52%);
+  color: color-mix(in oklab, var(--color-accent-soft), var(--color-heading) 48%);
   background: color-mix(in oklab, var(--color-highlight), transparent 80%);
   border: 1px solid color-mix(in oklab, var(--color-highlight), transparent 56%);
   border-radius: 0.45rem;
@@ -282,7 +281,7 @@ body {
 }
 
 .tafseer-rich .tafseer-salawat {
-  color: color-mix(in oklab, #f1d28b, var(--color-heading) 62%);
+  color: color-mix(in oklab, var(--color-accent-soft), var(--color-heading) 58%);
 }
 
 .tafseer-rich .tafseer-reference-chip {
@@ -291,7 +290,7 @@ body {
   border-radius: 999px;
   border: 1px solid color-mix(in oklab, var(--color-accent), var(--color-highlight) 46%);
   background: color-mix(in oklab, var(--color-surface-2), var(--color-highlight) 18%);
-  color: color-mix(in oklab, #d8f4e8, var(--color-text) 68%);
+  color: color-mix(in oklab, var(--color-accent-soft), var(--color-text) 68%);
   padding-inline: 0.52rem;
   padding-block: 0.08rem;
   font-size: 0.9em;
@@ -303,7 +302,7 @@ a {
 }
 
 ::selection {
-  background-color: color-mix(in oklab, var(--color-accent), white 65%);
+  background-color: color-mix(in oklab, var(--color-accent), transparent 55%);
   color: var(--color-heading);
 }
 

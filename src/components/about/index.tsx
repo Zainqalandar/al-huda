@@ -47,7 +47,7 @@ export default function AboutRoot() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Card className="animate-fade-up border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-surface),white_16%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))]">
+        <Card className="animate-fade-up border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)]">
           <CardHeader>
             <CardTitle className="text-2xl">Mission</CardTitle>
           </CardHeader>

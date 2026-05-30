@@ -271,13 +271,12 @@ export default function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_68%)] bg-[color-mix(in_oklab,var(--color-bg),transparent_12%)] backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,color-mix(in_oklab,var(--color-accent),white_45%),transparent)]" />
+      <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[color-mix(in_oklab,var(--color-bg),transparent_8%)] backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--color-accent),transparent)] opacity-40" />
         <div className="mx-auto flex h-[4.2rem] max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="group flex items-center gap-2.5">
-            <span className="relative inline-flex size-9 items-center justify-center overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_56%)] bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-accent),white_12%),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_82%))] text-[var(--color-accent-foreground)] shadow-[var(--shadow-soft)] transition-transform duration-300 group-hover:-translate-y-px">
+            <span className="relative inline-flex size-9 items-center justify-center overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[linear-gradient(140deg,var(--color-accent-soft),var(--color-accent))] text-[var(--color-accent-foreground)] shadow-[var(--shadow-soft)] transition-transform duration-300 group-hover:-translate-y-px">
               <Sparkles className="size-4" />
-              <span className="absolute -bottom-4 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-white/30 blur-sm" />
             </span>
             <span className="font-display text-[1.37rem] font-semibold tracking-wide text-[var(--color-heading)]">
               Al-Quran
@@ -295,8 +294,8 @@ export default function SiteHeader() {
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition-all',
                     active
-                      ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_68%),color-mix(in_oklab,var(--color-highlight),white_78%))] text-[var(--color-heading)] shadow-[var(--shadow-soft)] dark:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_22%),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_86%))] dark:text-[var(--color-accent-foreground)]'
-                      : 'text-[var(--color-muted-text)] hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_12%)] hover:text-[var(--color-text)]'
+                      ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%)] text-[var(--color-accent-soft)] shadow-[var(--shadow-soft)]'
+                      : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
                   )}
                   aria-current={active ? 'page' : undefined}
                 >
@@ -347,12 +346,12 @@ export default function SiteHeader() {
           id="mobile-nav"
           aria-hidden={!open}
           className={cn(
-            'grid overflow-hidden border-t border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_68%)] transition-[grid-template-rows] duration-300 md:hidden',
+            'grid overflow-hidden border-t border-[var(--color-border)] transition-[grid-template-rows] duration-300 md:hidden',
             open ? 'pointer-events-auto grid-rows-[1fr]' : 'pointer-events-none grid-rows-[0fr]'
           )}
         >
           <nav
-            className="min-h-0 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-bg),white_6%),var(--color-bg))]"
+            className="min-h-0 bg-[var(--color-bg)]"
             aria-label="Mobile"
           >
             <ul className="space-y-1 px-4 py-3">
@@ -366,7 +365,7 @@ export default function SiteHeader() {
                       className={cn(
                         'inline-flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition-all',
                         active
-                          ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_52%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_68%),color-mix(in_oklab,var(--color-highlight),white_80%))] text-[var(--color-heading)] dark:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_20%),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_88%))] dark:text-[var(--color-accent-foreground)]'
+                          ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%)] text-[var(--color-accent-soft)] shadow-[var(--shadow-soft)]'
                           : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
                       )}
                     >
@@ -416,7 +415,7 @@ export default function SiteHeader() {
           />
 
           <div className="absolute inset-0 grid place-items-center p-4">
-            <div className="w-full max-w-md animate-fade-up rounded-2xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_56%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_95%))] p-5 shadow-[var(--shadow-card)] sm:p-6">
+            <div className="w-full max-w-md animate-fade-up rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)] sm:p-6">
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
@@ -451,8 +450,8 @@ export default function SiteHeader() {
                   className={cn(
                     'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition-all',
                     authTab === 'signin'
-                      ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_52%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_70%),color-mix(in_oklab,var(--color-highlight),white_82%))] text-[var(--color-heading)] shadow-[var(--shadow-soft)] dark:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_38%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_22%),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_86%))] dark:text-[var(--color-accent-foreground)]'
-                      : 'text-[var(--color-muted-text)] hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_10%)] hover:text-[var(--color-text)] dark:hover:bg-[color-mix(in_oklab,var(--color-surface-2),black_14%)]'
+                      ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%)] text-[var(--color-accent-soft)] shadow-[var(--shadow-soft)]'
+                      : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
                   )}
                 >
                   <LogIn className="size-4" />
@@ -467,8 +466,8 @@ export default function SiteHeader() {
                   className={cn(
                     'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition-all',
                     authTab === 'signup'
-                      ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_52%)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),white_70%),color-mix(in_oklab,var(--color-highlight),white_82%))] text-[var(--color-heading)] shadow-[var(--shadow-soft)] dark:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_38%)] dark:bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-accent),black_22%),color-mix(in_oklab,var(--color-highlight),var(--color-accent)_86%))] dark:text-[var(--color-accent-foreground)]'
-                      : 'text-[var(--color-muted-text)] hover:bg-[color-mix(in_oklab,var(--color-surface-2),white_10%)] hover:text-[var(--color-text)] dark:hover:bg-[color-mix(in_oklab,var(--color-surface-2),black_14%)]'
+                      ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%)] text-[var(--color-accent-soft)] shadow-[var(--shadow-soft)]'
+                      : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
                   )}
                 >
                   <UserPlus className="size-4" />

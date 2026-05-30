@@ -41,7 +41,7 @@ export default function Filter() {
   };
 
   return (
-    <Card className="mb-6 animate-fade-up border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_14%),color-mix(in_oklab,var(--color-highlight),var(--color-surface)_96%))]">
+    <Card className="mb-6 animate-fade-up border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[var(--color-surface)]">
       <CardContent className="p-4 sm:p-5">
         <div className="grid gap-3 lg:grid-cols-[1.3fr_auto_auto_auto] lg:items-end">
           <div className="space-y-1">

@@ -160,7 +160,7 @@ export default function AdminPage() {
             <CardContent className="space-y-2">
               <Link
                 href="/admin"
-                className="block rounded-lg border border-[color-mix(in_oklab,var(--color-accent),#c79a42_52%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] px-3 py-2 text-sm font-semibold text-[var(--color-heading)]"
+                className="block rounded-lg border border-[color-mix(in_oklab,var(--color-accent),var(--color-accent)_52%)] bg-[color-mix(in_oklab,var(--color-surface-2),white_8%)] px-3 py-2 text-sm font-semibold text-[var(--color-heading)]"
               >
                 Tracking Dashboard
               </Link>
