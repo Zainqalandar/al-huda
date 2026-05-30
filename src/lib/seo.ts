@@ -80,7 +80,7 @@ export function buildPageMetadata(options: BuildMetadataOptions): Metadata {
       nocache: !index,
       googleBot: {
         index,
-        follow,
+        follow: index,
         'max-image-preview': 'large',
         'max-snippet': -1,
         'max-video-preview': -1,
