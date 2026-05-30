@@ -409,7 +409,7 @@ export default function SiteHeader() {
         <div className="fixed inset-0 z-[130]">
           <button
             type="button"
-            className="absolute inset-0 bg-black/58 backdrop-blur-[2px]"
+            className="absolute inset-0 cursor-pointer bg-black/58 backdrop-blur-[2px]"
             onClick={closeAuthModal}
             aria-label="Close authentication dialog"
           />
@@ -433,7 +433,7 @@ export default function SiteHeader() {
                 <button
                   type="button"
                   onClick={closeAuthModal}
-                  className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 text-[var(--color-muted-text)] transition hover:border-[var(--color-accent-soft)] hover:text-[var(--color-heading)]"
+                  className="cursor-pointer rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 text-[var(--color-muted-text)] transition hover:border-[var(--color-accent-soft)] hover:text-[var(--color-heading)]"
                   aria-label="Close authentication dialog"
                 >
                   <X className="size-4" />
@@ -448,7 +448,7 @@ export default function SiteHeader() {
                     setAuthError(null);
                   }}
                   className={cn(
-                    'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition-all',
+                    'inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition-all',
                     authTab === 'signin'
                       ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%)] text-[var(--color-accent-soft)] shadow-[var(--shadow-soft)]'
                       : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
@@ -464,7 +464,7 @@ export default function SiteHeader() {
                     setAuthError(null);
                   }}
                   className={cn(
-                    'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition-all',
+                    'inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition-all',
                     authTab === 'signup'
                       ? 'border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_88%)] text-[var(--color-accent-soft)] shadow-[var(--shadow-soft)]'
                       : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
