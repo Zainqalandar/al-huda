@@ -4,6 +4,7 @@ import { BookOpenText, ChevronRight, Headphones, Search } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { getAllSurahs } from '@/lib/quran-index';
 import { buildSurahPath } from '@/lib/quran-routing';
 import { buildPageMetadata } from '@/lib/seo';
@@ -208,6 +209,7 @@ export default async function SurahIndexPage({
           );
         })}
       </div>
+      <StickyScrollNav />
     </div>
   );
 }

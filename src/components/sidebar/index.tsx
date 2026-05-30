@@ -29,6 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSurahContext } from '@/hooks/useSurahContext';
 import {
@@ -2084,6 +2085,7 @@ export default function QuranReaderPage() {
         </div>
       </div>
       <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
+      <StickyScrollNav />
 
       {isNavigatorOpen ? (
         <div className="fixed inset-0 z-[85]">
