@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getAllSurahs } from '@/lib/quran-index';
 import { buildSurahPath } from '@/lib/quran-routing';
 import { buildPageMetadata } from '@/lib/seo';
+import { CORE_QURAN_KEYWORDS, SURAH_AYAH_KEYWORDS } from '@/lib/seo-keywords';
 
 interface SurahIndexPageProps {
   searchParams: Promise<{
@@ -21,18 +22,28 @@ export async function generateMetadata({
 
   if (!query) {
     return buildPageMetadata({
-      title: 'Surah Index – Read Quran by Surah',
+      title: 'Surah Index – Read All 114 Surahs with Arabic Text & Urdu Translation',
       description:
-        'Browse all 114 surahs with Arabic text, Urdu and English translation, ayah links, tafseer access, and recitation audio.',
+        'Browse all 114 surahs of the Quran with Arabic text, Urdu and English translation, ayah links, tafseer access, recitation audio, bookmarks, and likes. Find popular surahs like Yaseen, Rahman, Kahf, Mulk, Waqiah, and more.',
       path: '/surah',
       ogType: 'website',
       imageUrl: '/og?kind=surah-index',
+      keywords: [
+        ...CORE_QURAN_KEYWORDS,
+        ...SURAH_AYAH_KEYWORDS,
+        'surah list',
+        '114 surahs',
+        'quran chapters',
+        'all surahs quran',
+        'surah index',
+        'quran surah directory',
+      ],
     });
   }
 
   return buildPageMetadata({
-    title: `Search Surah: ${query}`,
-    description: `Surah search results for "${query}" with direct links to Surah, Ayah, and Tafseer pages.`,
+    title: `Search Surah: ${query} – Al-Huda Quran`,
+    description: `Search results for "${query}" with direct links to Surah, Ayah, and Tafseer pages. Find all matching Surahs with Arabic text and Urdu translation.`,
     path: '/surah',
     index: false,
     ogType: 'website',

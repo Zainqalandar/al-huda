@@ -38,6 +38,27 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+      {
         source: '/sw.js',
         headers: [
           {
@@ -70,6 +91,32 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: `public, max-age=${ONE_YEAR_SECONDS}, immutable`,
+          },
+        ],
+      },
+      {
+        source: '/sitemaps/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/xml; charset=utf-8',
+          },
+        ],
+      },
+      {
+        source: '/robots.txt',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/plain; charset=utf-8',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
           },
         ],
       },
