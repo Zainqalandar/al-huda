@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: 'Googlebot',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search'],
         disallow: [
           '/admin',
           '/admin/',
@@ -27,7 +27,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'Bingbot',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search'],
         disallow: [
           '/admin',
           '/admin/',
@@ -44,7 +44,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: '*',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search'],
         disallow: [
           '/admin',
           '/admin/',
@@ -67,6 +67,8 @@ export default function robots(): MetadataRoute.Robots {
       `${baseUrl}/sitemap.xml`,
       `${baseUrl}/sitemaps/surah`,
       `${baseUrl}/sitemaps/ayah-1`,
+      `${baseUrl}/local-sitemap.xml`,
+      `${baseUrl}/voice-sitemap.xml`,
     ],
     host: baseUrl,
   };

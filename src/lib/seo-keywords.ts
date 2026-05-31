@@ -134,3 +134,135 @@ export const GLOBAL_QURAN_SEO_KEYWORDS = Array.from(
   ])
 );
 
+/**
+ * LOCAL SEO - Pakistan Keywords
+ */
+export const PAKISTAN_LOCAL_KEYWORDS = [
+  'quran app pakistan',
+  'quran reader pakistan',
+  'quran app urdu pakistan',
+  'online quran reader pakistan',
+  'free quran app pakistan',
+  'quran app karachi',
+  'quran app islamabad',
+  'quran app lahore',
+  'quran app rawalpindi',
+  'quran app multan',
+  'quran app faisalabad',
+  'quran app peshawar',
+  'قرآن ایپ',
+  'قرآن ایپ پاکستان',
+  'آن لائن قرآن',
+  'قرآن اردو میں',
+  'مفت قرآن ایپ',
+  'quran memorization pakistan',
+  'tajweed lessons online pakistan',
+  'quran learning app pakistan',
+  'islamic education app pakistan',
+];
+
+export const CITY_KEYWORDS = {
+  karachi: [
+    'quran app karachi',
+    'quran reader karachi',
+    'islamic learning karachi',
+    'تعليم قرآن کراچی',
+  ],
+  islamabad: [
+    'quran app islamabad',
+    'quran learning islamabad',
+    'islamic education islamabad',
+    'قرآن اسلام آباد',
+  ],
+  lahore: [
+    'quran app lahore',
+    'quran reader lahore',
+    'islamic app lahore',
+    'قرآن لاہور',
+  ],
+  rawalpindi: [
+    'quran app rawalpindi',
+    'islamic learning rawalpindi',
+    'قرآن راولپنڈی',
+  ],
+  multan: [
+    'quran app multan',
+    'islamic education multan',
+    'قرآن ملتان',
+  ],
+};
+
+export const ALL_LOCAL_KEYWORDS = [
+  ...PAKISTAN_LOCAL_KEYWORDS,
+  ...Object.values(CITY_KEYWORDS).flat(),
+];
+
+export const VOICE_SEARCH_KEYWORDS = [
+  'how to read quran',
+  'how do i read the quran',
+  'where can i read the quran online',
+  'what is surah yaseen',
+  'what is ayat ul kursi',
+  'how to memorize the quran',
+  'how to learn tajweed',
+  'what does quran say about',
+  'what is the meaning of',
+  'how many surahs are in the quran',
+  'how many ayahs are in the quran',
+  'what is the best time to read quran',
+  'what are the benefits of reading quran',
+  'how to listen to quran recitation',
+  'where can i find quran translation',
+  'what is tafseer',
+  'how do i track my reading progress',
+  'what is quran app for',
+  'best quran reader app',
+  'easiest way to read quran',
+  'quran reading tips',
+  'how to understand quran',
+  'islamic learning for beginners',
+];
+
+export const VOICE_SEARCH_QUESTIONS = [
+  {
+    question: 'What is Surah Yaseen?',
+    answer: 'Surah Yaseen is the 36th chapter of the Quran, known for its spiritual significance and beautiful recitation.',
+    keywords: ['surah yaseen', 'chapter 36', 'quran yaseen'],
+  },
+  {
+    question: 'What is Ayat ul Kursi?',
+    answer: 'Ayat ul Kursi (Verse of the Throne) is Quran 2:255, one of the most powerful verses in the Quran about the majesty of Allah.',
+    keywords: ['ayat ul kursi', 'quran 2:255', 'verse of throne'],
+  },
+  {
+    question: 'How many Surahs are in the Quran?',
+    answer: 'There are 114 Surahs (chapters) in the Quran.',
+    keywords: ['surahs in quran', '114 chapters', 'quran structure'],
+  },
+  {
+    question: 'How many verses are in the Quran?',
+    answer: 'There are 6,236 verses (Ayahs) in the Quran.',
+    keywords: ['quran verses', 'ayahs', 'quran length'],
+  },
+  {
+    question: 'What is Tajweed?',
+    answer: 'Tajweed is the art of reciting the Quran correctly with proper pronunciation and rules of elongation.',
+    keywords: ['tajweed', 'quran recitation', 'proper pronunciation'],
+  },
+  {
+    question: 'What is Tafseer?',
+    answer: 'Tafseer is the interpretation and explanation of the Quran, helping understand the meanings and context of verses.',
+    keywords: ['tafseer', 'quran interpretation', 'quran explanation'],
+  },
+  {
+    question: 'How do I memorize the Quran?',
+    answer: 'Start with short Surahs, recite regularly, use visualization, and practice consistently. Al-Huda helps track your progress.',
+    keywords: ['memorize quran', 'hifz', 'memorization tips'],
+  },
+  {
+    question: 'What is the best time to read Quran?',
+    answer: 'Early morning (Fajr time) is considered spiritually beneficial, but any time with focus and intention is good.',
+    keywords: ['best time quran', 'quran routine', 'reading schedule'],
+  },
+];
+

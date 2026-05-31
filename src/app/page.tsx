@@ -9,6 +9,9 @@ import {
   TAFSEER_LEARNING_KEYWORDS,
   ISLAMIC_LEARNING_KEYWORDS,
   ACCESSIBILITY_KEYWORDS,
+  PAKISTAN_LOCAL_KEYWORDS,
+  VOICE_SEARCH_KEYWORDS,
+  VOICE_SEARCH_QUESTIONS,
 } from '@/lib/seo-keywords';
 import { buildWebsiteJsonLd, buildOrganizationJsonLd, buildFaqJsonLd, getSiteOrigin } from '@/lib/seo';
 
@@ -25,6 +28,8 @@ export const metadata: Metadata = {
     ...TAFSEER_LEARNING_KEYWORDS,
     ...ISLAMIC_LEARNING_KEYWORDS,
     ...ACCESSIBILITY_KEYWORDS,
+    ...PAKISTAN_LOCAL_KEYWORDS,
+    ...VOICE_SEARCH_KEYWORDS,
   ],
   alternates: {
     canonical: '/',
@@ -89,6 +94,19 @@ const faqJsonLd = buildFaqJsonLd([
   {
     question: 'Can I use Al-Huda on mobile devices?',
     answer: 'Yes, Al-Huda works on all devices - mobile phones, tablets, and desktops. It provides a responsive design that adapts to any screen size.',
+  },
+  // Voice Search Enhanced FAQs
+  {
+    question: 'What is Surah Yaseen?',
+    answer: 'Surah Yaseen is the 36th chapter of the Quran, known for its spiritual significance and beautiful recitation. It is often recited for healing and protection.',
+  },
+  {
+    question: 'How many Surahs are in the Quran?',
+    answer: 'There are 114 Surahs (chapters) in the Quran, each with varying lengths and spiritual meanings.',
+  },
+  {
+    question: 'What is Tajweed?',
+    answer: 'Tajweed is the art of reciting the Quran correctly with proper pronunciation and rules of elongation, ensuring the beauty and accuracy of Quranic recitation.',
   },
 ]);
 

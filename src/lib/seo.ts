@@ -301,3 +301,155 @@ export function buildCreativeWorkJsonLd(options: {
     ...(options.about && { about: options.about }),
   };
 }
+
+/**
+ * LOCAL SEO - Pakistan specific schema builders
+ */
+
+export function buildLocalBusinessJsonLd(options: {
+  name: string;
+  description: string;
+  url: string;
+  telephone: string;
+  email: string;
+  address: {
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+  image: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: options.name,
+    description: options.description,
+    url: options.url,
+    telephone: options.telephone,
+    email: options.email,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: options.address.city,
+      addressCountry: options.address.country,
+      postalCode: options.address.postalCode,
+    },
+    image: options.image,
+    sameAs: [
+      'https://www.facebook.com/alhuda.quran',
+      'https://www.instagram.com/alhuda.quran',
+      'https://twitter.com/al_huda_quran',
+    ],
+  };
+}
+
+export function buildEducationalOrganizationJsonLd(options: {
+  name: string;
+  description: string;
+  url: string;
+  logo: string;
+  location: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: options.name,
+    description: options.description,
+    url: options.url,
+    logo: options.logo,
+    location: options.location,
+    foundingDate: '2024',
+    sameAs: [
+      'https://www.facebook.com/alhuda.quran',
+      'https://www.instagram.com/alhuda.quran',
+    ],
+  };
+}
+
+export function buildCityPageSchema(city: string, country: string = 'Pakistan') {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `Al-Huda Quran - ${city}, ${country}`,
+    description: `Read Quran online in ${city} with Urdu translation, tafseer, and audio`,
+    url: toAbsoluteUrl(`/${city.toLowerCase()}`),
+    areaServed: {
+      '@type': 'City',
+      name: city,
+      containedIn: {
+        '@type': 'Country',
+        name: country,
+      },
+    },
+  };
+}
+
+export function buildHowToJsonLd(options: {
+  name: string;
+  description: string;
+  image?: string;
+  steps: Array<{
+    name: string;
+    description: string;
+    image?: string;
+  }>;
+  totalTime?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: options.name,
+    description: options.description,
+    ...(options.image && { image: toAbsoluteUrl(options.image) }),
+    step: options.steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.description,
+      ...(step.image && {
+        image: toAbsoluteUrl(step.image),
+      }),
+    })),
+    ...(options.totalTime && { totalTime: options.totalTime }),
+  };
+}
+
+export function buildSearchActionJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: siteOrigin,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteOrigin}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+}
+
+export function buildVoiceSearchOptimizedPage(options: {
+  title: string;
+  description: string;
+  faqs: Array<{
+    question: string;
+    answer: string;
+  }>;
+  path: string;
+  keywords?: string[];
+}) {
+  return {
+    metadata: buildPageMetadata({
+      title: options.title,
+      description: options.description,
+      path: options.path,
+      keywords: options.keywords,
+    }),
+    schemas: {
+      faq: buildFaqJsonLd(options.faqs),
+      searchAction: buildSearchActionJsonLd(),
+    },
+  };
+}

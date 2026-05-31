@@ -1,0 +1,71 @@
+import type { Metadata } from 'next';
+import { VoiceSearch } from '@/components/voice-search';
+import {
+  buildPageMetadata,
+  buildFaqJsonLd,
+  buildSearchActionJsonLd,
+  toAbsoluteUrl,
+} from '@/lib/seo';
+import { VOICE_SEARCH_KEYWORDS, VOICE_SEARCH_QUESTIONS } from '@/lib/seo-keywords';
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Voice Search - Ask Questions About the Quran',
+  description:
+    'Use voice search to ask questions about the Quran. Al-Huda provides instant answers using AI and schema-optimized content for voice assistants.',
+  path: '/voice-search',
+  keywords: [...VOICE_SEARCH_KEYWORDS, 'voice search', 'voice assistant', 'ask quran questions'],
+});
+
+export default function VoiceSearchPage() {
+  const faqSchema = buildFaqJsonLd(VOICE_SEARCH_QUESTIONS);
+  const searchActionSchema = buildSearchActionJsonLd();
+
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          <VoiceSearch />
+
+          <section className="mt-16">
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">Frequently Asked Questions</h2>
+            <div className="grid gap-6">
+              {VOICE_SEARCH_QUESTIONS.map((item) => (
+                <details
+                  key={item.question}
+                  className="group border border-gray-200 rounded-lg p-4 hover:border-amber-500 transition-colors"
+                >
+                  <summary className="cursor-pointer font-semibold text-gray-800 group-open:text-amber-600">
+                    {item.question}
+                  </summary>
+                  <p className="mt-4 text-gray-700 leading-relaxed">{item.answer}</p>
+                  <div className="mt-3 flex gap-2 flex-wrap">
+                    {item.keywords.map((kw) => (
+                      <span key={kw} className="text-xs bg-amber-100 text-amber-900 px-2 py-1 rounded">
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-16 bg-amber-50 rounded-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎤 Voice Search Benefits</h2>
+            <ul className="space-y-3 text-gray-700">
+              <li>✓ Ask questions naturally in conversational language</li>
+              <li>✓ Get instant answers about Quranic verses and concepts</li>
+              <li>✓ Compatible with Google Assistant, Alexa, and Siri</li>
+              <li>✓ Optimized for all voice search devices</li>
+              <li>✓ Multi-language support (English, Urdu, Arabic)</li>
+              <li>✓ FAQ schema for better voice search indexing</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(searchActionSchema) }} />
+    </main>
+  );
+}
