@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import dynamic from 'next/dynamic';
 import {
 	Manrope,
 	Cormorant_Garamond,
@@ -15,9 +16,18 @@ import SiteFooter from '@/components/layout/site-footer';
 import ScrollProgress from '@/components/ui/ScrollProgress';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppSettingsProvider } from '@/components/providers/app-settings-provider';
-import ServiceWorkerRegister from '@/components/providers/service-worker-register';
-import ActivityTrackerProvider from '@/components/providers/activity-tracker-provider';
+import { SuspenseBoundary } from '@/components/ui/suspense-boundary';
+import { PerformanceMonitor } from '@/components/performance-monitor';
 import { GLOBAL_QURAN_SEO_KEYWORDS } from '@/lib/seo-keywords';
+
+// Dynamically import components that don't need to be critical for initial render
+const ServiceWorkerRegister = dynamic(
+	() => import('@/components/providers/service-worker-register')
+);
+
+const ActivityTrackerProvider = dynamic(
+	() => import('@/components/providers/activity-tracker-provider')
+);
 
 const defaultSiteUrl = 'https://al-huda.vercel.app';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
@@ -29,11 +39,13 @@ const siteDescription =
 const ogImage = '/logos/logo3.png';
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
+// Optimize font loading with preload strategy
 const bodyFont = Manrope({
 	subsets: ['latin'],
 	variable: '--font-body',
 	weight: ['400', '500', '600', '700'],
 	display: 'swap',
+	preload: true,
 });
 
 const displayFont = Cormorant_Garamond({
@@ -41,6 +53,7 @@ const displayFont = Cormorant_Garamond({
 	variable: '--font-display',
 	weight: ['500', '600', '700'],
 	display: 'swap',
+	preload: true,
 });
 
 const arabicAmiri = Amiri({
@@ -48,6 +61,7 @@ const arabicAmiri = Amiri({
 	variable: '--font-arabic-amiri',
 	weight: ['400', '700'],
 	display: 'swap',
+	preload: false,
 });
 
 const arabicNaskh = Noto_Naskh_Arabic({
@@ -55,6 +69,7 @@ const arabicNaskh = Noto_Naskh_Arabic({
 	variable: '--font-arabic-naskh',
 	weight: ['400', '700'],
 	display: 'swap',
+	preload: false,
 });
 
 const arabicScheherazade = Scheherazade_New({
@@ -62,6 +77,7 @@ const arabicScheherazade = Scheherazade_New({
 	variable: '--font-arabic-scheherazade',
 	weight: ['400', '700'],
 	display: 'swap',
+	preload: false,
 });
 
 const urduNastaliq = Noto_Nastaliq_Urdu({
@@ -69,6 +85,7 @@ const urduNastaliq = Noto_Nastaliq_Urdu({
 	variable: '--font-urdu-nastaliq',
 	weight: ['400', '500', '600', '700'],
 	display: 'swap',
+	preload: false,
 });
 
 export const metadata: Metadata = {
@@ -175,10 +192,13 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
+				{/* DNS prefetch for external API services */}
 				<link rel="dns-prefetch" href="//quranapi.pages.dev" />
 				<link rel="dns-prefetch" href="//api.alquran.cloud" />
 				<link rel="dns-prefetch" href="//api.quran.com" />
 				<link rel="dns-prefetch" href="//ia801503.us.archive.org" />
+
+				{/* Preconnect for critical external resources */}
 				<link
 					rel="preconnect"
 					href="https://quranapi.pages.dev"
@@ -203,6 +223,7 @@ export default function RootLayout({
 			<body
 				className={`${bodyFont.variable} ${displayFont.variable} ${arabicAmiri.variable} ${arabicNaskh.variable} ${arabicScheherazade.variable} ${urduNastaliq.variable} font-body`}
 			>
+				{/* Structured data - critical for SEO */}
 				<script
 					type="application/ld+json"
 					dangerouslySetInnerHTML={{
@@ -215,31 +236,50 @@ export default function RootLayout({
 						__html: JSON.stringify(websiteJsonLd),
 					}}
 				/>
+
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
 					enableSystem
 				>
 					<AppSettingsProvider>
+						{/* Skip to main content link for accessibility */}
 						<a
 							href="#main-content"
 							className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-[var(--color-accent)] focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-[var(--color-accent-foreground)]"
 						>
 							Skip to main content
 						</a>
+
+						{/* Critical rendering path components */}
 						<ScrollProgress />
-						<ServiceWorkerRegister />
-						<ActivityTrackerProvider />
 						<SiteHeader />
+
+						{/* Main content */}
 						<main
 							id="main-content"
 							className="min-h-[calc(100vh-4rem)]"
 						>
 							{children}
 						</main>
+
 						<SiteFooter />
+
+						{/* Non-critical components loaded with suspense */}
+						<SuspenseBoundary fallback={null} name="service-worker">
+							<ServiceWorkerRegister />
+						</SuspenseBoundary>
+
+						<SuspenseBoundary fallback={null} name="activity-tracker">
+							<ActivityTrackerProvider />
+						</SuspenseBoundary>
+
+						{/* Performance monitoring */}
+						<PerformanceMonitor />
 					</AppSettingsProvider>
 				</ThemeProvider>
+
+				{/* Load Google Analytics asynchronously */}
 				<GoogleAnalytics gaId="G-HZJ0Z0MFBP" />
 			</body>
 		</html>

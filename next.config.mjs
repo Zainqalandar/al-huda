@@ -1,15 +1,29 @@
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
+const SIX_MONTHS_SECONDS = 60 * 60 * 24 * 180;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
+  
   images: {
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: SIX_MONTHS_SECONDS,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ['lucide-react', 'next-themes'],
+    // Streaming optimizations
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
   async redirects() {
     return [
@@ -56,6 +70,10 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            key: 'Permissions-Policy',
+            value: 'geolocation=(), microphone=(), camera=()',
+          },
         ],
       },
       {
@@ -64,6 +82,10 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=0, must-revalidate',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
           },
         ],
       },
@@ -117,6 +139,15 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=3600',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
