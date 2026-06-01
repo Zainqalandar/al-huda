@@ -282,12 +282,15 @@ export default function SiteHeader() {
   const [authSubmitting, setAuthSubmitting]   = useState(false);
   const [authError, setAuthError]             = useState<string | null>(null);
   const [authReason, setAuthReason]           = useState<string | null>(null);
+  const [googleReady, setGoogleReady]         = useState(false);
+  const [googleLoading, setGoogleLoading]     = useState(false);
 
   const [signInEmail, setSignInEmail]         = useState('');
   const [signInPassword, setSignInPassword]   = useState('');
   const [signUpName, setSignUpName]           = useState('');
   const [signUpEmail, setSignUpEmail]         = useState('');
   const [signUpPassword, setSignUpPassword]   = useState('');
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
@@ -383,6 +386,112 @@ export default function SiteHeader() {
       window.location.reload();
     } catch { setAuthError('Unable to create account right now.'); }
     finally   { setAuthSubmitting(false); }
+  };
+
+  const handleGoogleCredentialResponse = useCallback(async (response: { credential?: string }) => {
+    if (!response.credential) {
+      setAuthError('Google sign-in failed.');
+      setGoogleLoading(false);
+      return;
+    }
+
+    setAuthSubmitting(true);
+    setGoogleLoading(true);
+    setAuthError(null);
+
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: response.credential }),
+      });
+      const data = (await res.json()) as AuthPayload;
+      if (!res.ok) {
+        setAuthError(data.message ?? 'Unable to sign in with Google.');
+        return;
+      }
+      setSessionUser(data.user ?? null);
+      setAuthModalOpen(false);
+      window.location.reload();
+    } catch {
+      setAuthError('Unable to sign in with Google right now.');
+    } finally {
+      setAuthSubmitting(false);
+      setGoogleLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!googleClientId) return;
+    if (typeof window === 'undefined') return;
+
+    const initializeGoogle = () => {
+      const google = (window as any).google;
+      if (!google?.accounts?.id) {
+        return;
+      }
+
+      google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleCredentialResponse,
+        ux_mode: 'popup',
+      });
+
+      setGoogleReady(true);
+    };
+
+    if ((window as any).google?.accounts?.id) {
+      initializeGoogle();
+      return;
+    }
+
+    const existingScript = document.getElementById('google-identity-service');
+    if (existingScript) {
+      existingScript.addEventListener('load', initializeGoogle);
+      return () => existingScript.removeEventListener('load', initializeGoogle);
+    }
+
+    const script = document.createElement('script');
+    script.id = 'google-identity-service';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogle;
+    script.onerror = () => {
+      setAuthError('Unable to load Google sign-in.');
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      script.onload = null;
+      script.onerror = null;
+    };
+  }, [googleClientId, handleGoogleCredentialResponse]);
+
+  const handleGoogleSignIn = () => {
+    if (!googleClientId) {
+      setAuthError('Google sign-in is not configured.');
+      return;
+    }
+    if (!googleReady) {
+      setAuthError('Google sign-in is still loading.');
+      return;
+    }
+
+    setAuthError(null);
+    setGoogleLoading(true);
+
+    try {
+      (window as any).google.accounts.id.prompt();
+      window.setTimeout(() => {
+        if (googleLoading) {
+          setGoogleLoading(false);
+        }
+      }, 4500);
+    } catch {
+      setAuthError('Unable to start Google sign-in.');
+      setGoogleLoading(false);
+    }
   };
 
   const isActive = (href: string, exact = false) =>
@@ -988,6 +1097,44 @@ export default function SiteHeader() {
                 ))}
               </div>
 
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={!googleReady || authSubmitting}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  width: '100%',
+                  padding: '0.75rem',
+                  marginBottom: '0.75rem',
+                  borderRadius: '0.75rem',
+                  border: '1px solid var(--color-border)',
+                  background: googleReady ? 'var(--color-surface-elevated)' : 'var(--color-surface)',
+                  color: googleReady ? 'var(--color-text)' : 'var(--color-muted-text)',
+                  fontSize: '0.95rem',
+                  fontWeight: 700,
+                  cursor: !googleReady || authSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: !googleReady || authSubmitting ? 0.65 : 1,
+                }}
+              >
+                <Mail style={{ width: '1.1rem', height: '1.1rem' }} />
+                {googleLoading ? 'Opening Google...' : 'Continue with Google'}
+              </button>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                marginBottom: '1rem',
+                color: 'var(--color-muted-text)',
+                fontSize: '0.8rem',
+              }}>
+                <span style={{ flex: 1, height: '1px', background: 'var(--color-border)' }} />
+                <span>or</span>
+                <span style={{ flex: 1, height: '1px', background: 'var(--color-border)' }} />
+              </div>
               {/* error */}
               {authError && (
                 <div style={{

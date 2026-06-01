@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import mongoose, { Schema, type Model } from 'mongoose';
 
+import { hashPassword } from '@/lib/auth/password';
 import { connectToMongoDatabase } from '@/lib/db/mongodb';
 import { buildBookmarkId } from '@/lib/quran-utils';
 
@@ -367,6 +368,27 @@ export async function createUser(input: {
   }
 
   return user;
+}
+
+export async function findOrCreateGoogleUser(input: {
+  name: string;
+  email: string;
+}): Promise<StoredUser> {
+  const normalizedEmail = normalizeEmail(input.email);
+  const existingUser = await findUserByEmail(normalizedEmail);
+  if (existingUser) {
+    const updatedUser = await markUserLogin(existingUser.id);
+    return updatedUser ?? existingUser;
+  }
+
+  const secret = randomUUID();
+  const digest = await hashPassword(secret);
+  return createUser({
+    name: input.name.trim(),
+    email: normalizedEmail,
+    passwordHash: digest.hash,
+    passwordSalt: digest.salt,
+  });
 }
 
 export async function markUserLogin(userId: string): Promise<StoredUser | null> {
