@@ -21,26 +21,26 @@ export default function VoiceSearchPage() {
   const searchActionSchema = buildSearchActionJsonLd();
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <div className="container mx-auto px-4 py-16">
+    <main className="min-h-screen bg-(--color-bg)">
+      <div className="container mx-auto px-4 py-16 text-(--color-text)">
         <div className="max-w-4xl mx-auto">
           <VoiceSearch />
 
           <section className="mt-16">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold text-(--color-heading) mb-8">Frequently Asked Questions</h2>
             <div className="grid gap-6">
               {VOICE_SEARCH_QUESTIONS.map((item) => (
                 <details
                   key={item.question}
-                  className="group border border-gray-200 rounded-lg p-4 hover:border-amber-500 transition-colors"
+                  className="group border rounded-lg p-4 border-(--color-border) hover:border-(--color-accent) transition-colors"
                 >
-                  <summary className="cursor-pointer font-semibold text-gray-800 group-open:text-amber-600">
+                  <summary className="cursor-pointer font-semibold text-(--color-heading) group-open:text-(--color-accent)">
                     {item.question}
                   </summary>
-                  <p className="mt-4 text-gray-700 leading-relaxed">{item.answer}</p>
+                  <p className="mt-4 leading-relaxed text-(--color-text)">{item.answer}</p>
                   <div className="mt-3 flex gap-2 flex-wrap">
                     {item.keywords.map((kw) => (
-                      <span key={kw} className="text-xs bg-amber-100 text-amber-900 px-2 py-1 rounded">
+                      <span key={kw} className="text-xs bg-(--color-accent-soft) text-(--color-heading) px-2 py-1 rounded">
                         {kw}
                       </span>
                     ))}
@@ -50,9 +50,9 @@ export default function VoiceSearchPage() {
             </div>
           </section>
 
-          <section className="mt-16 bg-amber-50 rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎤 Voice Search Benefits</h2>
-            <ul className="space-y-3 text-gray-700">
+          <section className="mt-16 bg-(--color-surface) rounded-lg p-8 border border-(--color-border)">
+            <h2 className="text-2xl font-bold text-(--color-heading) mb-4">🎤 Voice Search Benefits</h2>
+            <ul className="space-y-3 text-(--color-text)">
               <li>✓ Ask questions naturally in conversational language</li>
               <li>✓ Get instant answers about Quranic verses and concepts</li>
               <li>✓ Compatible with Google Assistant, Alexa, and Siri</li>

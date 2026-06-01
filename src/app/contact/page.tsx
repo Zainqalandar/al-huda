@@ -52,105 +52,105 @@ export default function ContactPage() {
   });
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900">
-      <div className="container mx-auto px-4 py-16 md:py-24">
+    <main className="min-h-screen bg-[color:var(--color-bg)]">
+      <div className="container mx-auto px-4 py-16 md:py-24 text-[color:var(--color-text)]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-[color:var(--color-heading)] mb-4">
               Contact Al-Huda Quran
             </h1>
-            <p className="text-xl text-slate-300">
+            <p className="text-xl text-[color:var(--color-muted-text)]">
               Get in touch with our team. We&apos;re here to help!
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="bg-slate-800 p-8 rounded-lg">
-              <h3 className="text-xl font-semibold text-amber-500 mb-3">Email</h3>
-              <p className="text-slate-300 mb-2">General Inquiries:</p>
-              <a href="mailto:support@al-huda.quran" className="text-blue-400 hover:underline">
+            <div className="bg-[color:var(--color-surface-elevated)] border border-[color:var(--color-border)] p-8 rounded-3xl shadow-card">
+              <h3 className="text-xl font-semibold text-[color:var(--color-accent)] mb-3">Email</h3>
+              <p className="text-[color:var(--color-muted-text)] mb-2">General Inquiries:</p>
+              <a href="mailto:support@al-huda.quran" className="text-[color:var(--color-info)] hover:underline">
                 support@al-huda.quran
               </a>
-              <p className="text-slate-300 mt-4 mb-2">Partnerships:</p>
-              <a href="mailto:partnerships@al-huda.quran" className="text-blue-400 hover:underline">
+              <p className="text-[color:var(--color-muted-text)] mt-4 mb-2">Partnerships:</p>
+              <a href="mailto:partnerships@al-huda.quran" className="text-[color:var(--color-info)] hover:underline">
                 partnerships@al-huda.quran
               </a>
             </div>
 
-            <div className="bg-slate-800 p-8 rounded-lg">
-              <h3 className="text-xl font-semibold text-amber-500 mb-3">Phone</h3>
-              <p className="text-slate-300 mb-2">Pakistan (Local):</p>
-              <a href="tel:+92-51-XXXXXXX" className="text-blue-400 hover:underline">
+            <div className="bg-[color:var(--color-surface-elevated)] border border-[color:var(--color-border)] p-8 rounded-3xl shadow-card">
+              <h3 className="text-xl font-semibold text-[color:var(--color-accent)] mb-3">Phone</h3>
+              <p className="text-[color:var(--color-muted-text)] mb-2">Pakistan (Local):</p>
+              <a href="tel:+92-51-XXXXXXX" className="text-[color:var(--color-info)] hover:underline">
                 +92-51-XXXXXXX
               </a>
-              <p className="text-slate-300 mt-4 mb-2">WhatsApp:</p>
-              <a href="https://wa.me/92XXXXXXXXXX" className="text-blue-400 hover:underline">
+              <p className="text-[color:var(--color-muted-text)] mt-4 mb-2">WhatsApp:</p>
+              <a href="https://wa.me/92XXXXXXXXXX" className="text-[color:var(--color-info)] hover:underline">
                 Chat on WhatsApp
               </a>
             </div>
 
-            <div className="bg-slate-800 p-8 rounded-lg">
-              <h3 className="text-xl font-semibold text-amber-500 mb-3">Location</h3>
-              <p className="text-slate-300">
+            <div className="bg-[color:var(--color-surface-elevated)] border border-[color:var(--color-border)] p-8 rounded-3xl shadow-card">
+              <h3 className="text-xl font-semibold text-[color:var(--color-accent)] mb-3">Location</h3>
+              <p className="text-[color:var(--color-muted-text)]">
                 Islamabad<br />
                 Pakistan
               </p>
-              <p className="text-slate-400 text-sm mt-4">
+              <p className="text-[color:var(--color-muted-text)] text-sm mt-4">
                 Available 24/7 for support
               </p>
             </div>
           </div>
 
-          <div className="bg-slate-800 p-8 rounded-lg mb-16">
-            <h2 className="text-2xl font-semibold text-white mb-6">Follow Us</h2>
+          <div className="bg-[color:var(--color-surface-elevated)] border border-[color:var(--color-border)] p-8 rounded-3xl mb-16 shadow-card">
+            <h2 className="text-2xl font-semibold text-[color:var(--color-heading)] mb-6">Follow Us</h2>
             <div className="flex flex-wrap gap-4">
               <a
                 href="https://www.facebook.com/alhuda.quran"
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                className="px-6 py-3 bg-[color:var(--color-accent)] hover:bg-[color:var(--color-highlight)] text-[color:var(--color-accent-foreground)] rounded-lg transition"
               >
                 Facebook
               </a>
               <a
                 href="https://www.instagram.com/alhuda.quran"
-                className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition"
+                className="px-6 py-3 bg-[color:var(--color-accent)] hover:bg-[color:var(--color-highlight)] text-[color:var(--color-accent-foreground)] rounded-lg transition"
               >
                 Instagram
               </a>
               <a
                 href="https://twitter.com/al_huda_quran"
-                className="px-6 py-3 bg-blue-400 hover:bg-blue-500 text-white rounded-lg transition"
+                className="px-6 py-3 bg-[color:var(--color-accent)] hover:bg-[color:var(--color-highlight)] text-[color:var(--color-accent-foreground)] rounded-lg transition"
               >
                 Twitter
               </a>
             </div>
           </div>
 
-          <div className="bg-slate-800 p-8 rounded-lg">
-            <h2 className="text-2xl font-semibold text-white mb-6">Frequently Asked Questions</h2>
+          <div className="bg-[color:var(--color-surface-elevated)] border border-[color:var(--color-border)] p-8 rounded-3xl shadow-card">
+            <h2 className="text-2xl font-semibold text-[color:var(--color-heading)] mb-6">Frequently Asked Questions</h2>
             <div className="space-y-4">
               <details className="group">
-                <summary className="cursor-pointer text-lg font-semibold text-amber-500 hover:text-amber-400">
+                <summary className="cursor-pointer text-lg font-semibold text-[color:var(--color-accent)] hover:text-[color:var(--color-highlight)]">
                   How can I report a bug?
                 </summary>
-                <p className="mt-2 text-slate-300 pl-4">
+                <p className="mt-2 text-[color:var(--color-muted-text)] pl-4">
                   Please email us at support@al-huda.quran with details about the bug.
                 </p>
               </details>
 
               <details className="group">
-                <summary className="cursor-pointer text-lg font-semibold text-amber-500 hover:text-amber-400">
+                <summary className="cursor-pointer text-lg font-semibold text-[color:var(--color-accent)] hover:text-[color:var(--color-highlight)]">
                   Is Al-Huda Quran available offline?
                 </summary>
-                <p className="mt-2 text-slate-300 pl-4">
+                <p className="mt-2 text-[color:var(--color-muted-text)] pl-4">
                   Yes, the app includes offline support for reading Quran.
                 </p>
               </details>
 
               <details className="group">
-                <summary className="cursor-pointer text-lg font-semibold text-amber-500 hover:text-amber-400">
+                <summary className="cursor-pointer text-lg font-semibold text-[color:var(--color-accent)] hover:text-[color:var(--color-highlight)]">
                   Does it have Urdu translation?
                 </summary>
-                <p className="mt-2 text-slate-300 pl-4">
+                <p className="mt-2 text-[color:var(--color-muted-text)] pl-4">
                   Yes, complete Quran with Urdu translation and tafseer.
                 </p>
               </details>

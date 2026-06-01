@@ -79,7 +79,7 @@ export function VoiceSearch() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold text-amber-700 mb-6">🎤 Voice Search</h1>
 
         <div className="space-y-4">
@@ -90,7 +90,7 @@ export function VoiceSearch() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch(query)}
               placeholder="Ask a question about the Quran..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
             <button
               onClick={() => handleSearch(query)}
