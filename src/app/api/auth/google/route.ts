@@ -26,7 +26,30 @@ export async function POST(request: Request) {
       );
     }
 
-    const payload = await verifyGoogleIdToken(idToken, googleClientId);
+    let payload;
+    try {
+      payload = await verifyGoogleIdToken(idToken, googleClientId);
+    } catch (err) {
+      // Attempt to decode token header for debugging (do not log full token)
+      try {
+        const parts = idToken.split('.');
+        const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+        const aud = (() => {
+          try {
+            const p = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+            return p.aud;
+          } catch {
+            return undefined;
+          }
+        })();
+        console.error('Google ID token verification failed. header=', header, 'aud=', aud, 'err=', (err as Error).message);
+      } catch (decodeErr) {
+        console.error('Google ID token verification failed and token header could not be decoded.', (err as Error).message, decodeErr);
+      }
+
+      const msg = (err as Error).message ?? 'Google ID token verification failed.';
+      return NextResponse.json({ message: msg }, { status: 401 });
+    }
     if (!payload.email || !payload.email_verified) {
       return NextResponse.json(
         { message: 'Google account verification failed.' },

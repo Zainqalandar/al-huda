@@ -98,13 +98,14 @@ export async function verifyGoogleIdToken(idToken: string, expectedAudience: str
   // Try to load cached certs first. If the kid is missing, retry once forcing a fresh fetch.
   let certs = await fetchGoogleCerts();
   let cert = certs[header.kid];
-  if (!cert) {
+    if (!cert) {
     // Retry forcing a fresh fetch in case Google's keys have rotated and cache missed them.
     certs = await fetchGoogleCerts(true);
     cert = certs[header.kid];
     if (!cert) {
-      // Include the kid in the error to help debugging which key is missing.
-      throw new Error(`Google ID token certificate not found for kid: ${header.kid}`);
+      // Include the kid and available kids in the error to help debugging which key is missing.
+      const available = Object.keys(certs).join(', ');
+      throw new Error(`Google ID token certificate not found for kid: ${header.kid}. Available kids: ${available}`);
     }
   }
 
