@@ -39,9 +39,9 @@ function certToPem(cert: string) {
   return `-----BEGIN CERTIFICATE-----\n${wrapped}\n-----END CERTIFICATE-----\n`;
 }
 
-async function fetchGoogleCerts() {
+async function fetchGoogleCerts(force = false) {
   const now = Date.now();
-  if (cachedGoogleCerts && cachedGoogleCerts.expiresAt > now) {
+  if (!force && cachedGoogleCerts && cachedGoogleCerts.expiresAt > now) {
     return cachedGoogleCerts.certs;
   }
 
@@ -95,10 +95,17 @@ export async function verifyGoogleIdToken(idToken: string, expectedAudience: str
     throw new Error('Google ID token header is missing kid.');
   }
 
-  const certs = await fetchGoogleCerts();
-  const cert = certs[header.kid];
+  // Try to load cached certs first. If the kid is missing, retry once forcing a fresh fetch.
+  let certs = await fetchGoogleCerts();
+  let cert = certs[header.kid];
   if (!cert) {
-    throw new Error('Google ID token certificate not found.');
+    // Retry forcing a fresh fetch in case Google's keys have rotated and cache missed them.
+    certs = await fetchGoogleCerts(true);
+    cert = certs[header.kid];
+    if (!cert) {
+      // Include the kid in the error to help debugging which key is missing.
+      throw new Error(`Google ID token certificate not found for kid: ${header.kid}`);
+    }
   }
 
   const verifier = createVerify('RSA-SHA256');
