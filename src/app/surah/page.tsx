@@ -43,7 +43,7 @@ export async function generateMetadata({
   }
 
   return buildPageMetadata({
-    title: `Search Surah: ${query} – Al-Huda Quran`,
+    title: `Search Surah: ${query} – Read al Quran`,
     description: `Search results for "${query}" with direct links to Surah, Ayah, and Tafseer pages. Find all matching Surahs with Arabic text and Urdu translation.`,
     path: '/surah',
     index: false,

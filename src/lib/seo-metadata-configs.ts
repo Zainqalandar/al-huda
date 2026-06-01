@@ -22,7 +22,7 @@ export const pageMetadataConfigs = {
   home: {
     title: 'Read Quran Online Free – Quran Pak with Urdu & English Translation, Audio, Tafseer',
     description:
-      'Al-Huda: Read Quran online free with Arabic text, Urdu and English translation, ayah-wise tafseer, tilawat audio, bookmarks, and progress tracking.',
+      'Read al Quran: Read Quran online free with Arabic text, Urdu and English translation, ayah-wise tafseer, tilawat audio, bookmarks, and progress tracking.',
     path: '/',
     keywords: [
       ...CORE_QURAN_KEYWORDS,
@@ -58,12 +58,12 @@ export const pageMetadataConfigs = {
    * About page metadata
    */
   about: {
-    title: 'About Al-Huda Quran – Our Mission & Vision',
+    title: 'About Read al Quran – Our Mission & Vision',
     description:
-      'Learn about Al-Huda Quran platform. Our mission is to provide the most accessible, user-friendly Quran reading experience with multiple translations, audio, offline support.',
+      'Learn about Read al Quran platform. Our mission is to provide the most accessible, user-friendly Quran reading experience with multiple translations, audio, offline support.',
     path: '/about',
     keywords: [
-      'about al-huda quran',
+      'about read al quran',
       'quran platform mission',
       'islamic learning platform',
       'free quran app',
@@ -76,7 +76,7 @@ export const pageMetadataConfigs = {
   practice: {
     title: 'Practice Quran – Interactive Quran Learning Tool',
     description:
-      'Practice reading the Quran with interactive features. Learn Arabic, improve tajweed, and track your progress with Al-Huda interactive learning tools.',
+      'Practice reading the Quran with interactive features. Learn Arabic, improve tajweed, and track your progress with Read al Quran interactive learning tools.',
     path: '/practice',
     keywords: [
       ...TAFSEER_LEARNING_KEYWORDS,
@@ -109,7 +109,7 @@ export const pageMetadataConfigs = {
    */
   settings: {
     title: 'Settings',
-    description: 'Configure your Al-Huda Quran preferences and settings.',
+    description: 'Configure your Read al Quran preferences and settings.',
     path: '/settings',
     index: false, // Don't index settings page
   },
@@ -118,8 +118,8 @@ export const pageMetadataConfigs = {
    * Signin page metadata (not for search)
    */
   signin: {
-    title: 'Sign In – Al-Huda Quran',
-    description: 'Sign in to your Al-Huda account to sync your progress across devices.',
+    title: 'Sign In – Read al Quran',
+    description: 'Sign in to your Read al Quran account to sync your progress across devices.',
     path: '/signin',
     index: false,
   },
@@ -128,7 +128,7 @@ export const pageMetadataConfigs = {
    * Signup page metadata (not for search)
    */
   signup: {
-    title: 'Create Account – Al-Huda Quran',
+    title: 'Create Account – Read al Quran',
     description: 'Create a free account to save your bookmarks and track your Quran reading progress.',
     path: '/signup',
     index: false,

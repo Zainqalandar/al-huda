@@ -5,8 +5,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Al-Huda Quran',
-    short_name: 'Al-Huda',
+    name: 'Read al Quran',
+    short_name: 'Read al Quran',
     description:
       'Quran-first app for reading, listening, Urdu translation, bookmarks, and progress tracking.',
     start_url: '/surah',

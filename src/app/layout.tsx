@@ -33,9 +33,9 @@ const defaultSiteUrl = 'https://al-huda.vercel.app';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
 const siteOrigin = new URL(siteUrl);
 const siteOriginString = siteOrigin.toString().replace(/\/$/, '');
-const siteName = 'Al-Huda Quran';
+const siteName = 'Read al Quran';
 const siteDescription =
-	'Al-Huda is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
+	'Read al Quran is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
 const ogImage = '/logos/logo3.png';
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
@@ -91,11 +91,11 @@ const urduNastaliq = Noto_Nastaliq_Urdu({
 export const metadata: Metadata = {
 	metadataBase: siteOrigin,
 	title: {
-		default: 'Al-Huda Quran | Read, Listen, and Learn',
-		template: '%s | Al-Huda Quran',
+		default: 'Read al Quran | Read, Listen, and Learn',
+		template: '%s | Read al Quran',
 	},
 	description: siteDescription,
-	applicationName: 'Al-Huda Quran',
+	applicationName: 'Read al Quran',
 	keywords: [...GLOBAL_QURAN_SEO_KEYWORDS],
 	category: 'education',
 	alternates: {
@@ -121,7 +121,7 @@ export const metadata: Metadata = {
 		google: googleSiteVerification || undefined,
 	},
 	openGraph: {
-		title: 'Al-Huda Quran',
+		title: 'Read al Quran',
 		description: siteDescription,
 		url: '/',
 		siteName,
@@ -132,13 +132,13 @@ export const metadata: Metadata = {
 				url: ogImage,
 				width: 1200,
 				height: 630,
-				alt: 'Al-Huda Quran app preview',
+				alt: 'Read al Quran app preview',
 			},
 		],
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Al-Huda Quran',
+		title: 'Read al Quran',
 		description: siteDescription,
 		images: [ogImage],
 	},

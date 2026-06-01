@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 
 const DEFAULT_SITE_URL = 'https://al-huda.vercel.app';
 const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, '');
-const SITE_NAME = 'Al-Huda Quran';
-const SITE_DESCRIPTION = 'Al-Huda is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
+const SITE_NAME = 'Read al Quran';
+const SITE_DESCRIPTION = 'Read al Quran is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
 
 export function getSiteOrigin() {
   return siteOrigin;
@@ -369,7 +369,7 @@ export function buildCityPageSchema(city: string, country: string = 'Pakistan') 
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: `Al-Huda Quran - ${city}, ${country}`,
+    name: `Read al Quran - ${city}, ${country}`,
     description: `Read Quran online in ${city} with Urdu translation, tafseer, and audio`,
     url: toAbsoluteUrl(`/${city.toLowerCase()}`),
     areaServed: {

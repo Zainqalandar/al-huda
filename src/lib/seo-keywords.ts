@@ -256,7 +256,7 @@ export const VOICE_SEARCH_QUESTIONS = [
   },
   {
     question: 'How do I memorize the Quran?',
-    answer: 'Start with short Surahs, recite regularly, use visualization, and practice consistently. Al-Huda helps track your progress.',
+    answer: 'Start with short Surahs, recite regularly, use visualization, and practice consistently. Read al Quran helps track your progress.',
     keywords: ['memorize quran', 'hifz', 'memorization tips'],
   },
   {

@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import { buildLocalBusinessJsonLd, buildEducationalOrganizationJsonLd, toAbsoluteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Contact Al-Huda Quran - Pakistan | Get in Touch',
+  title: 'Contact Read al Quran - Pakistan | Get in Touch',
   description:
-    'Contact Al-Huda Quran team in Pakistan. Support, feedback, or partnership inquiries. Available in Urdu, English, and Arabic.',
+    'Contact Read al Quran team in Pakistan. Support, feedback, or partnership inquiries. Available in Urdu, English, and Arabic.',
   keywords: [
-    'contact al-huda quran',
+    'contact read al quran',
     'quran app contact pakistan',
-    'al-huda support',
+    'read al quran support',
     'quran app customer service',
     'islamic learning support',
   ],
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Contact Al-Huda Quran',
-    description: 'Get in touch with Al-Huda Quran team',
+    title: 'Contact Read al Quran',
+    description: 'Get in touch with Read al Quran team',
     url: toAbsoluteUrl('/contact'),
     type: 'website',
   },
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   const localBusinessSchema = buildLocalBusinessJsonLd({
-    name: 'Al-Huda Quran',
+    name: 'Read al Quran',
     description: 'Islamic learning platform with Quran, Tafseer, and Hadith',
     url: toAbsoluteUrl('/'),
-    telephone: '+92-51-XXXXXXX',
-    email: 'support@al-huda.quran',
+    telephone: '+923364157981',
+    email: 'zainqlandar@gmail.com',
     address: {
       city: 'Islamabad',
       country: 'Pakistan',
@@ -44,7 +44,7 @@ export default function ContactPage() {
   });
 
   const educationalOrgSchema = buildEducationalOrganizationJsonLd({
-    name: 'Al-Huda Quran',
+    name: 'Read al Quran',
     description: 'Islamic learning platform with Quran, Tafseer, and Hadith',
     url: toAbsoluteUrl('/'),
     logo: toAbsoluteUrl('/logos/logo3.png'),
@@ -57,7 +57,7 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold text-[color:var(--color-heading)] mb-4">
-              Contact Al-Huda Quran
+              Contact Read al Quran
             </h1>
             <p className="text-xl text-[color:var(--color-muted-text)]">
               Get in touch with our team. We&apos;re here to help!
@@ -69,7 +69,7 @@ export default function ContactPage() {
               <h3 className="text-xl font-semibold text-[color:var(--color-accent)] mb-3">Email</h3>
               <p className="text-[color:var(--color-muted-text)] mb-2">General Inquiries:</p>
               <a href="mailto:support@al-huda.quran" className="text-[color:var(--color-info)] hover:underline">
-                support@al-huda.quran
+                zainqlandar@gmail.com
               </a>
               <p className="text-[color:var(--color-muted-text)] mt-4 mb-2">Partnerships:</p>
               <a href="mailto:partnerships@al-huda.quran" className="text-[color:var(--color-info)] hover:underline">
@@ -80,11 +80,11 @@ export default function ContactPage() {
             <div className="bg-[color:var(--color-surface-elevated)] border border-[color:var(--color-border)] p-8 rounded-3xl shadow-card">
               <h3 className="text-xl font-semibold text-[color:var(--color-accent)] mb-3">Phone</h3>
               <p className="text-[color:var(--color-muted-text)] mb-2">Pakistan (Local):</p>
-              <a href="tel:+92-51-XXXXXXX" className="text-[color:var(--color-info)] hover:underline">
-                +92-51-XXXXXXX
+              <a href="tel:+923364157981" className="text-[color:var(--color-info)] hover:underline">
+                +923364157981
               </a>
               <p className="text-[color:var(--color-muted-text)] mt-4 mb-2">WhatsApp:</p>
-              <a href="https://wa.me/92XXXXXXXXXX" className="text-[color:var(--color-info)] hover:underline">
+              <a href="https://wa.me/923364157981" className="text-[color:var(--color-info)] hover:underline">
                 Chat on WhatsApp
               </a>
             </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
 
               <details className="group">
                 <summary className="cursor-pointer text-lg font-semibold text-[color:var(--color-accent)] hover:text-[color:var(--color-highlight)]">
-                  Is Al-Huda Quran available offline?
+                  Is Read al Quran available offline?
                 </summary>
                 <p className="mt-2 text-[color:var(--color-muted-text)] pl-4">
                   Yes, the app includes offline support for reading Quran.

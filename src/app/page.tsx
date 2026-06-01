@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title:
     'Read Quran Online Free – Quran Pak with Urdu & English Translation, Audio, Tafseer',
   description:
-    'Al-Huda: Read Quran online free with Arabic text, Urdu and English translation, ayah-wise tafseer, tilawat audio, bookmarks, and progress tracking. Open Surah Yaseen, Rahman, Kahf, Mulk, Waqiah, Ayat ul Kursi, and explore 114 Surahs with offline access.',
+    'Read al Quran: Read Quran online free with Arabic text, Urdu and English translation, ayah-wise tafseer, tilawat audio, bookmarks, and progress tracking. Open Surah Yaseen, Rahman, Kahf, Mulk, Waqiah, Ayat ul Kursi, and explore 114 Surahs with offline access.',
   keywords: [
     ...CORE_QURAN_KEYWORDS,
     ...URDU_TRANSLATION_KEYWORDS,
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Read Quran Online Free – Al-Huda Quran',
-    description: 'Al-Huda: The most accessible Quran reader with Arabic text, Urdu/English translations, audio, tafseer, and offline access.',
+    title: 'Read Quran Online Free – Read al Quran',
+    description: 'Read al Quran: The most accessible Quran reader with Arabic text, Urdu/English translations, audio, tafseer, and offline access.',
     url: getSiteOrigin(),
     type: 'website',
     locale: 'en_US',
@@ -51,13 +51,13 @@ export const metadata: Metadata = {
         url: `${getSiteOrigin()}/logos/logo3.png`,
         width: 1200,
         height: 630,
-        alt: 'Al-Huda Quran - Read, Listen, Learn',
+        alt: 'Read al Quran - Read, Listen, Learn',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Read Quran Online Free – Al-Huda Quran',
+    title: 'Read Quran Online Free – Read al Quran',
     description: 'Accessible Quran reader with Arabic text, Urdu/English translations, audio, tafseer & offline access.',
   },
 };
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
 const faqJsonLd = buildFaqJsonLd([
   {
     question: 'How can I read Quran online with Urdu translation?',
-    answer: 'Open the Surah reader, switch to Arabic plus Urdu translation mode, and read ayah by ayah with synchronized highlighting. Al-Huda provides authentic Urdu translation alongside Arabic text for easy understanding.',
+    answer: 'Open the Surah reader, switch to Arabic plus Urdu translation mode, and read ayah by ayah with synchronized highlighting. Read al Quran provides authentic Urdu translation alongside Arabic text for easy understanding.',
   },
   {
     question: 'Can I listen to Quran audio online and download audio?',
@@ -80,20 +80,20 @@ const faqJsonLd = buildFaqJsonLd([
     answer: 'Yes. All 114 surahs are available with Arabic text, Urdu and English translation, tafseer, and recitation audio. You can easily search and access popular surahs.',
   },
   {
-    question: 'Is Al-Huda Quran app available offline?',
-    answer: 'Yes, Al-Huda is a Progressive Web App (PWA) that works offline. Once loaded, you can continue reading the Quran without an internet connection.',
+    question: 'Is Read al Quran app available offline?',
+    answer: 'Yes, Read al Quran is a Progressive Web App (PWA) that works offline. Once loaded, you can continue reading the Quran without an internet connection.',
   },
   {
-    question: 'Does Al-Huda track my reading progress?',
-    answer: 'Yes, Al-Huda automatically tracks your reading and listening progress, bookmarks, and liked verses so you can resume from where you left off.',
+    question: 'Does Read al Quran track my reading progress?',
+    answer: 'Yes, Read al Quran automatically tracks your reading and listening progress, bookmarks, and liked verses so you can resume from where you left off.',
   },
   {
     question: 'How do I search for specific surahs or verses?',
     answer: 'Use the search feature on the Surah Index page to find surahs by name, Arabic name, or verse number. The search includes all 114 surahs with instant results.',
   },
   {
-    question: 'Can I use Al-Huda on mobile devices?',
-    answer: 'Yes, Al-Huda works on all devices - mobile phones, tablets, and desktops. It provides a responsive design that adapts to any screen size.',
+    question: 'Can I use Read al Quran on mobile devices?',
+    answer: 'Yes, Read al Quran works on all devices - mobile phones, tablets, and desktops. It provides a responsive design that adapts to any screen size.',
   },
   // Voice Search Enhanced FAQs
   {

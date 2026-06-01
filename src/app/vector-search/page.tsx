@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { VectorSearchTools } from '@/components/vector-search';
 
 export const metadata: Metadata = {
-  title: 'AI-Powered Quran Search - Al-Huda',
+  title: 'AI-Powered Quran Search - Read al Quran',
   description: 'Search the Quran by meaning and ask AI questions about Islamic knowledge',
   robots: {
     index: false, // Don't index demo page

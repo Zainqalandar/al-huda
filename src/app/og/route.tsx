@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         ? `Ayah ${surah && ayah ? `${surah}:${ayah}` : ''}`.trim()
         : kind === 'surah'
           ? `Surah ${surah}`.trim()
-          : 'Al-Huda Quran';
+          : 'Read al Quran';
 
   const subtitle =
     kind === 'surah-index'
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
           >
             AQ
           </div>
-          Al-Huda Quran
+          Read al Quran
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

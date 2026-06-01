@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: {
     default: 'Admin',
-    template: '%s | Admin | Al-Huda Quran',
+    template: '%s | Admin | Read al Quran',
   },
   robots: {
     index: false,

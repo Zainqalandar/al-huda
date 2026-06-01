@@ -11,7 +11,7 @@ import { VOICE_SEARCH_KEYWORDS, VOICE_SEARCH_QUESTIONS } from '@/lib/seo-keyword
 export const metadata: Metadata = buildPageMetadata({
   title: 'Voice Search - Ask Questions About the Quran',
   description:
-    'Use voice search to ask questions about the Quran. Al-Huda provides instant answers using AI and schema-optimized content for voice assistants.',
+    'Use voice search to ask questions about the Quran. Read al Quran provides instant answers using AI and schema-optimized content for voice assistants.',
   path: '/voice-search',
   keywords: [...VOICE_SEARCH_KEYWORDS, 'voice search', 'voice assistant', 'ask quran questions'],
 });
