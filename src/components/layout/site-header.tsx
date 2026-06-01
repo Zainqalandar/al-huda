@@ -292,6 +292,10 @@ export default function SiteHeader() {
   const [signUpPassword, setSignUpPassword]   = useState('');
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
+  console.log('Google Client ID:', googleClientId ? 'Loaded' : 'Not set');
+
+  console.log('Client ID:', googleClientId);
+
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   /* load session */
