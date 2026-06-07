@@ -14,6 +14,7 @@ import {
   Hash,
   Heart,
   Menu,
+  Loader2,
   Pause,
   Play,
   Repeat,
@@ -734,6 +735,7 @@ export default function QuranReaderPage() {
       audio.removeAttribute('src');
       audio.load();
       setIsPlaying(false);
+      setIsPlayPending(false);
       setAudioCurrentTime(0);
       setAudioDuration(0);
       return;
@@ -745,14 +747,18 @@ export default function QuranReaderPage() {
     setAudioDuration(0);
 
     if (settings.autoPlayAudio) {
+      setIsPlayPending(true);
       audio
         .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false));
+        .catch(() => {
+          setIsPlaying(false);
+          setIsPlayPending(false);
+        });
       return;
     }
 
     setIsPlaying(false);
+    setIsPlayPending(false);
   }, [audioSrc, settings.autoPlayAudio]);
 
   useEffect(() => {
@@ -783,8 +789,17 @@ export default function QuranReaderPage() {
     };
 
     const onPlay = () => {
+      setIsPlayPending(true);
+    };
+    const onPlaying = () => {
       setIsPlaying(true);
       setIsPlayPending(false);
+    };
+    const onWaiting = () => {
+      if (!audio.paused && !audio.ended) {
+        setIsPlaying(false);
+        setIsPlayPending(true);
+      }
     };
     const onPause = () => {
       setIsPlaying(false);
@@ -801,6 +816,8 @@ export default function QuranReaderPage() {
     audio.addEventListener('progress', onProgress);
     audio.addEventListener('timeupdate', onTime);
     audio.addEventListener('play', onPlay);
+    audio.addEventListener('playing', onPlaying);
+    audio.addEventListener('waiting', onWaiting);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnd);
     audio.addEventListener('error', onEnd);
@@ -812,6 +829,8 @@ export default function QuranReaderPage() {
       audio.removeEventListener('progress', onProgress);
       audio.removeEventListener('timeupdate', onTime);
       audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('playing', onPlaying);
+      audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('ended', onEnd);
       audio.removeEventListener('error', onEnd);
@@ -1231,8 +1250,6 @@ export default function QuranReaderPage() {
 
       try {
         await audio.play();
-        setIsPlaying(true);
-        setIsPlayPending(false);
       } catch {
         setIsPlaying(false);
         setIsPlayPending(false);
@@ -1473,10 +1490,7 @@ export default function QuranReaderPage() {
     }
 
     playPromise
-      .then(() => {
-        setIsPlaying(true);
-        setIsPlayPending(false);
-      })
+      .then(() => undefined)
       .catch(() => {
         setIsPlaying(false);
         setIsPlayPending(false);
@@ -2036,8 +2050,10 @@ export default function QuranReaderPage() {
             >
               {isPlaying ? (
                 <Pause className="size-4" />
+              ) : isPlayPending ? (
+                <Loader2 className="size-4 animate-spin" />
               ) : (
-                <Play className={`size-4 ${isPlayPending ? 'animate-pulse' : ''}`} />
+                <Play className="size-4" />
               )}
             </Button>
             <Button

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Loader2,
   Pause,
   Play,
   SkipBack,
@@ -64,6 +65,7 @@ export default function QuranAudioBottomBar({
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(0.9);
+  const [isPlayPending, setIsPlayPending] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -120,12 +122,16 @@ export default function QuranAudioBottomBar({
     setDuration(0);
 
     if (settings.autoPlayAudio) {
+      setIsPlayPending(true);
       audio
         .play()
-        .then(() => handleSetPlaying(true))
-        .catch(() => handleSetPlaying(false));
+        .catch(() => {
+          handleSetPlaying(false);
+          setIsPlayPending(false);
+        });
     } else {
       handleSetPlaying(false);
+      setIsPlayPending(false);
     }
   }, [audioSrc, handleSetPlaying, settings.autoPlayAudio]);
 
@@ -143,16 +149,44 @@ export default function QuranAudioBottomBar({
     };
     const onEnd = () => {
       handleSetPlaying(false);
+      setIsPlayPending(false);
+    };
+    const onPlay = () => {
+      setIsPlayPending(true);
+    };
+    const onPlaying = () => {
+      handleSetPlaying(true);
+      setIsPlayPending(false);
+    };
+    const onPause = () => {
+      handleSetPlaying(false);
+      setIsPlayPending(false);
+    };
+    const onWaiting = () => {
+      if (!audio.paused && !audio.ended) {
+        handleSetPlaying(false);
+        setIsPlayPending(true);
+      }
     };
 
     audio.addEventListener('loadedmetadata', onLoaded);
     audio.addEventListener('timeupdate', onTime);
     audio.addEventListener('ended', onEnd);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('playing', onPlaying);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('waiting', onWaiting);
+    audio.addEventListener('error', onEnd);
 
     return () => {
       audio.removeEventListener('loadedmetadata', onLoaded);
       audio.removeEventListener('timeupdate', onTime);
       audio.removeEventListener('ended', onEnd);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('playing', onPlaying);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('waiting', onWaiting);
+      audio.removeEventListener('error', onEnd);
     };
   }, [handleSetPlaying]);
 
@@ -182,14 +216,16 @@ export default function QuranAudioBottomBar({
     if (isPlaying) {
       audio.pause();
       handleSetPlaying(false);
+      setIsPlayPending(false);
       return;
     }
 
     try {
+      setIsPlayPending(true);
       await audio.play();
-      handleSetPlaying(true);
     } catch {
       handleSetPlaying(false);
+      setIsPlayPending(false);
     }
   };
 
@@ -224,7 +260,13 @@ export default function QuranAudioBottomBar({
                 disabled={loadingSource || !audioSrc}
                 aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
               >
-                {isPlaying ? <Pause className="size-5" /> : <Play className="size-5" />}
+                {isPlaying ? (
+                  <Pause className="size-5" />
+                ) : isPlayPending ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <Play className="size-5" />
+                )}
               </Button>
 
               <Button

@@ -112,10 +112,11 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
     }
 
     try {
+      setIsBuffering(true);
       await audio.play();
-      setIsPlaying(true);
     } catch {
       setIsPlaying(false);
+      setIsBuffering(false);
     }
   }, [sourceUrl]);
 
@@ -127,6 +128,7 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
 
     audio.pause();
     setIsPlaying(false);
+    setIsBuffering(false);
   }, []);
 
   const togglePlay = useCallback(async () => {
@@ -307,6 +309,7 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
       audio.removeAttribute('src');
       audio.load();
       setIsPlaying(false);
+      setIsBuffering(false);
       setCurrentTime(0);
       setDuration(0);
       return;
@@ -316,6 +319,7 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
     audio.load();
     setCurrentTime(0);
     setDuration(0);
+    setIsBuffering(false);
 
     if (pendingAutoplayRef.current || settings.autoPlayAudio) {
       void play();
@@ -350,30 +354,43 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
     };
 
     const onPlay = () => {
+      setIsBuffering(true);
+    };
+
+    const onPlaying = () => {
       setIsPlaying(true);
+      setIsBuffering(false);
     };
 
     const onPause = () => {
       setIsPlaying(false);
+      setIsBuffering(false);
     };
 
     const onEnded = () => {
       if (!prefs.loop) {
         setIsPlaying(false);
       }
+      setIsBuffering(false);
     };
 
     const onWaiting = () => {
-      setIsBuffering(true);
+      if (!audio.paused && !audio.ended) {
+        setIsPlaying(false);
+        setIsBuffering(true);
+      }
     };
 
     const onCanPlay = () => {
-      setIsBuffering(false);
+      if (audio.paused || audio.ended) {
+        setIsBuffering(false);
+      }
     };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('play', onPlay);
+    audio.addEventListener('playing', onPlaying);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('waiting', onWaiting);
@@ -383,6 +400,7 @@ export function QuranPlayerProvider({ children }: PropsWithChildren) {
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('waiting', onWaiting);
