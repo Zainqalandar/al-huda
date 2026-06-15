@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://al-huda.vercel.app';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.readalquran.online';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -65,8 +65,8 @@ export default function robots(): MetadataRoute.Robots {
     ],
     sitemap: [
       `${baseUrl}/sitemap.xml`,
-      `${baseUrl}/sitemaps/surah`,
-      `${baseUrl}/sitemaps/ayah-1`,
+      `${baseUrl}/sitemaps/surah.xml`,
+      `${baseUrl}/sitemaps/ayah-1.xml`,
       `${baseUrl}/local-sitemap.xml`,
       `${baseUrl}/voice-sitemap.xml`,
     ],

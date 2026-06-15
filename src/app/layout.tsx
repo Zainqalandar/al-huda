@@ -29,7 +29,7 @@ const ActivityTrackerProvider = dynamic(
 	() => import('@/components/providers/activity-tracker-provider')
 );
 
-const defaultSiteUrl = 'https://al-huda.vercel.app';
+const defaultSiteUrl = 'https://www.readalquran.online';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
 const siteOrigin = new URL(siteUrl);
 const siteOriginString = siteOrigin.toString().replace(/\/$/, '');

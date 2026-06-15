@@ -1,7 +1,7 @@
 export const dynamic = 'force-static';
 
 function renderLocalSitemapXml() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://alhudaq.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.readalquran.online';
   const updatedAt = new Date().toISOString();
 
   const entries = [

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const defaultSiteUrl = 'https://al-huda.vercel.app';
+const defaultSiteUrl = 'https://www.readalquran.online';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl;
 
 export default function manifest(): MetadataRoute.Manifest {
