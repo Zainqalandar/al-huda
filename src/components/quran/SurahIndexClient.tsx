@@ -168,7 +168,7 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
           variant={isFiltersOpen || isFiltered ? 'default' : 'outline'}
           className={`h-auto py-3 px-5 rounded-xl border-2 font-medium flex items-center justify-center gap-2 text-sm md:text-base transition-all ${
             isFiltered && !isFiltersOpen
-              ? 'border-[var(--color-accent)] text-[var(--color-accent)] bg-[var(--color-accent)]/5'
+              ? 'border-[var(--color-accent)]  bg-[var(--color-accent)]/5'
               : ''
           }`}
           onClick={() => setIsFiltersOpen(!isFiltersOpen)}
@@ -183,10 +183,10 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
       <div className="flex flex-wrap gap-2 border-b border-[var(--color-border)] pb-4">
         <button
           onClick={() => setRevelationFilter('all')}
-          className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+          className={`flex items-center   gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
             revelationFilter === 'all'
-              ? 'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-sm font-bold'
-              : 'bg-[var(--color-surface-elevated)] text-[var(--color-muted-text)] hover:text-[var(--color-text)] border border-[var(--color-border)]'
+              ? 'bg-[var(--color-accent)]  shadow-sm font-bold'
+              : 'bg-[var(--color-surface-elevated)]  border border-[var(--color-border)]'
           }`}
         >
           <BookOpen className="size-4" />
@@ -197,8 +197,8 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
           onClick={() => setRevelationFilter('mecca')}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
             revelationFilter === 'mecca'
-              ? 'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-sm font-bold'
-              : 'bg-[var(--color-surface-elevated)] text-[var(--color-muted-text)] hover:text-[var(--color-text)] border border-[var(--color-border)]'
+              ? 'bg-[var(--color-accent)]  shadow-sm font-bold'
+              : 'bg-[var(--color-surface-elevated)]  border border-[var(--color-border)]'
           }`}
         >
           <Sun className="size-4 text-amber-500" />
@@ -209,8 +209,8 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
           onClick={() => setRevelationFilter('madina')}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
             revelationFilter === 'madina'
-              ? 'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-sm font-bold'
-              : 'bg-[var(--color-surface-elevated)] text-[var(--color-muted-text)] hover:text-[var(--color-text)] border border-[var(--color-border)]'
+              ? 'bg-[var(--color-accent)]  shadow-sm font-bold'
+              : 'bg-[var(--color-surface-elevated)]  border border-[var(--color-border)]'
           }`}
         >
           <Moon className="size-4 text-blue-500" />
@@ -221,8 +221,8 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
           onClick={() => setRevelationFilter('popular')}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
             revelationFilter === 'popular'
-              ? 'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-sm font-bold'
-              : 'bg-[var(--color-surface-elevated)] text-[var(--color-muted-text)] hover:text-[var(--color-text)] border border-[var(--color-border)]'
+              ? 'bg-[var(--color-accent)]  shadow-sm font-bold'
+              : 'bg-[var(--color-surface-elevated)]  border border-[var(--color-border)]'
           }`}
         >
           <Sparkles className="size-4 text-purple-500" />
