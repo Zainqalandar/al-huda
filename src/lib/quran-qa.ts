@@ -3,7 +3,7 @@ import { connectToMongoDatabase } from './db/mongodb';
 import { generateEmbedding } from './embeddings';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'mock-key-for-build',
 });
 
 export interface QAResult {
