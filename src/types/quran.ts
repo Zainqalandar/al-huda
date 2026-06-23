@@ -2,6 +2,7 @@ export interface SurahAudioOption {
   reciter?: string;
   url?: string;
   originalUrl?: string;
+  recitationId?: number;
 }
 
 export interface SurahListItem {
@@ -44,6 +45,12 @@ export interface SurahMeta {
   urdu?: string[];
   arabic1?: string[];
   audio?: Record<string, SurahAudioOption>;
+  verses?: Array<{
+    verse_number: number;
+    text_uthmani?: string;
+    english?: string;
+    urdu?: string;
+  }>;
 }
 
 export interface UrduTafsirEntry {

@@ -115,17 +115,14 @@ export const RESOURCE_HINTS = {
 
   // DNS prefetch for external services
   dnsPrefetch: [
-    'quranapi.pages.dev',
-    'api.alquran.cloud',
     'api.quran.com',
     'ia801503.us.archive.org',
   ],
 
   // Preconnect for critical services
   preconnect: [
-    { href: 'https://quranapi.pages.dev', crossOrigin: true },
-    { href: 'https://api.alquran.cloud', crossOrigin: true },
     { href: 'https://api.quran.com', crossOrigin: true },
+    { href: 'https://ia801503.us.archive.org', crossOrigin: true },
   ],
 };
 

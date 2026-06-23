@@ -1,4 +1,4 @@
-import type { SurahDetail, SurahMeta, UrduTafsirEntry } from '@/types/quran';
+import type { SurahAudioOption, SurahDetail, SurahMeta, UrduTafsirEntry } from '@/types/quran';
 import { isValidSurahId } from '@/lib/quran-utils';
 
 const surahMetaCache = new Map<number, SurahMeta>();
@@ -7,6 +7,55 @@ const urduTafsirCache = new Map<string, UrduTafsirEntry>();
 const surahMetaInFlight = new Map<number, Promise<SurahMeta>>();
 const surahDetailInFlight = new Map<number, Promise<SurahDetail>>();
 const urduTafsirInFlight = new Map<string, Promise<UrduTafsirEntry>>();
+
+// Quran.com API configuration
+const QURAN_COM_API = 'https://api.quran.com/api/v4';
+const ENGLISH_TRANSLATION_ID = 20; // Sahih International
+const URDU_TRANSLATION_ID = 54; // Maududi (Urdu)
+
+const QURAN_COM_RECITATION_IDS = [
+  { id: 7, name: 'Mishari al Afasy' },
+  { id: 4, name: 'Abu Bakr al Shatri' },
+  { id: 5, name: 'Hani ar Rifai' },
+] as const;
+
+async function fetchRecitationOptions(
+  surahId: number,
+  signal?: AbortSignal
+): Promise<SurahAudioOption[]> {
+  const requests = QURAN_COM_RECITATION_IDS.map(async (recitation) => {
+    const response = await fetch(
+      `${QURAN_COM_API}/chapter_recitations/${recitation.id}/${surahId}?segments=true`,
+      {
+        signal,
+        cache: 'force-cache',
+      }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await response.json()) as {
+      audio_file?: { audio_url?: string };
+    };
+
+    const audioUrl = payload.audio_file?.audio_url;
+    if (!audioUrl) {
+      return null;
+    }
+
+    return {
+      recitationId: recitation.id,
+      reciter: recitation.name,
+      originalUrl: audioUrl,
+      url: audioUrl,
+    } satisfies SurahAudioOption;
+  });
+
+  const results = await Promise.all(requests);
+  return results.filter((item): item is SurahAudioOption => item !== null);
+}
 
 export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Promise<SurahMeta> {
   if (!isValidSurahId(surahId)) {
@@ -23,16 +72,80 @@ export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Pro
     return inFlight;
   }
 
-  const request = fetch(`https://quranapi.pages.dev/api/${surahId}.json`, {
-    signal,
-    cache: 'force-cache',
-  })
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`Unable to load surah meta (${response.status})`);
+  const request = Promise.all([
+    fetch(`${QURAN_COM_API}/chapters/${surahId}?language=en`, {
+      signal,
+      cache: 'force-cache',
+    }),
+    fetch(
+      `${QURAN_COM_API}/verses/by_chapter/${surahId}?language=en&translations=${ENGLISH_TRANSLATION_ID},${URDU_TRANSLATION_ID}`,
+      {
+        signal,
+        cache: 'force-cache',
+      }
+    ),
+  ])
+    .then(async ([chapterRes, versesRes]) => {
+      if (!chapterRes.ok) {
+        throw new Error(`Unable to load chapter metadata (${chapterRes.status})`);
+      }
+      if (!versesRes.ok) {
+        throw new Error(`Unable to load verses (${versesRes.status})`);
       }
 
-      const payload = (await response.json()) as SurahMeta;
+      const chapterData = (await chapterRes.json()) as {
+        chapter?: {
+          name_arabic?: string;
+          name_simple?: string;
+          translated_name?: { name?: string };
+          verses_count?: number;
+        };
+      };
+      const versesData = (await versesRes.json()) as {
+        verses?: Array<{
+          verse_number?: number;
+          translations?: Array<{
+            resource_id?: number;
+            text?: string;
+          }>;
+        }>;
+      };
+
+      const chapter = chapterData.chapter || {};
+      const verses = versesData.verses || [];
+      
+      const english: string[] = [];
+      const urdu: string[] = [];
+
+      verses.forEach((v) => {
+        const translations = v.translations || [];
+        const englishTrans = translations.find((t) => t.resource_id === ENGLISH_TRANSLATION_ID);
+        const urduTrans = translations.find((t) => t.resource_id === URDU_TRANSLATION_ID);
+
+        english.push(englishTrans?.text?.replace(/<[^>]*>/g, '') || '');
+        urdu.push(urduTrans?.text?.replace(/<[^>]*>/g, '') || '');
+      });
+
+      const audioOptions = await fetchRecitationOptions(surahId, signal);
+      const audio = audioOptions.reduce<Record<string, SurahAudioOption>>((acc, item) => {
+        const key = String(item.recitationId ?? item.reciter ?? acc.length);
+        acc[key] = item;
+        return acc;
+      }, {});
+
+      const payload: SurahMeta = {
+        surahName: chapter.name_simple || '',
+        surahNameArabic: chapter.name_arabic || '',
+        surahNameTranslation: chapter.translated_name?.name || '',
+        revelationPlace: 'Unknown',
+        totalAyah: chapter.verses_count || 0,
+        surahNo: surahId,
+        english,
+        urdu,
+        arabic1: [],
+        audio,
+      };
+
       surahMetaCache.set(surahId, payload);
       return payload;
     })
@@ -62,23 +175,61 @@ export async function fetchSurahDetail(
     return inFlight;
   }
 
-  const request = fetch(`https://api.alquran.cloud/v1/surah/${surahId}`, {
-    signal,
-    cache: 'force-cache',
-  })
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`Unable to load surah ayahs (${response.status})`);
+  const request = Promise.all([
+    fetch(`${QURAN_COM_API}/chapters/${surahId}?language=en`, {
+      signal,
+      cache: 'force-cache',
+    }),
+    fetch(`${QURAN_COM_API}/quran/verses/uthmani?chapter_number=${surahId}`, {
+      signal,
+      cache: 'force-cache',
+    }),
+  ])
+    .then(async ([chapterRes, textRes]) => {
+      if (!chapterRes.ok) {
+        throw new Error(`Unable to load chapter (${chapterRes.status})`);
+      }
+      if (!textRes.ok) {
+        throw new Error(`Unable to load verses (${textRes.status})`);
       }
 
-      const payload = (await response.json()) as { data: SurahDetail };
+      const chapterData = (await chapterRes.json()) as {
+        chapter?: {
+          id?: number;
+          name_simple?: string;
+          translated_name?: { name?: string };
+          verses_count?: number;
+        };
+      };
+      const textData = (await textRes.json()) as {
+        verses?: Array<{
+          id?: number;
+          verse_key?: string;
+          text_uthmani?: string;
+        }>;
+      };
 
-      if (!payload?.data?.ayahs) {
-        throw new Error('Invalid surah details payload');
-      }
+      const chapter = chapterData.chapter || {};
+      const verses = textData.verses || [];
 
-      surahDetailCache.set(surahId, payload.data);
-      return payload.data;
+      const ayahs = verses.map((v, idx) => ({
+        number: v.id || idx + 1,
+        numberInSurah: idx + 1,
+        text: v.text_uthmani || '',
+      }));
+
+      const payload: SurahDetail = {
+        number: chapter.id || surahId,
+        name: '',
+        englishName: chapter.name_simple || '',
+        englishNameTranslation: chapter.translated_name?.name || '',
+        revelationType: 'Unknown',
+        numberOfAyahs: chapter.verses_count || 0,
+        ayahs,
+      };
+
+      surahDetailCache.set(surahId, payload);
+      return payload;
     })
     .finally(() => {
       surahDetailInFlight.delete(surahId);

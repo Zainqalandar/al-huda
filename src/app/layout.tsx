@@ -193,22 +193,9 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<head>
 				{/* DNS prefetch for external API services */}
-				<link rel="dns-prefetch" href="//quranapi.pages.dev" />
-				<link rel="dns-prefetch" href="//api.alquran.cloud" />
-				<link rel="dns-prefetch" href="//api.quran.com" />
-				<link rel="dns-prefetch" href="//ia801503.us.archive.org" />
+			<link rel="dns-prefetch" href="//api.quran.com" />
+			<link rel="dns-prefetch" href="//ia801503.us.archive.org" />
 
-				{/* Preconnect for critical external resources */}
-				<link
-					rel="preconnect"
-					href="https://quranapi.pages.dev"
-					crossOrigin=""
-				/>
-				<link
-					rel="preconnect"
-					href="https://api.alquran.cloud"
-					crossOrigin=""
-				/>
 				<link
 					rel="preconnect"
 					href="https://api.quran.com"

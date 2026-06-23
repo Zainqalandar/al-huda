@@ -65,7 +65,7 @@ export default function useSurahList(): UseSurahListResult {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await fetch('https://quranapi.pages.dev/api/surah.json', {
+        const res = await fetch('https://api.quran.com/api/v4/chapters?language=en', {
           signal: controller.signal,
           cache: 'force-cache',
         });
@@ -74,8 +74,10 @@ export default function useSurahList(): UseSurahListResult {
           throw new Error(`Surah list request failed (${res.status})`);
         }
 
-        const payload = (await res.json()) as unknown;
-        const normalized = normalizeSurahList(payload);
+        const payload = (await res.json()) as { chapters?: unknown };
+        const normalized = normalizeSurahList(
+          Array.isArray(payload.chapters) ? payload.chapters : []
+        );
 
         cachedSurahs = normalized;
         setSurahList(normalized);

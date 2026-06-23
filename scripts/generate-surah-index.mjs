@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-const SOURCE_URL = 'https://quranapi.pages.dev/api/surah.json';
+const SOURCE_URL = 'https://api.quran.com/api/v4/chapters?language=en';
 const OUTPUT_PATH = resolve(process.cwd(), 'src/data/surah-index.json');
 
 async function main() {
@@ -16,21 +16,20 @@ async function main() {
   }
 
   const payload = await response.json();
-  if (!Array.isArray(payload) || payload.length !== 114) {
+  const chapters = Array.isArray(payload?.chapters) ? payload.chapters : [];
+  if (chapters.length !== 114) {
     throw new Error('Unexpected surah index payload.');
   }
 
-  const normalized = payload.map((entry, index) => ({
-    id: index + 1,
-    surahName: String(entry?.surahName ?? ''),
-    surahNameArabic: String(entry?.surahNameArabic ?? ''),
+  const normalized = chapters.map((entry) => ({
+    id: Number(entry?.id ?? 0),
+    surahName: String(entry?.name_simple ?? ''),
+    surahNameArabic: String(entry?.name_arabic ?? ''),
     surahNameArabicLong:
-      entry?.surahNameArabicLong !== undefined
-        ? String(entry.surahNameArabicLong)
-        : undefined,
-    surahNameTranslation: String(entry?.surahNameTranslation ?? ''),
-    revelationPlace: String(entry?.revelationPlace ?? ''),
-    totalAyah: Number(entry?.totalAyah ?? 0),
+      entry?.name_complex !== undefined ? String(entry.name_complex) : undefined,
+    surahNameTranslation: String(entry?.translated_name?.name ?? ''),
+    revelationPlace: String(entry?.revelation_place ?? ''),
+    totalAyah: Number(entry?.verses_count ?? 0),
   }));
 
   await writeFile(OUTPUT_PATH, `${JSON.stringify(normalized, null, 2)}\n`, 'utf8');

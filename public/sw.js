@@ -26,8 +26,8 @@ self.addEventListener('activate', (event) => {
 
 function isApiRequest(requestUrl) {
   return (
-    requestUrl.includes('quranapi.pages.dev') ||
-    requestUrl.includes('api.alquran.cloud')
+    requestUrl.includes('api.quran.com') ||
+    requestUrl.includes('ia801503.us.archive.org')
   );
 }
 
