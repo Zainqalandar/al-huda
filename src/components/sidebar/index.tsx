@@ -208,6 +208,30 @@ function getTranslationAudioUrl(surahNumber: number) {
   ).padStart(3, '0')}.ogg`;
 }
 
+function getWeightedAyahIndex(progress: number, ayahs: AyahWithTranslation[]) {
+  if (ayahs.length === 0) {
+    return 0;                                                                                                                                                                                                                                     
+  }                                                                               
+
+  const weights = ayahs.map(({ translation }) => {
+    const text = translation?.trim() ?? '';
+    return Math.max(1, text.length);
+  });
+
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  const target = clampRange(progress, 0, 0.999999) * totalWeight;
+
+  let accumulated = 0;
+  for (let index = 0; index < weights.length; index += 1) {
+    accumulated += weights[index];
+    if (target < accumulated) {
+      return index;
+    }
+  }
+
+  return ayahs.length - 1;
+}
+
 function getAudioDuration(audio: HTMLAudioElement) {
   if (Number.isFinite(audio.duration) && audio.duration > 0) {
     return audio.duration;
@@ -922,10 +946,7 @@ export default function QuranReaderPage() {
 
     if (audioDuration > 0) {
       const progress = clampRange(audioCurrentTime / audioDuration, 0, 0.999999);
-      const index = Math.min(
-        ayahs.length - 1,
-        Math.floor(progress * ayahs.length)
-      );
+      const index = getWeightedAyahIndex(progress, ayahs);
 
       setActiveAudioAyahNumber(ayahs[index]?.ayah.numberInSurah ?? null);
       return;

@@ -54,7 +54,7 @@ async function fetchRecitationOptions(
   });
 
   const results = await Promise.all(requests);
-  return results.filter((item): item is SurahAudioOption => item !== null);
+  return results.filter((item) => item !== null) as SurahAudioOption[];
 }
 
 export async function fetchSurahMeta(surahId: number, signal?: AbortSignal): Promise<SurahMeta> {
