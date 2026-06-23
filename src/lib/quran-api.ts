@@ -11,7 +11,7 @@ const urduTafsirInFlight = new Map<string, Promise<UrduTafsirEntry>>();
 // Quran.com API configuration
 const QURAN_COM_API = 'https://api.quran.com/api/v4';
 const ENGLISH_TRANSLATION_ID = 20; // Sahih International
-const URDU_TRANSLATION_ID = 54; // Maududi (Urdu)
+const URDU_TRANSLATION_ID = 234; // Fatah Muhammad Jalandhari (Urdu)
 
 const QURAN_COM_RECITATION_IDS = [
   { id: 7, name: 'Mishari al Afasy' },

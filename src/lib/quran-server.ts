@@ -6,7 +6,7 @@ import type { SurahMeta, UrduTafsirEntry } from '@/types/quran';
 
 const QURAN_COM_API = 'https://api.quran.com/api/v4';
 const ENGLISH_TRANSLATION_ID = 20; // Sahih International
-const URDU_TRANSLATION_ID = 54; // Maududi (Urdu)
+const URDU_TRANSLATION_ID = 234; // Fatah Muhammad Jalandhari (Urdu)
 const QURAN_COM_TAFSIR_IDS = [160, 159, 818, 157] as const;
 
 export interface AyahContentEntry {
