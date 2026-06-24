@@ -31,11 +31,12 @@ function renderSitemapIndexXml() {
   const updatedAt = new Date().toISOString();
   const names = buildSitemapNames();
 
-  const items = names
-    .map((name) => {
+  const items = [
+    `<sitemap><loc>${origin}/hadith/sitemap.xml</loc><lastmod>${updatedAt}</lastmod></sitemap>`,
+    ...names.map((name) => {
       return `<sitemap><loc>${origin}/sitemaps/${name}</loc><lastmod>${updatedAt}</lastmod></sitemap>`;
-    })
-    .join('');
+    }),
+  ].join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;

@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: 'Googlebot',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search', '/hadith', '/hadith/'],
         disallow: [
           '/admin',
           '/admin/',
@@ -16,7 +16,6 @@ export default function robots(): MetadataRoute.Robots {
           '/signup',
           '/settings',
           '/practice',
-          '/hadith',
           '/quran',
           '/quran/',
           '/*?*search=*',
@@ -27,7 +26,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'Bingbot',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search', '/hadith', '/hadith/'],
         disallow: [
           '/admin',
           '/admin/',
@@ -36,7 +35,6 @@ export default function robots(): MetadataRoute.Robots {
           '/signup',
           '/settings',
           '/practice',
-          '/hadith',
           '/quran',
           '/quran/',
         ],
@@ -44,7 +42,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: '*',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search', '/hadith', '/hadith/'],
         disallow: [
           '/admin',
           '/admin/',
@@ -53,7 +51,6 @@ export default function robots(): MetadataRoute.Robots {
           '/signup',
           '/settings',
           '/practice',
-          '/hadith',
           '/quran',
           '/quran/',
           '/*?*search=*',
@@ -69,6 +66,7 @@ export default function robots(): MetadataRoute.Robots {
       `${baseUrl}/sitemaps/ayah-1.xml`,
       `${baseUrl}/local-sitemap.xml`,
       `${baseUrl}/voice-sitemap.xml`,
+      `${baseUrl}/hadith/sitemap.xml`,
     ],
     host: baseUrl,
   };
