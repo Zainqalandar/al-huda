@@ -23,7 +23,7 @@ async function fetchTafsirAyahsBySurah(surahId) {
 
   for (const tafsirId of TAFSIR_IDS) {
     const response = await fetch(
-      `https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_chapter/${surahId}`,
+      `https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_chapter/${surahId}?limit=300`,
       {
         headers: { Accept: 'application/json' },
       }
