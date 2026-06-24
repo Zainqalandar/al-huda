@@ -82,6 +82,7 @@ const NAV: NavEntry[] = [
       { label: 'Read Online',  href: '/read-quran-online', icon: BookMarked   },
       { label: 'AI Search',    href: '/vector-search',     icon: BrainCircuit },
       { label: 'Voice Search', href: '/voice-search',      icon: Mic          },
+      { label: 'Tafseer Index', href: '/tafsir',            icon: BookOpenText },
     ],
   },
   { label: 'About',   href: '/about',   icon: Info           },

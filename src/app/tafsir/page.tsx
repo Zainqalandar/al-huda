@@ -1,0 +1,98 @@
+import type { Metadata } from 'next';
+
+import { Badge } from '@/components/ui/badge';
+import StickyScrollNav from '@/components/ui/StickyScrollNav';
+import { getAllSurahs } from '@/lib/quran-index';
+import { getTafsirAyahNumbersBySurah } from '@/lib/tafsir-index';
+import { buildPageMetadata } from '@/lib/seo';
+import { CORE_QURAN_KEYWORDS, SURAH_AYAH_KEYWORDS } from '@/lib/seo-keywords';
+import TafsirIndexClient from '@/components/tafsir/TafsirIndexClient';
+
+interface TafsirIndexPageProps {
+  searchParams: Promise<{
+    search?: string;
+  }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: TafsirIndexPageProps): Promise<Metadata> {
+  const query = String((await searchParams).search ?? '').trim();
+
+  if (!query) {
+    return buildPageMetadata({
+      title: 'Tafseer Index – Complete Urdu Tafseer of All Surahs',
+      description:
+        'Browse complete Urdu tafseer (Islamic interpretation) for all Quranic surahs. Find detailed explanations, Islamic knowledge, and spiritual insights for each chapter with Arabic text and translations.',
+      path: '/tafsir',
+      ogType: 'website',
+      imageUrl: '/og?kind=tafsir-index',
+      keywords: [
+        ...CORE_QURAN_KEYWORDS,
+        ...SURAH_AYAH_KEYWORDS,
+        'tafseer urdu',
+        'tafsir',
+        'quran explanation',
+        'islamic tafseer',
+        'quran interpretation',
+        'urdu tafseer',
+        'tafseer of quran',
+      ],
+    });
+  }
+
+  return buildPageMetadata({
+    title: `Search Tafseer: ${query} – al Quran Online`,
+    description: `Search results for "${query}" in Quran tafseer with direct links to detailed explanations and Islamic knowledge.`,
+    path: '/tafsir',
+    index: false,
+    ogType: 'website',
+    imageUrl: '/og?kind=tafsir-index',
+  });
+}
+
+export default async function TafsirIndexPage({
+  searchParams,
+}: TafsirIndexPageProps) {
+  const query = String((await searchParams).search ?? '').trim();
+  const allSurahs = getAllSurahs();
+
+  const surahsWithTafseer = allSurahs.map((surah) => ({
+    ...surah,
+    tafseerAyahs: getTafsirAyahNumbersBySurah(surah.id),
+  }));
+
+  return (
+    <div className="pb-20 pt-8 md:pt-12" data-slot="page-shell">
+      <section className="mb-10 animate-fade-up">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <Badge className="bg-gradient-to-r text-white from-[var(--color-accent)] to-[var(--color-accent-soft)]">
+              Al-Quran Al-Kareem
+            </Badge>
+            <Badge variant="secondary" className="text-xs">
+              Urdu Tafseer
+            </Badge>
+          </div>
+
+          <h1 className="font-display text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--color-heading)] to-[var(--color-accent)] bg-clip-text text-transparent mb-4">
+            Tafseer Index
+          </h1>
+
+          <p className="text-base md:text-lg leading-relaxed text-[var(--color-muted-text)] max-w-2xl">
+            مکمل اردو تفسیر - Complete Urdu tafseer (Islamic interpretation) of all Quranic surahs with detailed explanations and spiritual insights.
+          </p>
+        </div>
+
+        {/* Dynamic client-side search and filters */}
+        <TafsirIndexClient
+          initialSurahs={surahsWithTafseer}
+          initialSearchQuery={query}
+        />
+      </section>
+
+      <StickyScrollNav />
+    </div>
+  );
+}
