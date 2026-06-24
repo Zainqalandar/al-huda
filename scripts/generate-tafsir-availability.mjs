@@ -18,6 +18,9 @@ function extractAyahNumber(verseKey) {
 }
 
 async function fetchTafsirAyahsBySurah(surahId) {
+  const ayahSet = new Set();
+  let firstSourceId = null;
+
   for (const tafsirId of TAFSIR_IDS) {
     const response = await fetch(
       `https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_chapter/${surahId}`,
@@ -36,23 +39,21 @@ async function fetchTafsirAyahsBySurah(surahId) {
       continue;
     }
 
-    const ayahs = Array.from(
-      new Set(
-        tafsirs
-          .map((entry) => extractAyahNumber(entry?.verse_key))
-          .filter((entry) => entry !== null)
-      )
-    ).sort((left, right) => left - right);
+    if (firstSourceId === null) {
+      firstSourceId = tafsirId;
+    }
 
-    return {
-      sourceId: tafsirId,
-      ayahs,
-    };
+    tafsirs
+      .map((entry) => extractAyahNumber(entry?.verse_key))
+      .filter((ayahNumber) => ayahNumber !== null)
+      .forEach((ayahNumber) => ayahSet.add(ayahNumber));
   }
 
+  const ayahs = Array.from(ayahSet).sort((left, right) => left - right);
+
   return {
-    sourceId: null,
-    ayahs: [],
+    sourceId: firstSourceId,
+    ayahs,
   };
 }
 

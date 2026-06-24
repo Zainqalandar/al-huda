@@ -15,7 +15,6 @@ import {
 import { resolveSurahParam } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 import { buildBreadcrumbJsonLd, buildPageMetadata, getSiteOrigin } from '@/lib/seo';
-import { hasTafsirForAyah } from '@/lib/tafsir-index';
 
 interface TafsirPageProps {
   params: Promise<{
@@ -52,15 +51,6 @@ export async function generateMetadata({
   }
 
   const surah = resolved.surah;
-  if (!hasTafsirForAyah(surah.id, ayahNumber)) {
-    return buildPageMetadata({
-      title: `Tafseer ${surah.id}:${ayahNumber} Not Available`,
-      description: 'Requested tafseer content is unavailable.',
-      path: buildAyahPath(surah.id, surah.surahName, ayahNumber),
-      index: false,
-    });
-  }
-
   const tafsir = await getUrduTafsirByAyah(surah.id, ayahNumber);
   if (!tafsir) {
     return buildPageMetadata({
@@ -102,10 +92,6 @@ export default async function TafsirDetailPage({
 
   if (!isCanonicalSlug) {
     permanentRedirect(buildTafsirPath(surah.id, surah.surahName, ayahNumber));
-  }
-
-  if (!hasTafsirForAyah(surah.id, ayahNumber)) {
-    notFound();
   }
 
   const [ayah, tafsir, audioUrls] = await Promise.all([

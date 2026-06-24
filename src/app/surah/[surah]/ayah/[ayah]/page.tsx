@@ -15,7 +15,6 @@ import {
 import { resolveSurahParam } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
-import { hasTafsirForAyah } from '@/lib/tafsir-index';
 
 interface AyahPageProps {
   params: Promise<{
@@ -53,10 +52,8 @@ export async function generateMetadata({
 
   const surah = resolved.surah;
   const ayah = await getAyahContent(surah.id, ayahNumber);
-  const canOpenTafsir = hasTafsirForAyah(surah.id, ayahNumber);
-  const tafsir = canOpenTafsir
-    ? await getUrduTafsirByAyah(surah.id, ayahNumber)
-    : null;
+  const tafsir = await getUrduTafsirByAyah(surah.id, ayahNumber);
+  const canOpenTafsir = Boolean(tafsir);
   const canonicalPath = buildAyahPath(surah.id, surah.surahName, ayahNumber);
 
   const title = canOpenTafsir
@@ -112,11 +109,11 @@ export default async function AyahDetailPage({
     notFound();
   }
 
-  const canOpenTafsir = hasTafsirForAyah(surah.id, ayahNumber);
   const [audioUrls, tafsir] = await Promise.all([
     getAyahAudioUrls(surah.id, ayahNumber),
-    canOpenTafsir ? getUrduTafsirByAyah(surah.id, ayahNumber) : Promise.resolve(null),
+    getUrduTafsirByAyah(surah.id, ayahNumber),
   ]);
+  const canOpenTafsir = Boolean(tafsir);
 
   const surahPath = buildSurahPath(surah.id, surah.surahName);
   const tafsirPath = buildTafsirPath(surah.id, surah.surahName, ayahNumber);
