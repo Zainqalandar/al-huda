@@ -10,7 +10,8 @@ type FetchOptions = {
 export class HadithApiError extends Error {
   constructor(
     public status: number,
-    message: string
+    message: string,
+    public retryAfterMs?: number
   ) {
     super(message);
     this.name = 'HadithApiError';
@@ -46,9 +47,15 @@ export async function hadithFetch<T>(
       const response = await fetch(url, nextOptions);
 
       if (!response.ok) {
+        const retryAfterHeader = response.headers.get('Retry-After');
+        const retryAfterMs = retryAfterHeader
+          ? Number(retryAfterHeader) * 1000
+          : undefined;
+
         throw new HadithApiError(
           response.status,
-          `HadithAPI error: ${response.status} ${response.statusText}`
+          `HadithAPI error: ${response.status} ${response.statusText}`,
+          retryAfterMs
         );
       }
 
@@ -56,11 +63,15 @@ export async function hadithFetch<T>(
       return data;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error');
-      if (error instanceof HadithApiError && error.status < 500) {
+      if (error instanceof HadithApiError && error.status !== 429 && error.status < 500) {
         throw error;
       }
       if (attempt < 2) {
-        await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+        const delayMs =
+          error instanceof HadithApiError && error.retryAfterMs
+            ? error.retryAfterMs
+            : 500 * (attempt + 1);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
     }
   }
