@@ -90,6 +90,14 @@ body {
   font-family: 'Amiri Quran', 'Noto Naskh Arabic', 'Scheherazade New', serif;
 }
 
+.font-arabic-amiri {
+  font-family: var(--font-arabic-amiri), 'Amiri', 'Noto Naskh Arabic', serif;
+}
+
+.font-urdu-nastaliq {
+  font-family: var(--font-urdu-nastaliq), 'Noto Nastaliq Urdu', serif;
+}
+
 :root[data-arabic-font='amiriQuran'] .arabic-font {
   font-family: 'Amiri Quran', 'Amiri', 'Noto Naskh Arabic', serif;
 }

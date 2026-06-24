@@ -85,6 +85,14 @@ const NAV: NavEntry[] = [
       { label: 'Tafseer Index', href: '/tafsir',            icon: BookOpenText },
     ],
   },
+  {
+    label: 'Hadith',
+    icon: BookMarked,
+    items: [
+      { label: 'Collections', href: '/hadith',        icon: BookOpenText, exact: true },
+      { label: 'Search',      href: '/hadith/search', icon: BookMarked,  exact: true },
+    ],
+  },
   { label: 'About',   href: '/about',   icon: Info           },
   { label: 'Contact', href: '/contact', icon: MessageSquare  },
 ];
