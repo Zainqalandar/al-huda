@@ -12,9 +12,10 @@ import {
   sanitizeTafsirHtml,
   stripHtml,
 } from '@/lib/quran-server';
-import { resolveSurahParam } from '@/lib/quran-index';
-import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
+import { getAllSurahs, resolveSurahParam } from '@/lib/quran-index';
+import { buildAyahPath, buildSurahPath, buildTafsirPath, buildSurahSlug } from '@/lib/quran-routing';
 import { buildBreadcrumbJsonLd, buildPageMetadata, getSiteOrigin } from '@/lib/seo';
+import { getAllTafsirRefs } from '@/lib/tafsir-index';
 
 interface TafsirPageProps {
   params: Promise<{
@@ -24,6 +25,21 @@ interface TafsirPageProps {
 }
 
 export const revalidate = 86400;
+
+export function generateStaticParams() {
+  const tafsirRefs = getAllTafsirRefs();
+  const surahs = getAllSurahs();
+  const surahMap = new Map(surahs.map((s) => [s.id, s]));
+
+  return tafsirRefs.map((ref) => {
+    const surah = surahMap.get(ref.surahId);
+    if (!surah) return null;
+    return {
+      surah: buildSurahSlug(ref.surahId, ref.surahName),
+      ayah: String(ref.ayahNumber),
+    };
+  }).filter(Boolean);
+}
 
 function parseAyahNumber(value: string) {
   const parsed = Number(value);
@@ -108,6 +124,12 @@ export default async function TafsirDetailPage({
   const surahPath = buildSurahPath(surah.id, surah.surahName);
   const ayahPath = buildAyahPath(surah.id, surah.surahName, ayahNumber);
   const canonicalPath = buildTafsirPath(surah.id, surah.surahName, ayahNumber);
+  const prevTafsirPath = ayahNumber > 1 
+    ? buildTafsirPath(surah.id, surah.surahName, ayahNumber - 1)
+    : null;
+  const nextTafsirPath = ayahNumber < surah.totalAyah
+    ? buildTafsirPath(surah.id, surah.surahName, ayahNumber + 1)
+    : null;
 
   const breadcrumbs = buildBreadcrumbJsonLd([
     { name: 'Home', item: '/' },
@@ -287,6 +309,22 @@ export default async function TafsirDetailPage({
         >
           Back to Surah
         </Link>
+        {prevTafsirPath ? (
+          <Link
+            href={prevTafsirPath}
+            className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm hover:border-[var(--color-accent-soft)]"
+          >
+            Previous Tafseer
+          </Link>
+        ) : null}
+        {nextTafsirPath ? (
+          <Link
+            href={nextTafsirPath}
+            className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm hover:border-[var(--color-accent-soft)]"
+          >
+            Next Tafseer
+          </Link>
+        ) : null}
       </section>
     </div>
   );
