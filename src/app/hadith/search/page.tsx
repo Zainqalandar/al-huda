@@ -22,7 +22,7 @@ export async function generateMetadata({
 async function SearchResults({ query, page }: { query: string; page: number }) {
   if (!query) {
     return (
-      <div className="text-center py-16 text-gray-400">
+      <div className="text-center py-16 text-[var(--color-muted-text)]">
         <p className="text-lg">Type a keyword above to search hadiths</p>
       </div>
     );
@@ -41,7 +41,7 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
+      <p className="text-sm text-[var(--color-muted-text)]">
         {results.hadiths.total.toLocaleString()} results for "{query}"
       </p>
       {results.hadiths.data.map((hadith) => (
@@ -66,8 +66,8 @@ export default async function SearchPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Search Hadiths</h1>
-      <Suspense fallback={<div className="text-gray-400 text-sm">Searching...</div>}>
+      <h1 className="text-2xl font-bold text-[var(--color-heading)]">Search Hadiths</h1>
+      <Suspense fallback={<div className="text-[var(--color-muted-text)] text-sm">Searching...</div>}>
         <SearchResults query={q} page={currentPage} />
       </Suspense>
     </div>

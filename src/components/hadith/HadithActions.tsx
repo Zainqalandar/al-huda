@@ -32,7 +32,7 @@ export default function HadithActions({ hadith }: HadithActionsProps) {
       <button
         onClick={handleCopy}
         aria-label="Copy hadith"
-        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="p-1.5 rounded-lg text-[var(--color-muted-text)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] dark:hover:bg-[var(--color-surface-3)] transition-colors"
       >
         {copied ? (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -50,7 +50,7 @@ export default function HadithActions({ hadith }: HadithActionsProps) {
         <button
           onClick={handleShare}
           aria-label="Share hadith"
-          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-1.5 rounded-lg text-[var(--color-muted-text)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] dark:hover:bg-[var(--color-surface-3)] transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />

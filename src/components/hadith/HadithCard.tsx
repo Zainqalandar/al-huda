@@ -14,16 +14,16 @@ export default function HadithCard({ hadith, showBook = false }: HadithCardProps
 
   return (
     <article
-      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 space-y-4"
+      className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 space-y-4"
       id={`hadith-${hadith.hadithNumber}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
+          <span className="text-sm font-mono text-[var(--color-muted-text)]">
             #{hadith.hadithNumber}
           </span>
           {showBook && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-[var(--color-muted-text)]">
               · {hadith.book.bookName}
             </span>
           )}
@@ -43,7 +43,7 @@ export default function HadithCard({ hadith, showBook = false }: HadithCardProps
         </div>
       )}
 
-      <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-base">
+      <p className="text-[var(--color-text)] leading-relaxed text-base">
         {hadith.hadithEnglish}
       </p>
 
@@ -51,13 +51,13 @@ export default function HadithCard({ hadith, showBook = false }: HadithCardProps
         <p
           dir="rtl"
           lang="ur"
-          className="text-gray-700 dark:text-gray-300 leading-loose text-right font-urdu-nastaliq"
+          className="text-[var(--color-text)] leading-loose text-right font-urdu-nastaliq"
         >
           {hadith.hadithUrdu}
         </p>
       )}
 
-      <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)]">
         <Link
           href={detailUrl}
           className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium"

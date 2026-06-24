@@ -25,7 +25,7 @@ export default function HadithPagination({ currentPage, totalPages, baseUrl }: P
         <Link
           href={getPageUrl(currentPage - 1)}
           aria-label="Previous page"
-          className="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="px-3 py-2 rounded-lg text-sm text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] dark:hover:bg-[var(--color-surface-3)] transition-colors"
         >
           ← Previous
         </Link>
@@ -33,7 +33,7 @@ export default function HadithPagination({ currentPage, totalPages, baseUrl }: P
 
       {pages.map((page, i) =>
         page === 'ellipsis' ? (
-          <span key={`ellipsis-${i}`} className="px-2 text-gray-400">…</span>
+          <span key={`ellipsis-${i}`} className="px-2 text-[var(--color-muted-text)]">…</span>
         ) : (
           <Link
             key={page}
@@ -42,8 +42,8 @@ export default function HadithPagination({ currentPage, totalPages, baseUrl }: P
             aria-current={page === currentPage ? 'page' : undefined}
             className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm transition-colors ${
               page === currentPage
-                ? 'bg-emerald-600 text-white font-medium'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                ? 'bg-[var(--color-accent)] text-white font-medium'
+                : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] dark:hover:bg-[var(--color-surface-3)]'
             }`}
           >
             {page}
@@ -55,7 +55,7 @@ export default function HadithPagination({ currentPage, totalPages, baseUrl }: P
         <Link
           href={getPageUrl(currentPage + 1)}
           aria-label="Next page"
-          className="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="px-3 py-2 rounded-lg text-sm text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] dark:hover:bg-[var(--color-surface-3)] transition-colors"
         >
           Next →
         </Link>

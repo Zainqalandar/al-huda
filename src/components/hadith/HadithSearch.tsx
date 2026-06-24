@@ -27,7 +27,7 @@ export default function HadithSearch() {
       <label htmlFor="hadith-search" className="sr-only">Search Hadiths</label>
       <div className="relative">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted-text)]"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -41,7 +41,7 @@ export default function HadithSearch() {
           placeholder="Search hadiths in English..."
           defaultValue={searchParams.get('q') ?? ''}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+          className="w-full pl-10 pr-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
           aria-label="Search hadiths"
         />
         {isPending && (
