@@ -1,173 +1,136 @@
 # Al-Huda Project - API Analysis
 
-## 🔤 QURAN TEXT APIs
+## 🔤 External Quran APIs
 
-### 1. **QuranAPI.pages.dev** (Primary Text Source)
-- **Base URL:** `https://quranapi.pages.dev`
+### 1. **Quran.com API** (Primary Quran data source)
+- **Base URL:** `https://api.quran.com/api/v4`
 - **Endpoints Used:**
-  - `GET /api/{surahId}.json` - Get complete Surah metadata (Arabic text, English translation, Urdu translation)
-  - `GET /api/surah.json` - Get list of all Surahs with basic info
+  - `GET /chapters?language=en` - List of Surahs
+  - `GET /chapters/{surahId}?language=en` - Surah metadata
+  - `GET /verses/by_chapter/{surahId}?language=en&translations=20,234` - Ayah translations in English and Urdu
+  - `GET /quran/verses/uthmani?chapter_number={surahId}` - Arabic Quran text
+  - `GET /verses/by_verse/ar-default/{surahId}:{ayahNumber}` - Arabic audio metadata for a single ayah
+  - `GET /chapter_recitations/{recitationId}/{surahId}?segments=true` - Surah recitation audio options
+  - `GET /tafsirs/{tafsirId}/by_ayah/{surahId}:{ayahNumber}` - Urdu Tafsir
 - **Used in:**
-  - `src/lib/quran-api.ts` → `fetchSurahMeta()`
-  - `src/lib/quran-server.ts` → `getSurahMetaById()`
-  - `src/hooks/useSurahList.ts` → Fetch all Surahs list
-- **Data Returned:** Arabic text, English translation, Urdu translation, Surah metadata
-- **Cache Strategy:** Force cache with 24-hour revalidation
+  - `src/lib/quran-api.ts`
+  - `src/lib/quran-server.ts`
+  - `src/app/api/tafsir/ur/route.ts`
+  - `src/hooks/useSurahList.ts`
+- **Data Returned:** Surah metadata, Arabic text, translations, recitations, and Urdu Tafsir
+- **Cache Strategy:** Server-side cache / revalidation around 24 hours
 
-### 2. **Al-Quran Cloud API**
-- **Base URL:** `https://api.alquran.cloud`
-- **Endpoints Used:**
-  - `GET /v1/surah/{surahId}` - Get Surah details (ayahs with translations)
-  - `GET /v1/ayah/{surahId}:{ayahNumber}/ar.alafasy` - Get Arabic audio (Al-Afasy recitation)
-  - `GET /v1/ayah/{surahId}:{ayahNumber}/ur.khan` - Get Urdu audio (Khan recitation)
+### 2. **Archive.org Urdu audio index**
+- **Base URL:** `https://ia801503.us.archive.org/28/items/quran_urdu_audio_only/{surahId}.json`
 - **Used in:**
-  - `src/lib/quran-api.ts` → `fetchSurahDetail()`
-  - `src/lib/quran-server.ts` → `getAyahAudioUrls()`
-- **Data Returned:** Ayah text, translations, audio URLs
-- **Cache Strategy:** Force cache with 24-hour revalidation
+  - `src/lib/quran-server.ts`
+  - UI audio helpers in `src/components` and providers
+- **Data Returned:** Urdu audio index mapping ayah numbers to audio URLs
 
-### 3. **Quran.com API**
-- **Base URL:** `https://api.quran.com`
-- **Endpoints Used:**
-  - `GET /api/v4/tafsirs/{tafsirId}/by_ayah/{surahId}:{ayahNumber}` - Get Tafsir (Quranic commentary)
-- **Tafsir IDs Used:**
-  - `160` - Urdu Tafsir
-  - `159` - Urdu Tafsir
-  - `818` - Urdu Tafsir
-  - `157` - Urdu Tafsir
+### 3. **Google public certs**
+- **URL:** `https://www.googleapis.com/oauth2/v3/certs`
 - **Used in:**
-  - `src/lib/quran-server.ts` → `getUrduTafsirByAyah()`
-  - `src/app/api/tafsir/ur/route.ts` → `fetchUrduTafsirFromQuranCom()`
-  - `src/lib/quran-api.ts` → `fetchUrduTafsirByAyah()`
-- **Data Returned:** Tafsir text (HTML), resource name, source information
-- **Cache Strategy:** Force cache with 24-hour revalidation
+  - `src/lib/auth/google.ts`
+  - `src/app/api/auth/google/route.ts`
+- **Purpose:** Verify Google ID tokens for sign-in
+
+### 4. **OpenAI API**
+- **Library:** `openai` SDK
+- **Used in:**
+  - `src/lib/embeddings.ts` - Embedding generation
+  - `src/lib/quran-qa.ts` - Question answering
+- **Models Used:**
+  - `text-embedding-3-small` for semantic embeddings
+  - `gpt-4o` for AI Q&A
+- **Environment Variable:** `OPENAI_API_KEY`
 
 ---
 
-## 🔊 AUDIO APIs
+## 🔎 Internal API Routes (Next.js)
 
-### 1. **Al-Quran Cloud API - Audio Endpoints**
-- **Base URL:** `https://api.alquran.cloud`
+### Voice search
+- `POST /api/voice/search` - Voice/FAQ search over local `VOICE_SEARCH_QUESTIONS`
+- `GET /api/voice/search` - Return voice FAQ list
 
-#### Arabic Audio (Al-Afasy Recitation)
-- **Endpoint:** `GET /v1/ayah/{surahId}:{ayahNumber}/ar.alafasy`
-- **Used in:** `src/lib/quran-server.ts` → `getAyahAudioUrls()`
-- **Returns:** Audio URL for Arabic Quran recitation (Al-Afasy)
-- **Format:** MP3 URL string
+### Semantic and related search
+- `POST /api/vector/semantic-search` - Semantic surah/ayah search using OpenAI embeddings + MongoDB vector search
+- `GET /api/vector/related` - Related ayahs based on stored ayah embeddings
+- `POST /api/vector/qa` - RAG-style Quran Q&A using OpenAI and MongoDB
 
-#### Urdu Audio (Khan Recitation)
-- **Endpoint:** `GET /v1/ayah/{surahId}:{ayahNumber}/ur.khan`
-- **Used in:** `src/lib/quran-server.ts` → `getAyahAudioUrls()`
-- **Returns:** Audio URL for Urdu Quran recitation (Khan)
-- **Format:** MP3 URL string
+### Tafsir proxy
+- `GET /api/tafsir/ur` - Proxy Urdu Tafsir lookups from Quran.com
 
----
+### Quran likes and state
+- `GET /api/quran/likes` - Surah like counts from internal data store
 
-## 🤖 AI/ML APIs
+### Authentication and user state
+- `POST /api/auth/google` - Google sign-in via verified ID token
+- `POST /api/auth/signin` - Email/password sign-in
+- `POST /api/auth/signup` - Email/password signup
+- `POST /api/auth/signout` - Sign out and clear session cookie
+- `GET /api/auth/session` - Get current session user
+- `GET /api/auth/quran-state` - Load authenticated user Quran state
+- `PUT /api/auth/quran-state` - Save authenticated user Quran state
+- `POST /api/auth/track` - User activity / tracking event capture
 
-### 1. **OpenAI API**
-- **Service:** Text embeddings and chat completions
-- **API Key:** `process.env.OPENAI_API_KEY`
-- **Used in:**
-  - `src/lib/embeddings.ts` - Generate embeddings for semantic search
-  - `src/lib/quran-qa.ts` - Answer Quran questions using RAG pattern
-
-#### Models Used:
-1. **text-embedding-3-small**
-   - **Used for:** Vector search, semantic similarity
-   - **Dimensions:** 1536
-   - **Functions:**
-     - `generateEmbedding(text)` - Single embedding
-     - `generateEmbeddingsBatch(texts)` - Batch embeddings
-
-2. **gpt-4o**
-   - **Used for:** AI Q&A about Quran
-   - **Max Tokens:** 500
-   - **Temperature:** 0.7
-   - **Function:** `answerQuranQuestion(question, useCache)`
+### Admin
+- `GET /api/admin/users` - Return user list and administrative summary
 
 ---
 
-## 🔎 SEARCH APIs
+## 🗄️ Database and storage
 
-### Internal Vector Search APIs
-- **Base:** MongoDB with vector search via Cosmos
-- **Endpoints:**
-  - `POST /api/vector/semantic-search` - Search Surahs and Ayahs by semantic meaning
-  - `POST /api/vector/qa` - Ask questions about Quran using RAG
-
-### Voice Search API
-- **Endpoint:** `POST /api/voice/search` - Voice-based FAQ search
-- **Data Source:** Local knowledge base (`VOICE_SEARCH_QUESTIONS`)
-
----
-
-## 🗄️ DATABASE APIs
-
-### MongoDB Atlas
-- **Collections Used:**
+### MongoDB
+- Connected via `src/lib/db/mongodb.ts`
+- Collections in use:
   - `quran_surahs` - Surah embeddings and metadata
-  - `quran_ayahs` - Ayah embeddings and translations
-  - `quran_qa_cache` - Cached Q&A responses
-  - `users` - User authentication and data
-- **Vector Search:** Cosmos vector search for semantic queries
+  - `quran_ayahs` - Ayah embeddings, text, and translations
+  - `quran_qa_cache` - Cached QA answers
+  - `users` - User accounts, bookmarks, favorites, last-read state
+- Vector search is implemented with MongoDB aggregation using Cosmos vector search operators
+- Default local URI fallback: `mongodb://127.0.0.1:27017/al-huda`
 
 ---
 
-## 🔐 AUTHENTICATION APIs
+## 🔐 Authentication and session
 
-### Google OAuth
-- **Endpoint:** `POST /api/auth/google`
-- **Used for:** Google sign-in authentication
-- **Library:** Google ID token verification
-- **Environment Variable:** `GOOGLE_CLIENT_ID`
+- Google ID tokens are verified using Google public certs and `GOOGLE_CLIENT_ID`
+- Session cookies are attached and validated in `src/lib/auth/session.ts`
+- Email/password auth uses `src/lib/auth/password.ts` and `src/lib/auth/users-store.ts`
+- User state and bookmarks are stored in the `users` collection
 
 ---
 
 ## 📊 API Usage Summary
 
-| API | Purpose | Type | Count |
-|-----|---------|------|-------|
-| quranapi.pages.dev | Quran text (Arabic, English, Urdu) | Text | 2 endpoints |
-| api.alquran.cloud | Surah details + Audio | Text + Audio | 3 endpoints |
-| api.quran.com | Tafsir (Commentary) | Text | 1 endpoint (4 versions) |
-| OpenAI | Embeddings + Q&A | AI/ML | 2 models |
-| Google OAuth | Authentication | Auth | 1 endpoint |
-| MongoDB | Data storage + search | Database | 4+ collections |
+| API / Service | Purpose | Type |
+|---|---|---|
+| `https://api.quran.com/api/v4` | Quran metadata, Arabic text, translations, recitations, Urdu Tafsir | External Quran API |
+| `https://ia801503.us.archive.org` | Urdu audio index data | External audio metadata |
+| OpenAI | Embeddings and AI-generated answers | AI/ML |
+| Google OAuth certs | Google ID token verification | Auth |
+| MongoDB | Data storage, vector search, cache | Database |
+| Local Next.js routes | Internal app APIs | Backend |
 
 ---
 
 ## 📈 Data Flow
 
-```
-User Query
-    ↓
-┌─────────────────────────────────────┐
-│ Internal APIs (Next.js Routes)      │
-└─────────────────────────────────────┘
-    ↓
-┌──────────────────────────────────────────────┐
-│ External APIs                                │
-├──────────────────────────────────────────────┤
-│ • QuranAPI.pages.dev (Text)                  │
-│ • Al-Quran Cloud (Text + Audio)              │
-│ • Quran.com (Tafsir)                         │
-│ • OpenAI (Embeddings + AI)                   │
-│ • MongoDB (Caching + Vector Search)          │
-│ • Google OAuth (Authentication)              │
-└──────────────────────────────────────────────┘
-    ↓
-Response to Client
-```
+User request → internal Next.js route → external API(s) / MongoDB → response
+
+Examples:
+- `/api/vector/semantic-search` → OpenAI embedding + MongoDB vector query
+- `/api/vector/qa` → OpenAI QA + MongoDB cache + ayah source retrieval
+- `/api/tafsir/ur` → Quran.com tafsir proxy
+- `/api/voice/search` → local FAQ search
+- `/api/auth/google` → Google certs + user session handling
 
 ---
 
 ## 🔄 Caching Strategy
-- **QuranAPI.pages.dev:** Force cache with 24-hour revalidation
-- **Al-Quran Cloud:** Force cache with 24-hour revalidation
-- **Quran.com:** Force cache with 24-hour revalidation
-- **Q&A Results:** MongoDB cache with 95% confidence for repeated questions
-- **Embeddings:** Generated on-demand, cached in MongoDB
+- Next.js revalidation / force-cache for Quran.com requests
+- MongoDB cache for QA and stored embeddings
+- Local browser/session caching handled by app routes and cookies
 
 ---
 
@@ -183,8 +146,8 @@ MONGODB_URI=mongodb+srv://...
 
 ## 📝 Notes
 
-- All external Quran APIs support **force-cache** strategy for performance
-- Audio files are served as direct URLs from Al-Quran Cloud
-- Semantic search requires OpenAI embeddings (1536 dimensions)
-- Tafsir retrieval tries 4 different sources (fallback mechanism)
-- Voice search uses local FAQ database (no external API calls)
+- Outdated `QuranAPI.pages.dev` and `api.alquran.cloud` references were removed.
+- The app now relies primarily on `api.quran.com` plus Archive.org Urdu audio metadata.
+- OpenAI is used for semantic search embeddings and RAG-based Q&A.
+- Google sign-in is implemented with server-side token verification and session cookies.
+- Voice search is implemented locally with a static FAQ dataset.

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Download, FileText, Headphones } from 'lucid
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AyahSidebar from '@/components/ayah-sidebar';
 import {
   getAyahAudioUrls,
   getAyahContent,
@@ -157,8 +158,21 @@ export default async function AyahDetailPage({
 
   const tafsirSnippet = tafsir ? stripHtml(tafsir.textHtml).slice(0, 280) : null;
 
+  console.log("surah: ", surah);
+
   return (
     <div className="pb-16 pt-10" data-slot="page-shell">
+      <AyahSidebar
+        surahId={surah.id}
+        surahName={surah.surahName.toLocaleLowerCase()}
+        ayahNumber={ayahNumber}
+        totalAyah={surah.totalAyah}
+        arabicText={ayah.arabicText || ''}
+        urduTranslation={ayah.urduTranslation || ''}
+        englishTranslation={ayah.englishTranslation || ''}
+        tafsirPath={canOpenTafsir ? tafsirPath : undefined}
+        surahPath={surahPath}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
