@@ -28,16 +28,21 @@ function normalizeSurahList(input: unknown): SurahListItem[] {
 
     acc.push({
       id,
-      surahName: String(item.surahName ?? ''),
-      surahNameArabic: String(item.surahNameArabic ?? ''),
+      surahName: String(item.surahName ?? item.name_simple ?? ''),
+      surahNameArabic: String(item.surahNameArabic ?? item.name_arabic ?? ''),
       surahNameArabicLong:
         item.surahNameArabicLong !== undefined
           ? String(item.surahNameArabicLong)
           : undefined,
-      surahNameTranslation: String(item.surahNameTranslation ?? ''),
-      revelationPlace: String(item.revelationPlace ?? ''),
-      totalAyah: Number(item.totalAyah ?? 0),
-      surahNo: Number(item.surahNo ?? id),
+      surahNameTranslation: String(
+        item.surahNameTranslation ??
+          (item.translated_name && typeof item.translated_name === 'object'
+            ? String((item.translated_name as Record<string, unknown>).name ?? '')
+            : '')
+      ),
+      revelationPlace: String(item.revelationPlace ?? item.revelation_place ?? ''),
+      totalAyah: Number(item.totalAyah ?? item.verses_count ?? 0),
+      surahNo: Number(item.surahNo ?? item.chapter_number ?? id),
       audio:
         typeof item.audio === 'object' && item.audio !== null
           ? (item.audio as SurahListItem['audio'])
