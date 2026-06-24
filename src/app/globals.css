@@ -237,14 +237,27 @@ select {
   line-height: 1.95;
   font-size: clamp(1.5rem, 3.8vw, 2rem);
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.04em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  word-spacing: 0.15em;
   font-variant-ligatures: contextual;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "liga" 1, "dlig" 1, "calt" 1, "ss01" 1, "ss02" 1;
 }
 
 .arabic-reading {
-  font-size: clamp(1.45rem, calc(1.15rem + 2.1vw), 2.15rem);
-  line-height: 2.08;
   font-size: calc(clamp(1.45rem, calc(1.15rem + 2.1vw), 2.15rem) * var(--arabic-font-scale));
+  line-height: 2.15;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  font-feature-settings: "liga" 1, "dlig" 1, "calt" 1, "ss01" 1;
+  text-rendering: optimizeLegibility;
 }
 
 .urdu-font {
