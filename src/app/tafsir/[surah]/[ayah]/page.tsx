@@ -12,10 +12,9 @@ import {
   sanitizeTafsirHtml,
   stripHtml,
 } from '@/lib/quran-server';
-import { getAllSurahs, resolveSurahParam } from '@/lib/quran-index';
-import { buildAyahPath, buildSurahPath, buildTafsirPath, buildSurahSlug } from '@/lib/quran-routing';
+import { resolveSurahParam } from '@/lib/quran-index';
+import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 import { buildBreadcrumbJsonLd, buildPageMetadata, getSiteOrigin } from '@/lib/seo';
-import { getAllTafsirRefs } from '@/lib/tafsir-index';
 
 interface TafsirPageProps {
   params: Promise<{
@@ -26,20 +25,8 @@ interface TafsirPageProps {
 
 export const revalidate = 86400;
 
-export function generateStaticParams() {
-  const tafsirRefs = getAllTafsirRefs();
-  const surahs = getAllSurahs();
-  const surahMap = new Map(surahs.map((s) => [s.id, s]));
-
-  return tafsirRefs.map((ref) => {
-    const surah = surahMap.get(ref.surahId);
-    if (!surah) return null;
-    return {
-      surah: buildSurahSlug(ref.surahId, ref.surahName),
-      ayah: String(ref.ayahNumber),
-    };
-  }).filter(Boolean);
-}
+// Pages are generated on first request (ISR) to keep production builds fast.
+export const dynamicParams = true;
 
 function parseAyahNumber(value: string) {
   const parsed = Number(value);

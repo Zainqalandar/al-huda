@@ -12,8 +12,8 @@ import {
   getUrduTafsirByAyah,
   stripHtml,
 } from '@/lib/quran-server';
-import { getAllSurahs, resolveSurahParam } from '@/lib/quran-index';
-import { buildAyahPath, buildSurahPath, buildTafsirPath, buildSurahSlug } from '@/lib/quran-routing';
+import { resolveSurahParam } from '@/lib/quran-index';
+import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
 
 interface AyahPageProps {
@@ -25,21 +25,8 @@ interface AyahPageProps {
 
 export const revalidate = 86400;
 
-export function generateStaticParams() {
-  const surahs = getAllSurahs();
-  const params: Array<{ surah: string; ayah: string }> = [];
-
-  surahs.forEach((surah) => {
-    for (let ayahNumber = 1; ayahNumber <= surah.totalAyah; ayahNumber++) {
-      params.push({
-        surah: buildSurahSlug(surah.id, surah.surahName),
-        ayah: String(ayahNumber),
-      });
-    }
-  });
-
-  return params;
-}
+// Pages are generated on first request (ISR) to keep production builds fast.
+export const dynamicParams = true;
 
 function parseAyahNumber(value: string) {
   const parsed = Number(value);

@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import StickyNavigatorMenuButton from '@/components/ui/StickyNavigatorMenuButton';
 import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSurahContext } from '@/hooks/useSurahContext';
@@ -391,6 +392,7 @@ export default function QuranReaderPage() {
   const [navigatorSearch, setNavigatorSearch] = useState('');
   const [expandedSurahId, setExpandedSurahId] = useState<number>(surahId);
   const navigatorListRef = useRef<HTMLDivElement | null>(null);
+  const navigatorMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const debouncedSearch = useDebouncedValue(searchInput, 280);
   const resumeTargetRef = useRef<HTMLButtonElement | null>(null);
@@ -1529,6 +1531,7 @@ export default function QuranReaderPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <Button
+                    ref={navigatorMenuButtonRef}
                     type="button"
                     size="icon"
                     variant="outline"
@@ -2124,6 +2127,14 @@ export default function QuranReaderPage() {
       </div>
       <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
       <StickyScrollNav />
+      <StickyNavigatorMenuButton
+        targetRef={navigatorMenuButtonRef}
+        isNavigatorOpen={isNavigatorOpen}
+        onOpen={() => {
+          setExpandedSurahId(surahId);
+          setIsNavigatorOpen(true);
+        }}
+      />
 
       {isNavigatorOpen ? (
         <div className="fixed inset-0 z-[85]">

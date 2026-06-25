@@ -7,6 +7,10 @@ export async function GET() {
 
   try {
     const chunkCount = await getHadithSitemapChunkCount();
+    if (!Number.isInteger(chunkCount) || chunkCount < 1) {
+      throw new Error('Invalid hadith sitemap chunk count');
+    }
+
     const items = [
       `<sitemap><loc>${origin}/sitemaps/hadith-collections</loc><lastmod>${updatedAt}</lastmod></sitemap>`,
       ...Array.from({ length: chunkCount }, (_, index) => {
