@@ -143,7 +143,7 @@ export default function AdminPage() {
         <Badge className="mb-2">Admin</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)]">Tracking Dashboard</h1>
         <p className="mt-2 text-sm text-[var(--color-muted-text)]">
-          Sirf logged-in users ka website usage aur audio watch time tracking.
+          Website usage and audio watch time tracking for logged-in users only.
         </p>
       </section>
 
@@ -155,7 +155,7 @@ export default function AdminPage() {
                 <LayoutDashboard className="size-5 text-[var(--color-accent)]" />
                 Admin Sidebar
               </CardTitle>
-              <CardDescription>Admin sections yahan se open karein.</CardDescription>
+              <CardDescription>Open admin sections from here.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <Link
@@ -254,7 +254,7 @@ export default function AdminPage() {
                 Usage Graph
               </CardTitle>
               <CardDescription>
-                Website aur audio usage ka visual comparison
+                Visual comparison of website and audio usage
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-5 lg:grid-cols-[1.45fr_1fr]">
@@ -314,7 +314,7 @@ export default function AdminPage() {
           <Card className="animate-fade-up-delay-2 border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_62%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface),white_15%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))]">
             <CardContent className="flex items-center gap-2 p-4 text-sm text-[var(--color-muted-text)]">
               <Gauge className="size-4 text-[var(--color-accent)]" />
-              Usage data sirf authenticated users ke liye track hota hai.
+              Usage data is tracked only for authenticated users.
             </CardContent>
           </Card>
         </section>

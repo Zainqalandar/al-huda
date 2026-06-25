@@ -1117,7 +1117,7 @@ export default function QuranReaderPage() {
       audio.currentTime = abRepeatStartSeconds;
       setAudioCurrentTime(abRepeatStartSeconds);
     } catch {
-      setAbRepeatError('A-B repeat start point apply nahi ho saka.');
+      setAbRepeatError('Could not apply A-B repeat start point.');
       setAbRepeatEnabled(false);
     }
   }, [abRepeatCount, abRepeatEnabled, abRepeatStartSeconds, audioSrc]);
@@ -1176,7 +1176,7 @@ export default function QuranReaderPage() {
       setAbRepeatCycle((currentCycle) => currentCycle + 1);
       setAbRepeatError(null);
     } catch {
-      setAbRepeatError('A-B repeat jump apply nahi ho saka.');
+      setAbRepeatError('Could not apply A-B repeat jump.');
       setAbRepeatEnabled(false);
     } finally {
       window.setTimeout(() => {
@@ -1246,12 +1246,12 @@ export default function QuranReaderPage() {
 
     const audio = audioRef.current;
     if (!audio || !audioSrc) {
-      setAbRepeatError('A-B repeat ke liye audio source ready hona chahiye.');
+      setAbRepeatError('Audio source must be ready before using A-B repeat.');
       return;
     }
 
     if (abRepeatStartSeconds === null || abRepeatEndSeconds === null) {
-      setAbRepeatError('A-B repeat start karne se pehle audio ko ek dafa play karein.');
+      setAbRepeatError('Play the audio once before starting A-B repeat.');
       return;
     }
 
@@ -1265,7 +1265,7 @@ export default function QuranReaderPage() {
       setAudioCurrentTime(abRepeatStartSeconds);
     } catch {
       setAbRepeatEnabled(false);
-      setAbRepeatError('A-B repeat start point seek nahi ho saka.');
+      setAbRepeatError('Could not seek to A-B repeat start point.');
       return;
     }
 
@@ -1278,7 +1278,7 @@ export default function QuranReaderPage() {
         setIsPlaying(false);
         setIsPlayPending(false);
         setAbRepeatEnabled(false);
-        setAbRepeatError('Audio play start nahi hui. Browser permission check karein.');
+        setAbRepeatError('Audio could not start. Check browser permissions.');
       }
     }
   };
@@ -1372,7 +1372,7 @@ export default function QuranReaderPage() {
       }
 
       const errorObject = loadError as { message?: string };
-      setTafseerError(errorObject.message ?? 'Urdu tafseer abhi load nahi ho saki.');
+      setTafseerError(errorObject.message ?? 'Urdu tafseer could not be loaded.');
     } finally {
       if (requestId === tafseerRequestRef.current) {
         setTafseerLoading(false);
@@ -1390,7 +1390,7 @@ export default function QuranReaderPage() {
       audioDuration > 0 ? audioDuration : getAudioDuration(audio);
 
     if (effectiveDuration <= 0) {
-      setAudioSourceError('Seek audio start hone ke baad available hogi.');
+      setAudioSourceError('Seek will be available after audio starts.');
       return;
     }
 
@@ -1401,14 +1401,14 @@ export default function QuranReaderPage() {
       setAudioDuration(effectiveDuration);
       setAudioSourceError(null);
     } catch {
-      setAudioSourceError('Seek is waqt apply nahi ho saki. Dubara try karein.');
+      setAudioSourceError('Could not apply seek right now. Please try again.');
     }
   };
 
   const jumpAudioBy = (seconds: number) => {
     const audio = audioRef.current;
     if (!audio || !audioSrc) {
-      setAudioSourceError('Audio source abhi ready nahi hai.');
+      setAudioSourceError('Audio source is not ready yet.');
       return;
     }
 
@@ -1432,7 +1432,7 @@ export default function QuranReaderPage() {
       }
       setAudioSourceError(null);
     } catch {
-      setAudioSourceError('Audio skip apply nahi ho saka.');
+      setAudioSourceError('Could not skip audio.');
     }
   };
 
@@ -1481,12 +1481,12 @@ export default function QuranReaderPage() {
   const toggleAudioPlay = async () => {
     const audio = audioRef.current;
     if (loadingAudioSource) {
-      setAudioSourceError('Audio source load ho rahi hai. Thora wait karein.');
+      setAudioSourceError('Audio source is loading. Please wait a moment.');
       return;
     }
 
     if (!audio || !audioSrc) {
-      setAudioSourceError('Audio source abhi ready nahi hai.');
+      setAudioSourceError('Audio source is not ready yet.');
       return;
     }
 
@@ -1518,7 +1518,7 @@ export default function QuranReaderPage() {
       .catch(() => {
         setIsPlaying(false);
         setIsPlayPending(false);
-        setAudioSourceError('Play start nahi ho saki. Dusri voice try karein.');
+        setAudioSourceError('Could not start playback. Try another reciter.');
       });
   };
 
@@ -2153,7 +2153,7 @@ export default function QuranReaderPage() {
                       Quran Navigator
                     </p>
                     <p className="mt-1 text-sm text-[var(--color-muted-text)]">
-                      Surah aur Ayah par direct jump karein.
+                      Jump directly to any surah or ayah.
                     </p>
                   </div>
                   <Button
@@ -2188,13 +2188,13 @@ export default function QuranReaderPage() {
               <div ref={navigatorListRef} className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
                 {surahListLoading ? (
                   <p className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3 text-sm text-[var(--color-muted-text)]">
-                    Surah list load ho rahi hai...
+                    Loading surah list...
                   </p>
                 ) : null}
 
                 {!surahListLoading && filteredNavigatorSurahs.length === 0 ? (
                   <p className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3 text-sm text-[var(--color-muted-text)]">
-                    Koi surah match nahi hui. Search change karein.
+                    No surahs matched your search. Try a different query.
                   </p>
                 ) : null}
 

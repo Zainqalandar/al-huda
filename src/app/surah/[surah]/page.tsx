@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: SurahPageProps): Promise<Meta
 
   const surah = resolved.surah;
   const title = `Surah ${surah.surahName} (${surah.surahNameArabic}) – Urdu & English Translation, Tilawat Audio`;
-  const description = `Surah ${surah.surahName} (${surah.surahNameTranslation}) read karein: Arabic text, Urdu/English translation tabs, tafseer panel, bookmarks, likes, aur audio playback/download options.`;
+  const description = `Read Surah ${surah.surahName} (${surah.surahNameTranslation}) with Arabic text, Urdu/English translation tabs, tafseer panel, bookmarks, likes, and audio playback/download options.`;
   const canonicalPath = buildSurahPath(surah.id, surah.surahName);
 
   return buildPageMetadata({

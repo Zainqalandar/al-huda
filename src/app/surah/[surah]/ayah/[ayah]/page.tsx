@@ -63,8 +63,8 @@ export async function generateMetadata({
     ? `Ayah ${surah.id}:${ayahNumber} (${surah.surahName}) – Arabic, Urdu & English Translation, Audio, Tafseer`
     : `Ayah ${surah.id}:${ayahNumber} (${surah.surahName}) – Arabic, Urdu & English Translation, Audio`;
   const fallbackDescription = canOpenTafsir
-    ? `Ayah ${surah.id}:${ayahNumber} ka Arabic text, Urdu aur English translation, Arabic + Urdu audio, aur tafseer link.`
-    : `Ayah ${surah.id}:${ayahNumber} ka Arabic text, Urdu aur English translation, aur Arabic + Urdu audio.`;
+    ? `Ayah ${surah.id}:${ayahNumber} Arabic text, Urdu and English translation, Arabic + Urdu audio, and tafseer link.`
+    : `Ayah ${surah.id}:${ayahNumber} Arabic text, Urdu and English translation, and Arabic + Urdu audio.`;
   const translationSnippet = [ayah?.urduTranslation, ayah?.englishTranslation]
     .map((value) => String(value ?? '').trim())
     .filter(Boolean)
@@ -194,8 +194,8 @@ export default async function AyahDetailPage({
           Ayah {surah.id}:{ayahNumber} • Surah {surah.surahName}
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--color-muted-text)] sm:text-base">
-          Arabic matn, Urdu aur English translation, downloadable audio, aur tafseer link
-          is page par available hai.
+          Arabic text, Urdu and English translation, downloadable audio, and tafseer links
+          are available on this page.
         </p>
       </section>
 
@@ -292,7 +292,7 @@ export default async function AyahDetailPage({
         ) : (
           <Card>
             <CardContent className="p-5 text-sm text-[var(--color-muted-text)]">
-              Is ayah ke liye tafseer abhi available nahi hai.
+              Tafseer is not available for this ayah yet.
             </CardContent>
           </Card>
         )}

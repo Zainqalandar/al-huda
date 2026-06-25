@@ -20,6 +20,7 @@ import type { AyahBookmark, LastReadEntry } from '@/types/quran';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import HomeFeatureTour from '@/components/home/home-feature-tour';
 import { getSurahById } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 
@@ -200,6 +201,7 @@ export default function HomeRoot() {
 
   return (
     <div className="pb-20 pt-10 sm:pt-16">
+      <HomeFeatureTour />
       <section className="relative overflow-hidden" data-slot="page-shell">
         <div className="pointer-events-none absolute -top-16 right-[-10%] size-60 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent),transparent_88%)_0%,transparent_72%)] opacity-60 blur-3xl animate-float" />
         <div className="pointer-events-none absolute -bottom-16 left-[-8%] size-64 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent-soft),transparent_90%)_0%,transparent_72%)] opacity-40 blur-3xl animate-float" />
@@ -218,26 +220,30 @@ export default function HomeRoot() {
               favorite surahs and bookmarks organized in one place.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg">
-                <Link
-                  href={lastReadPath}
-                >
-                  {hasLastRead ? 'Continue Reading' : 'Open Quran'}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/surah">
-                  <Settings2 className="size-4" />
-                  Quran Settings
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/read-quran-online">
-                  Read Quran Online
-                  <ChevronRight className="size-4" />
-                </Link>
-              </Button>
+              <span id="home-tour-primary-cta" className="inline-flex">
+                <Button asChild size="lg">
+                  <Link href={lastReadPath}>
+                    {hasLastRead ? 'Continue Reading' : 'Open Quran'}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </span>
+              <span id="home-tour-quran-settings" className="inline-flex">
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/surah">
+                    <Settings2 className="size-4" />
+                    Quran Settings
+                  </Link>
+                </Button>
+              </span>
+              <span id="home-tour-read-online" className="inline-flex">
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/read-quran-online">
+                    Read Quran Online
+                    <ChevronRight className="size-4" />
+                  </Link>
+                </Button>
+              </span>
             </div>
 
             <dl className="mt-8 grid gap-3 text-sm sm:grid-cols-4">
@@ -376,7 +382,7 @@ export default function HomeRoot() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-[var(--color-muted-text)]">
-              Urdu translation toggle aur ayah-wise tafseer panel Quran reader ke andar.
+              Urdu translation toggle and ayah-wise tafseer panel inside the Quran reader.
             </CardContent>
           </Card>
 

@@ -182,7 +182,7 @@ export default function AdminUsersPage() {
         <Badge className="mb-2">Admin</Badge>
         <h1 className="font-display text-4xl text-[var(--color-heading)]">Users Table</h1>
         <p className="mt-2 text-sm text-[var(--color-muted-text)]">
-          Login users, total time spent, aur audio watch time tracking.
+          Login users, total time spent, and audio watch time tracking.
         </p>
       </section>
 
@@ -194,7 +194,7 @@ export default function AdminUsersPage() {
                 <LayoutDashboard className="size-5 text-[var(--color-accent)]" />
                 Admin Sidebar
               </CardTitle>
-              <CardDescription>Admin sections yahan se open karein.</CardDescription>
+              <CardDescription>Open admin sections from here.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <Link
