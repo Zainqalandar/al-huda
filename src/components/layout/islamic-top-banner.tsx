@@ -62,7 +62,7 @@ export default function IslamicTopBanner() {
 
   return (
     <div
-      className="relative overflow-hidden border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_55%)] bg-[linear-gradient(90deg,color-mix(in_oklab,var(--color-accent),#0b2017_88%)_0%,color-mix(in_oklab,var(--color-accent-soft),#13382b_82%)_50%,color-mix(in_oklab,var(--color-accent),#1a1408_88%)_100%)] text-[var(--color-accent-foreground)]"
+      className="relative overflow-x-hidden border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_55%)] bg-[linear-gradient(90deg,color-mix(in_oklab,var(--color-accent),#0b2017_88%)_0%,color-mix(in_oklab,var(--color-accent-soft),#13382b_82%)_50%,color-mix(in_oklab,var(--color-accent),#1a1408_88%)_100%)] text-[var(--color-accent-foreground)]"
       role="region"
       aria-label="Islamic inspiration banner"
     >
@@ -74,7 +74,7 @@ export default function IslamicTopBanner() {
         }}
       />
 
-      <div className="relative mx-auto flex max-w-7xl items-center gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
+      <div className="relative mx-auto flex h-12 max-w-7xl items-center gap-2 px-3 sm:gap-3 sm:px-4">
         <div className="hidden shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] sm:flex">
           <Sparkles className="h-3 w-3" aria-hidden="true" />
           <span>{greeting}</span>
@@ -82,25 +82,39 @@ export default function IslamicTopBanner() {
 
         <div
           className={cn(
-            'min-w-0 flex-1 transition-all duration-300',
-            visible ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-0'
+            'flex h-10 min-w-0 flex-1 items-center gap-2 overflow-hidden sm:gap-3 transition-all duration-300',
+            visible ? 'translate-y-0 opacity-100' : 'translate-y-0.5 opacity-0'
           )}
         >
-          {item.arabic && (
-            <p
-              dir="rtl"
-              lang="ar"
-              className="truncate font-arabic-amiri text-sm leading-none sm:text-base"
-            >
-              {item.arabic}
+          {item.arabic ? (
+            <>
+              <p
+                dir="rtl"
+                lang="ar"
+                className="max-w-[46%] shrink-0 truncate font-arabic-amiri text-sm leading-normal sm:max-w-[40%] sm:text-[15px]"
+              >
+                {item.arabic}
+              </p>
+              <span
+                className="h-3.5 w-px shrink-0 bg-white/25"
+                aria-hidden="true"
+              />
+            </>
+          ) : null}
+
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+            <p className="min-w-0 truncate text-[11px] font-medium text-white/90 sm:text-sm">
+              {item.text}
             </p>
-          )}
-          <p className="mt-0.5 truncate text-[11px] font-medium text-white/90 sm:mt-1 sm:text-sm">
-            {item.text}
-            <span className="mx-2 hidden text-white/50 sm:inline">·</span>
-            <span className="hidden text-white/70 sm:inline">{item.source}</span>
-          </p>
-          <p className="truncate text-[10px] text-white/65 sm:hidden">{item.source}</p>
+            <span
+              className={cn(
+                'shrink-0 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] text-white/70 sm:text-[11px]',
+                item.arabic ? 'hidden sm:inline-flex' : 'inline-flex'
+              )}
+            >
+              {item.source}
+            </span>
+          </div>
         </div>
 
         {item.href && item.cta && (
