@@ -46,7 +46,7 @@ export default function HadithSearch() {
         />
         {isPending && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true">
-            <div className="h-4 w-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-accent)] border-t-transparent" />
           </div>
         )}
       </div>

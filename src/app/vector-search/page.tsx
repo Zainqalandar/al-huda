@@ -15,10 +15,10 @@ export default function VectorSearchPage() {
     <main className="min-h-screen bg-(--color-bg) container mx-auto px-4 py-12 max-w-4xl text-(--color-text)">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="mb-4 bg-[linear-gradient(135deg,var(--color-accent-soft),var(--color-accent))] bg-clip-text font-display text-4xl font-bold text-transparent md:text-5xl">
             AI-Powered Quran Explorer
           </h1>
-          <p className="text-lg text-(--color-text) mb-6">
+          <p className="mb-6 text-lg text-[var(--color-muted-text)]">
             Discover the Quran through semantic search and AI-powered insights
           </p>
 

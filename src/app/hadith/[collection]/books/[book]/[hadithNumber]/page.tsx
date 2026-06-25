@@ -128,10 +128,10 @@ export default async function HadithDetailPage({
 
         <header className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-[var(--color-heading)]">
               Hadith #{hadithNumber}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
+            <p className="mt-1 text-[var(--color-muted-text)]">
               {hadith.book.bookName} · {hadith.chapter.chapterEnglish}
             </p>
           </div>
@@ -139,36 +139,36 @@ export default async function HadithDetailPage({
         </header>
 
         {hadith.englishNarrator && (
-          <p className="text-emerald-700 dark:text-emerald-400 font-medium">
+          <p className="font-medium text-[var(--color-accent-soft)]">
             {hadith.englishNarrator}
           </p>
         )}
 
         {hadith.hadithArabic && (
-          <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-6 border-r-4 border-amber-400">
-            <ArabicText text={hadith.hadithArabic} size="lg" />
+          <div className="rounded-xl border-r-4 border-[var(--color-accent)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_92%)] p-6">
+            <ArabicText text={hadith.hadithArabic} size="lg" className="text-[var(--color-heading)]" />
           </div>
         )}
 
-        <div className="prose dark:prose-invert prose-emerald max-w-none">
-          <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-lg">
+        <div className="max-w-none">
+          <p className="text-lg leading-relaxed text-[var(--color-text)]">
             {hadith.hadithEnglish}
           </p>
         </div>
 
         {hadith.hadithUrdu && (
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-5">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
             <p
               dir="rtl"
               lang="ur"
-              className="text-gray-700 dark:text-gray-300 leading-loose text-right font-urdu-nastaliq text-lg"
+              className="text-right font-urdu-nastaliq text-lg leading-loose text-[var(--color-text)]"
             >
               {hadith.hadithUrdu}
             </p>
           </div>
         )}
 
-        <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3 border-t border-[var(--color-border)] pt-4">
           <HadithActions hadith={hadith} />
         </div>
 

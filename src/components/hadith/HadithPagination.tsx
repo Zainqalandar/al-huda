@@ -42,7 +42,7 @@ export default function HadithPagination({ currentPage, totalPages, baseUrl }: P
             aria-current={page === currentPage ? 'page' : undefined}
             className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm transition-colors ${
               page === currentPage
-                ? 'bg-[var(--color-accent)] text-white font-medium'
+                ? 'bg-[var(--color-accent)] font-medium text-[var(--color-accent-foreground)]'
                 : 'text-[var(--color-muted-text)] hover:bg-[var(--color-surface-2)] dark:hover:bg-[var(--color-surface-3)]'
             }`}
           >

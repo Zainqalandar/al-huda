@@ -40,7 +40,7 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
 
   if (results.hadiths.data.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-400">
+      <div className="py-16 text-center text-[var(--color-muted-text)]">
         <p className="text-lg">No hadiths found for "{query}"</p>
         <p className="text-sm mt-2">Try different keywords</p>
       </div>

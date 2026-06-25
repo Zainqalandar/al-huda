@@ -14,12 +14,12 @@ export default function HadithCard({ hadith, showBook = false }: HadithCardProps
 
   return (
     <article
-      className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 space-y-4"
+      className="space-y-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6"
       id={`hadith-${hadith.hadithNumber}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-mono text-[var(--color-muted-text)]">
+          <span className="font-mono text-sm text-[var(--color-muted-text)]">
             #{hadith.hadithNumber}
           </span>
           {showBook && (
@@ -32,18 +32,18 @@ export default function HadithCard({ hadith, showBook = false }: HadithCardProps
       </div>
 
       {hadith.englishNarrator && (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
+        <p className="text-sm font-medium text-[var(--color-accent-soft)]">
           {hadith.englishNarrator}
         </p>
       )}
 
       {hadith.hadithArabic && (
-        <div className="border-r-4 border-emerald-500 pr-4 py-2">
-          <ArabicText text={hadith.hadithArabic} size="md" />
+        <div className="rounded-xl border-r-4 border-[var(--color-accent)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_92%)] py-2 pr-4">
+          <ArabicText text={hadith.hadithArabic} size="md" className="text-[var(--color-heading)]" />
         </div>
       )}
 
-      <p className="text-[var(--color-text)] leading-relaxed text-base">
+      <p className="text-base leading-relaxed text-[var(--color-text)]">
         {hadith.hadithEnglish}
       </p>
 
@@ -51,16 +51,16 @@ export default function HadithCard({ hadith, showBook = false }: HadithCardProps
         <p
           dir="rtl"
           lang="ur"
-          className="text-[var(--color-text)] leading-loose text-right font-urdu-nastaliq"
+          className="text-right font-urdu-nastaliq leading-loose text-[var(--color-text)]"
         >
           {hadith.hadithUrdu}
         </p>
       )}
 
-      <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)]">
+      <div className="flex items-center justify-between border-t border-[var(--color-border)] pt-2">
         <Link
           href={detailUrl}
-          className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium"
+          className="text-sm font-medium text-[var(--color-accent-soft)] transition-colors hover:text-[var(--color-accent)]"
         >
           View details →
         </Link>

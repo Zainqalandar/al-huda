@@ -16,23 +16,28 @@ function normalizeGrade(raw: string): HadithGradeType {
 const gradeConfig: Record<HadithGradeType, { label: string; className: string }> = {
   Sahih: {
     label: 'Sahih',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    className:
+      'border border-[color-mix(in_oklab,#22c55e,var(--color-border)_50%)] bg-[color-mix(in_oklab,#22c55e,var(--color-surface)_88%)] text-[#166534] dark:text-[#86efac]',
   },
   Hasan: {
     label: 'Hasan',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    className:
+      'border border-[color-mix(in_oklab,#3b82f6,var(--color-border)_50%)] bg-[color-mix(in_oklab,#3b82f6,var(--color-surface)_88%)] text-[#1d4ed8] dark:text-[#93c5fd]',
   },
   Daif: {
     label: "Da'if",
-    className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    className:
+      'border border-[color-mix(in_oklab,#eab308,var(--color-border)_50%)] bg-[color-mix(in_oklab,#eab308,var(--color-surface)_88%)] text-[#a16207] dark:text-[#fde047]',
   },
   Maudu: {
     label: 'Maudu',
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    className:
+      'border border-[color-mix(in_oklab,var(--color-danger),var(--color-border)_50%)] bg-[color-mix(in_oklab,var(--color-danger),var(--color-surface)_88%)] text-[var(--color-danger)]',
   },
   Unknown: {
     label: 'Unknown',
-    className: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+    className:
+      'border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-muted-text)]',
   },
 };
 
@@ -42,7 +47,7 @@ export default function HadithGrade({ grade }: HadithGradeProps) {
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}
     >
       {config.label}
     </span>

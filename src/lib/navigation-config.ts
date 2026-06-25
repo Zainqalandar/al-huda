@@ -1,0 +1,303 @@
+import {
+  BookMarked,
+  BookOpenText,
+  BrainCircuit,
+  Compass,
+  Globe2,
+  Home,
+  Info,
+  Library,
+  MapPin,
+  MessageSquare,
+  Mic,
+  ScrollText,
+  Search,
+  Sparkles,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { buildSurahPath } from '@/lib/quran-routing';
+
+export interface NavLinkItem {
+  label: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+  exact?: boolean;
+  badge?: string;
+}
+
+export interface NavColumn {
+  title: string;
+  items: NavLinkItem[];
+}
+
+export interface MegaNavGroup {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  tagline: string;
+  columns: NavColumn[];
+  highlight?: NavLinkItem;
+}
+
+export interface SimpleNavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  exact?: boolean;
+}
+
+export const HOME_NAV: SimpleNavItem = {
+  label: 'Home',
+  href: '/',
+  icon: Home,
+  exact: true,
+};
+
+export const QURAN_MEGA_NAV: MegaNavGroup = {
+  id: 'quran',
+  label: 'Quran',
+  icon: BookOpenText,
+  tagline: 'Read, listen, and study the Holy Quran',
+  highlight: {
+    label: 'Surah Index',
+    description: 'All 114 surahs with Arabic, Urdu & English',
+    href: '/surah',
+    icon: Library,
+    badge: '114 Surahs',
+  },
+  columns: [
+    {
+      title: 'Read & Recite',
+      items: [
+        {
+          label: 'Surah Index',
+          description: 'Browse all 114 chapters of the Quran',
+          href: '/surah',
+          icon: BookOpenText,
+        },
+        {
+          label: 'Read Quran Online',
+          description: 'Full Quran reader with translations & audio',
+          href: '/read-quran-online',
+          icon: ScrollText,
+        },
+      ],
+    },
+    {
+      title: 'Study & Tafseer',
+      items: [
+        {
+          label: 'Urdu Tafseer',
+          description: 'Ayah-by-ayah Urdu tafseer commentary',
+          href: '/tafsir',
+          icon: BookMarked,
+        },
+      ],
+    },
+    {
+      title: 'Smart Search',
+      items: [
+        {
+          label: 'AI Semantic Search',
+          description: 'Find ayahs by meaning & topic',
+          href: '/vector-search',
+          icon: BrainCircuit,
+          badge: 'AI',
+        },
+        {
+          label: 'Voice Search',
+          description: 'Ask questions about the Quran naturally',
+          href: '/voice-search',
+          icon: Mic,
+        },
+      ],
+    },
+    {
+      title: 'Popular Surahs',
+      items: [
+        {
+          label: 'Surah Yaseen',
+          description: 'The heart of the Quran',
+          href: buildSurahPath(36, 'Yaseen'),
+          icon: Sparkles,
+        },
+        {
+          label: 'Surah Al-Kahf',
+          description: 'Recommended every Friday',
+          href: buildSurahPath(18, 'Al-Kahf'),
+          icon: Sparkles,
+        },
+        {
+          label: 'Surah Ar-Rahmaan',
+          description: 'The Most Merciful',
+          href: buildSurahPath(55, 'Ar-Rahmaan'),
+          icon: Sparkles,
+        },
+        {
+          label: 'Surah Al-Mulk',
+          description: 'Protection before sleep',
+          href: buildSurahPath(67, 'Al-Mulk'),
+          icon: Sparkles,
+        },
+      ],
+    },
+  ],
+};
+
+export const HADITH_MEGA_NAV: MegaNavGroup = {
+  id: 'hadith',
+  label: 'Hadith',
+  icon: BookMarked,
+  tagline: 'Authentic Prophetic traditions in three languages',
+  highlight: {
+    label: 'All Collections',
+    description: '60,000+ hadiths · Arabic · English · Urdu',
+    href: '/hadith',
+    icon: Library,
+    badge: '6 Books',
+  },
+  columns: [
+    {
+      title: 'Browse',
+      items: [
+        {
+          label: 'Hadith Collections',
+          description: 'Sahih Bukhari, Muslim & the six major books',
+          href: '/hadith',
+          icon: BookOpenText,
+          exact: true,
+        },
+        {
+          label: 'Search Hadiths',
+          description: 'Keyword search across all collections',
+          href: '/hadith/search',
+          icon: Search,
+          exact: true,
+        },
+      ],
+    },
+    {
+      title: 'Major Collections',
+      items: [
+        {
+          label: 'Sahih al-Bukhari',
+          description: 'The most authentic hadith collection',
+          href: '/hadith',
+          icon: BookMarked,
+        },
+        {
+          label: 'Sahih Muslim',
+          description: 'Second most authentic compilation',
+          href: '/hadith',
+          icon: BookMarked,
+        },
+        {
+          label: 'Sunan Abu Dawud',
+          description: 'Focus on legal hadiths',
+          href: '/hadith',
+          icon: BookMarked,
+        },
+        {
+          label: 'Jami at-Tirmidhi',
+          description: 'With grading of each narration',
+          href: '/hadith',
+          icon: BookMarked,
+        },
+      ],
+    },
+  ],
+};
+
+export const EXPLORE_MEGA_NAV: MegaNavGroup = {
+  id: 'explore',
+  label: 'Explore',
+  icon: Compass,
+  tagline: 'Learn more about Read al Quran',
+  columns: [
+    {
+      title: 'About Us',
+      items: [
+        {
+          label: 'About Read al Quran',
+          description: 'Our mission, features & vision',
+          href: '/about',
+          icon: Info,
+        },
+        {
+          label: 'Contact Us',
+          description: 'Questions, feedback & support',
+          href: '/contact',
+          icon: MessageSquare,
+        },
+      ],
+    },
+    {
+      title: 'Local Reading',
+      items: [
+        {
+          label: 'Karachi',
+          description: 'Read Quran online in Karachi',
+          href: '/cities/karachi',
+          icon: MapPin,
+        },
+        {
+          label: 'Lahore',
+          description: 'Read Quran online in Lahore',
+          href: '/cities/lahore',
+          icon: MapPin,
+        },
+        {
+          label: 'Islamabad',
+          description: 'Read Quran online in Islamabad',
+          href: '/cities/islamabad',
+          icon: MapPin,
+        },
+        {
+          label: 'Rawalpindi',
+          description: 'Read Quran online in Rawalpindi',
+          href: '/cities/rawalpindi',
+          icon: MapPin,
+        },
+      ],
+    },
+    {
+      title: 'Platform',
+      items: [
+        {
+          label: 'Read Quran Online',
+          description: 'Start reading with translations',
+          href: '/read-quran-online',
+          icon: Globe2,
+        },
+      ],
+    },
+  ],
+};
+
+export const MEGA_NAV_GROUPS: MegaNavGroup[] = [
+  QURAN_MEGA_NAV,
+  HADITH_MEGA_NAV,
+  EXPLORE_MEGA_NAV,
+];
+
+export function flattenMegaNavLinks(group: MegaNavGroup): NavLinkItem[] {
+  const links = group.columns.flatMap((column) => column.items);
+  if (group.highlight) {
+    return [group.highlight, ...links];
+  }
+  return links;
+}
+
+export function getAllMobileNavSections() {
+  return [
+    { id: 'main', title: 'Main', items: [HOME_NAV] },
+    ...MEGA_NAV_GROUPS.map((group) => ({
+      id: group.id,
+      title: group.label,
+      tagline: group.tagline,
+      items: flattenMegaNavLinks(group),
+    })),
+  ];
+}

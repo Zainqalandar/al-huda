@@ -12,6 +12,12 @@ interface SearchResult {
   relevance: string;
 }
 
+const inputClassName =
+  'w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] placeholder:text-[var(--color-muted-text)] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]';
+
+const primaryButtonClassName =
+  'inline-flex items-center justify-center gap-2 rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[linear-gradient(135deg,var(--color-accent-soft),var(--color-accent))] px-6 py-3 font-semibold text-[var(--color-accent-foreground)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50';
+
 export function SemanticSearch() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -52,10 +58,10 @@ export function SemanticSearch() {
   };
 
   return (
-    <div className="w-full space-y-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+    <div className="w-full space-y-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-soft)]">
       <div>
-        <h2 className="text-2xl font-bold">Semantic Search</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <h2 className="text-2xl font-bold text-[var(--color-heading)]">Semantic Search</h2>
+        <p className="mt-1 text-sm text-[var(--color-muted-text)]">
           Find Surahs by meaning and theme, not just keywords
         </p>
       </div>
@@ -68,97 +74,89 @@ export function SemanticSearch() {
               placeholder="e.g., Surahs about patience, guidance, healing..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClassName}
               disabled={loading}
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading || !query.trim()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-          >
+          <button type="submit" disabled={loading || !query.trim()} className={primaryButtonClassName}>
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Searching...
               </>
             ) : (
               <>
-                <Search className="w-4 h-4" />
+                <Search className="h-4 w-4" />
                 Search
               </>
             )}
           </button>
         </div>
 
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
+        <div className="flex gap-4 text-sm text-[var(--color-text)]">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="radio"
               name="searchType"
               value="surahs"
               checked={searchType === 'surahs'}
               onChange={(e) => setSearchType(e.target.value as 'surahs' | 'ayahs')}
-              className="w-4 h-4"
+              className="h-4 w-4 accent-[var(--color-accent)]"
             />
-            <span className="text-sm">Search Surahs</span>
+            <span>Search Surahs</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="radio"
               name="searchType"
               value="ayahs"
               checked={searchType === 'ayahs'}
               onChange={(e) => setSearchType(e.target.value as 'surahs' | 'ayahs')}
-              className="w-4 h-4"
+              className="h-4 w-4 accent-[var(--color-accent)]"
             />
-            <span className="text-sm">Search Ayahs</span>
+            <span>Search Ayahs</span>
           </label>
         </div>
       </form>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 dark:bg-red-900 dark:border-red-700 dark:text-red-100">
+        <div className="rounded-xl border border-[color-mix(in_oklab,var(--color-danger),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-danger),var(--color-surface)_90%)] p-4 text-[var(--color-danger)]">
           {error}
         </div>
       )}
 
       {results.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+          <p className="text-sm font-semibold text-[var(--color-muted-text)]">
             Found {results.length} results
           </p>
           {results.map((result, idx) => (
             <div
               key={`${result.surahId}-${idx}`}
-              className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="rounded-xl border border-[var(--color-border)] p-4 transition-colors hover:bg-[var(--color-surface-2)]"
             >
-              <div className="flex justify-between items-start mb-2">
+              <div className="mb-2 flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">
-                    {result.surahName}
-                  </p>
+                  <p className="font-semibold text-[var(--color-heading)]">{result.surahName}</p>
                   {result.surahNameArabic && (
-                    <p className="text-lg text-right mb-1">{result.surahNameArabic}</p>
+                    <p className="mb-1 text-right text-lg font-arabic-amiri text-[var(--color-heading)]">
+                      {result.surahNameArabic}
+                    </p>
                   )}
                   {result.surahNameTranslation && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {result.surahNameTranslation}
-                    </p>
+                    <p className="text-sm text-[var(--color-muted-text)]">{result.surahNameTranslation}</p>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-mono font-semibold text-blue-600 dark:text-blue-400">
+                  <p className="font-mono text-sm font-semibold text-[var(--color-accent-soft)]">
                     {(result.similarity * 100).toFixed(1)}%
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">
-                    {result.relevance}
-                  </p>
+                  <p className="text-xs capitalize text-[var(--color-muted-text)]">{result.relevance}</p>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div className="h-2 w-full rounded-full bg-[var(--color-surface-3)]">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all"
+                  className="h-2 rounded-full bg-[linear-gradient(90deg,var(--color-accent-soft),var(--color-accent))] transition-all"
                   style={{ width: `${result.similarity * 100}%` }}
                 />
               </div>
@@ -168,8 +166,8 @@ export function SemanticSearch() {
       )}
 
       {!loading && query && results.length === 0 && !error && (
-        <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-          No results found for "{query}"
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 text-center text-[var(--color-muted-text)]">
+          No results found for &quot;{query}&quot;
         </div>
       )}
     </div>

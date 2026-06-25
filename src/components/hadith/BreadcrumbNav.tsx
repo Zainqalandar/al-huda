@@ -24,22 +24,22 @@ export default function BreadcrumbNav({ items, includeSchema = true }: Breadcrum
         />
       )}
       <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
+        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-[var(--color-muted-text)]">
           {items.map((item, index) => (
             <li key={item.href} className="flex items-center gap-1.5">
               {index > 0 && (
-                <svg className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <svg className="h-3.5 w-3.5 text-[var(--color-border)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               )}
               {index === items.length - 1 ? (
-                <span className="text-gray-900 dark:text-white font-medium" aria-current="page">
+                <span className="font-medium text-[var(--color-heading)]" aria-current="page">
                   {item.label}
                 </span>
               ) : (
                 <Link
                   href={item.href}
-                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                  className="transition-colors hover:text-[var(--color-accent-soft)]"
                 >
                   {item.label}
                 </Link>

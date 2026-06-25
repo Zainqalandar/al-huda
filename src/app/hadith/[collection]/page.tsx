@@ -98,8 +98,8 @@ export default async function CollectionPage({
         <BreadcrumbNav items={navBreadcrumbs} includeSchema={false} />
 
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{book.bookName}</h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-[var(--color-heading)]">{book.bookName}</h1>
+          <p className="text-[var(--color-muted-text)]">
             By {book.writerName} ·{' '}
             <span className="font-medium">{book.hadiths_count.toLocaleString()} hadiths</span> ·{' '}
             {chapters.length} chapters
@@ -107,7 +107,7 @@ export default async function CollectionPage({
         </header>
 
         <section aria-labelledby="chapters-heading">
-          <h2 id="chapters-heading" className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 id="chapters-heading" className="mb-4 text-xl font-semibold text-[var(--color-heading)]">
             Chapters
           </h2>
           <div className="space-y-1">
@@ -118,22 +118,22 @@ export default async function CollectionPage({
                   chapter: chapter.chapterNumber,
                   page: 1,
                 })}
-                className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-white dark:hover:bg-gray-900 border border-transparent hover:border-gray-200 dark:hover:border-gray-800 transition-all group"
+                className="group flex items-center gap-4 rounded-lg border border-transparent px-4 py-3 transition-all hover:border-[var(--color-border)] hover:bg-[var(--color-surface-elevated)]"
               >
-                <span className="text-sm font-mono text-gray-400 w-8 shrink-0">
+                <span className="w-8 shrink-0 font-mono text-sm text-[var(--color-muted-text)]">
                   {chapter.chapterNumber}
                 </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-gray-800 dark:text-gray-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent-soft)]">
                     {chapter.chapterEnglish}
                   </p>
                   {chapter.chapterArabic && (
-                    <p dir="rtl" lang="ar" className="text-sm text-gray-400 mt-0.5 font-arabic-amiri">
+                    <p dir="rtl" lang="ar" className="mt-0.5 font-arabic-amiri text-sm text-[var(--color-muted-text)]">
                       {chapter.chapterArabic}
                     </p>
                   )}
                 </div>
-                <svg className="h-4 w-4 text-gray-300 group-hover:text-emerald-500 transition-colors shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <svg className="h-4 w-4 shrink-0 text-[var(--color-border)] transition-colors group-hover:text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

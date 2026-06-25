@@ -7,25 +7,25 @@ interface CollectionGridProps {
 
 export default function CollectionGrid({ collections }: CollectionGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {collections.map((collection) => (
         <Link
           key={collection.bookSlug}
           href={`/hadith/${collection.bookSlug}`}
-          className="group block bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-accent)] dark:hover:border-[var(--color-accent-soft)] hover:shadow-sm transition-all"
+          className="group block rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition-all hover:border-[var(--color-accent)] hover:shadow-[var(--shadow-soft)]"
         >
-          <div className="flex items-start justify-between mb-3">
-            <h2 className="font-semibold text-[var(--color-heading)] group-hover:text-[var(--color-accent)] dark:group-hover:text-[var(--color-accent-soft)] transition-colors">
+          <div className="mb-3 flex items-start justify-between">
+            <h2 className="font-semibold text-[var(--color-heading)] transition-colors group-hover:text-[var(--color-accent-soft)]">
               {collection.bookName}
             </h2>
-            <span className="text-xs bg-[var(--color-surface-2)] text-[var(--color-muted-text)] px-2 py-0.5 rounded-full shrink-0 ml-2">
+            <span className="ml-2 shrink-0 rounded-full bg-[var(--color-surface-2)] px-2 py-0.5 text-xs text-[var(--color-muted-text)]">
               {collection.hadiths_count.toLocaleString()}
             </span>
           </div>
-          <p className="text-sm text-[var(--color-muted-text)] line-clamp-2">
+          <p className="line-clamp-2 text-sm text-[var(--color-muted-text)]">
             {collection.writerName}
           </p>
-          <p className="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
+          <p className="mt-3 inline-block text-xs font-medium text-[var(--color-accent-soft)] transition-transform group-hover:translate-x-1">
             Browse collection →
           </p>
         </Link>

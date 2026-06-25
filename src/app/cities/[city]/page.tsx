@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildCityPageSchema, toAbsoluteUrl } from '@/lib/seo';
 import { CITY_KEYWORDS } from '@/lib/seo-keywords';
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   const { city } = await params;
   const cityData = cityInfo[city];
   const keywords = CITY_KEYWORDS[city as CityType] || [];
-  
+
   return {
     title: `Read Quran Online in ${cityData.name}, Pakistan | Read al Quran`,
     description: `Read al Quran app available in ${cityData.name}. Free Quran reader with Urdu translation, tafseer, audio.`,
@@ -42,18 +43,54 @@ export default async function CityPage({ params }: CityPageProps) {
   const cityData = cityInfo[city];
   const citySchema = buildCityPageSchema(cityData.name);
 
+  const features = [
+    { icon: '📖', title: 'Free', description: 'Completely free Quran app' },
+    { icon: '🎧', title: 'Audio', description: 'Listen to recitations' },
+    { icon: '🔤', title: 'Tafseer', description: 'Urdu translation & tafseer' },
+  ];
+
   return (
-    <main className="min-h-screen bg-linear-to-br from-slate-950 to-slate-900">
+    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-4">Read al Quran in {cityData.name}</h1>
-          <p className="text-xl text-slate-300 mb-8">Free Quran reader for {cityData.population} in {cityData.fullName}</p>
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="bg-slate-800 p-6 rounded-lg"><h3 className="text-amber-500 mb-2">📖 Free</h3><p className="text-slate-300">Completely free Quran app</p></div>
-            <div className="bg-slate-800 p-6 rounded-lg"><h3 className="text-amber-500 mb-2">🎧 Audio</h3><p className="text-slate-300">Listen to recitations</p></div>
-            <div className="bg-slate-800 p-6 rounded-lg"><h3 className="text-amber-500 mb-2">🔤 Tafseer</h3><p className="text-slate-300">Urdu translation</p></div>
+        <div className="mx-auto max-w-4xl">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
+            Local Reading · Pakistan
+          </p>
+          <h1 className="mb-4 font-display text-4xl font-bold text-[var(--color-heading)] sm:text-5xl">
+            Read al Quran in {cityData.name}
+          </h1>
+          <p className="mb-10 text-lg text-[var(--color-muted-text)] sm:text-xl">
+            Free Quran reader for {cityData.population} in {cityData.fullName}
+          </p>
+
+          <div className="mb-10 grid gap-4 md:grid-cols-3">
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-soft)]"
+              >
+                <h3 className="mb-2 text-lg font-semibold text-[var(--color-accent-soft)]">
+                  {feature.icon} {feature.title}
+                </h3>
+                <p className="text-sm text-[var(--color-muted-text)]">{feature.description}</p>
+              </div>
+            ))}
           </div>
-          <a href="/" className="inline-block px-8 py-3 bg-amber-500 text-white font-bold rounded-lg">Open Read al Quran</a>
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_40%)] bg-[linear-gradient(135deg,var(--color-accent-soft),var(--color-accent))] px-8 py-3 font-bold text-[var(--color-accent-foreground)] shadow-[0_4px_14px_-6px_color-mix(in_oklab,var(--color-accent),transparent_30%)] transition hover:brightness-110"
+            >
+              Open Read al Quran
+            </Link>
+            <Link
+              href="/surah"
+              className="inline-flex items-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-8 py-3 font-semibold text-[var(--color-heading)] transition hover:border-[var(--color-accent-soft)] hover:bg-[var(--color-surface-2)]"
+            >
+              Browse Surahs
+            </Link>
+          </div>
         </div>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(citySchema) }} />

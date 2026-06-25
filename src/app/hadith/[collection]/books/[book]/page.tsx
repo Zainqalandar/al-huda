@@ -114,10 +114,10 @@ export default async function BookPage({
         <BreadcrumbNav items={navBreadcrumbs} includeSchema={false} />
 
         <header>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-[var(--color-heading)]">
             {chapterMeta ? chapterMeta.chapterEnglish : bookData.bookName}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="mt-1 text-[var(--color-muted-text)]">
             {chapterMeta ? `${bookData.bookName} · ` : ''}
             Showing {hadithsData.hadiths.from}–{hadithsData.hadiths.to} of{' '}
             {hadithsData.hadiths.total.toLocaleString()} hadiths
