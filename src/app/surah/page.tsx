@@ -57,7 +57,7 @@ export default async function SurahIndexPage({
 
   return (
     <div className="pb-20 pt-8 md:pt-12" data-slot="page-shell">
-      <section className="mb-10 animate-fade-up">
+      <section className="mb-10">
         {/* Header Section with Enhanced Design */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
@@ -68,8 +68,8 @@ export default async function SurahIndexPage({
               114 Surahs
             </Badge>
           </div>
-          
-          <h1 className="font-display text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--color-heading)] to-[var(--color-accent)] bg-clip-text text-transparent mb-4">
+
+          <h1 className="font-display text-5xl md:text-6xl font-bold text-[var(--color-heading)] mb-4">
             Surah Index
           </h1>
           

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   BookOpen,
   BookOpenText,
@@ -22,6 +22,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import SurahFeatureTour from '@/components/quran/surah-feature-tour';
 import { buildSurahPath } from '@/lib/quran-routing';
 import type { SurahIndexEntry } from '@/lib/quran-index';
 
@@ -139,11 +140,20 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
     );
   }, [searchQuery, revelationFilter, lengthPreset, minAyahs, maxAyahs, sortBy, sortDirection]);
 
+  const handleTourStepChange = useCallback((stepId: string) => {
+    setIsFiltersOpen(stepId === 'filters');
+  }, []);
+
+  const handleTourClose = useCallback(() => {
+    setIsFiltersOpen(false);
+  }, []);
+
   return (
     <div className="space-y-6">
+      <SurahFeatureTour onStepChange={handleTourStepChange} onClose={handleTourClose} />
       {/* Search Bar & Advanced Toggle Row */}
       <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1">
+        <div id="surah-tour-search" className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-[var(--color-muted-text)] pointer-events-none" />
           <input
             id="surah-search"
@@ -164,6 +174,7 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
         </div>
 
         <Button
+          id="surah-tour-filters"
           type="button"
           variant={isFiltersOpen || isFiltered ? 'default' : 'outline'}
           className={`h-auto py-3 px-5 rounded-xl border-2 font-medium flex items-center justify-center gap-2 text-sm md:text-base transition-all ${
@@ -180,7 +191,7 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
       </div>
 
       {/* Quick Tabs with Icons */}
-      <div className="flex flex-wrap gap-2 border-b border-[var(--color-border)] pb-4">
+      <div id="surah-tour-quick-tabs" className="flex flex-wrap gap-2 border-b border-[var(--color-border)] pb-4">
         <button
           onClick={() => setRevelationFilter('all')}
           className={`flex items-center   gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${

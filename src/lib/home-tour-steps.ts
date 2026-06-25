@@ -1,14 +1,8 @@
-export interface HomeTourStep {
-  id: string;
-  targetId?: string;
-  title: string;
-  description: string;
-  placement?: 'bottom' | 'top';
-}
+import type { FeatureTourStep } from '@/lib/feature-tour-types';
 
 export const HOME_TOUR_STORAGE_KEY = 'readalquran-home-tour-completed';
 
-export const HOME_TOUR_STEPS: HomeTourStep[] = [
+export const HOME_TOUR_STEPS: FeatureTourStep[] = [
   {
     id: 'welcome',
     title: 'Welcome to Read al Quran',
