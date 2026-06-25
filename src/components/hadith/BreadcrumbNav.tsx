@@ -1,28 +1,28 @@
 import Link from 'next/link';
 import type { BreadcrumbItem } from '@/lib/hadith/types/hadith.types';
+import { buildBreadcrumbJsonLd } from '@/lib/seo';
 
 interface BreadcrumbNavProps {
   items: BreadcrumbItem[];
+  includeSchema?: boolean;
 }
 
-export default function BreadcrumbNav({ items }: BreadcrumbNavProps) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
+export default function BreadcrumbNav({ items, includeSchema = true }: BreadcrumbNavProps) {
+  const jsonLd = buildBreadcrumbJsonLd(
+    items.map((item) => ({
       name: item.label,
-      item: `https://readalquran.online${item.href}`,
-    })),
-  };
+      item: item.href,
+    }))
+  );
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {includeSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <nav aria-label="Breadcrumb" className="mb-6">
         <ol className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
           {items.map((item, index) => (

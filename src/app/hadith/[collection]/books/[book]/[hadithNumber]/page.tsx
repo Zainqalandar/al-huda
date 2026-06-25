@@ -7,6 +7,17 @@ import HadithNavigation from '@/components/hadith/HadithNavigation';
 import BreadcrumbNav from '@/components/hadith/BreadcrumbNav';
 import { getCollectionBySlug } from '@/lib/hadith/collections.service';
 import { getHadithByNumber } from '@/lib/hadith/hadith.service';
+import {
+  buildHadithCollectionPath,
+  buildHadithDetailPath,
+  buildHadithOgImagePath,
+} from '@/lib/hadith/hadith-routing';
+import { buildHadithDetailKeywords } from '@/lib/seo-keywords';
+import {
+  buildBreadcrumbJsonLd,
+  buildHadithArticleJsonLd,
+  buildPageMetadata,
+} from '@/lib/seo';
 
 export const revalidate = false;
 
@@ -20,24 +31,28 @@ export async function generateMetadata({
   if (!hadith) return {};
 
   const description = hadith.hadithEnglish.slice(0, 155).trim();
-  const canonicalUrl = `https://readalquran.online/hadith/${collection}/books/${collection}/${hadithNumber}`;
+  const path = buildHadithDetailPath(collection, hadithNumber);
+  const title = `Hadith ${hadithNumber} – ${hadith.book.bookName}`;
 
-  return {
-    title: `Hadith ${hadithNumber} — ${hadith.book.bookName} | ReadAlQuran`,
+  return buildPageMetadata({
+    title,
     description,
-    alternates: { canonical: canonicalUrl },
-    openGraph: {
-      title: `Hadith ${hadithNumber} — ${hadith.book.bookName}`,
-      description,
-      url: canonicalUrl,
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary',
-      title: `Hadith ${hadithNumber} — ${hadith.book.bookName}`,
-      description,
-    },
-  };
+    path,
+    ogType: 'article',
+    keywords: buildHadithDetailKeywords({
+      bookName: hadith.book.bookName,
+      writerName: hadith.book.writerName,
+      hadithNumber,
+      chapterEnglish: hadith.chapter.chapterEnglish,
+      grade: hadith.status,
+    }),
+    author: hadith.englishNarrator || hadith.book.writerName,
+    imageUrl: buildHadithOgImagePath({
+      variant: 'detail',
+      bookName: hadith.book.bookName,
+      hadithNumber,
+    }),
+  });
 }
 
 export default async function HadithDetailPage({
@@ -54,38 +69,62 @@ export default async function HadithDetailPage({
 
   if (!hadith || !bookData) notFound();
 
-  const canonicalUrl = `https://readalquran.online/hadith/${collection}/books/${collection}/${hadithNumber}`;
+  const detailPath = buildHadithDetailPath(collection, hadithNumber);
+  const collectionPath = buildHadithCollectionPath(collection);
+  const title = `Hadith ${hadithNumber} – ${hadith.book.bookName}`;
+  const description = hadith.hadithEnglish.slice(0, 155).trim();
+  const keywords = buildHadithDetailKeywords({
+    bookName: hadith.book.bookName,
+    writerName: hadith.book.writerName,
+    hadithNumber,
+    chapterEnglish: hadith.chapter.chapterEnglish,
+    grade: hadith.status,
+  });
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: `Hadith ${hadithNumber} — ${hadith.book.bookName}`,
-    description: hadith.hadithEnglish.slice(0, 155),
-    url: canonicalUrl,
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: 'Home', item: '/' },
+    { name: 'Hadith', item: '/hadith' },
+    { name: bookData.bookName, item: collectionPath },
+    { name: `Hadith ${hadithNumber}`, item: detailPath },
+  ]);
+
+  const articleJsonLd = buildHadithArticleJsonLd({
+    title,
+    description,
+    content: hadith.hadithEnglish,
+    path: detailPath,
+    author: hadith.englishNarrator || undefined,
+    bookName: hadith.book.bookName,
+    bookAuthor: hadith.book.writerName,
+    keywords,
     inLanguage: ['en', 'ar', 'ur'],
-    isPartOf: {
-      '@type': 'Book',
-      name: hadith.book.bookName,
-      author: { '@type': 'Person', name: hadith.book.writerName },
-    },
-  };
+    imageUrl: buildHadithOgImagePath({
+      variant: 'detail',
+      bookName: hadith.book.bookName,
+      hadithNumber,
+    }),
+  });
 
-  const breadcrumbs = [
+  const navBreadcrumbs = [
     { label: 'Home', href: '/' },
     { label: 'Hadith', href: '/hadith' },
-    { label: bookData.bookName, href: `/hadith/${collection}` },
-    { label: `Hadith ${hadithNumber}`, href: canonicalUrl },
+    { label: bookData.bookName, href: collectionPath },
+    { label: `Hadith ${hadithNumber}`, href: detailPath },
   ];
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
 
       <div className="space-y-6 max-w-3xl">
-        <BreadcrumbNav items={breadcrumbs} />
+        <BreadcrumbNav items={navBreadcrumbs} includeSchema={false} />
 
         <header className="flex items-start justify-between gap-4">
           <div>

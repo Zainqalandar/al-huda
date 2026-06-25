@@ -1,40 +1,29 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import CollectionGrid from '@/components/hadith/CollectionGrid';
 import { getAllCollections } from '@/lib/hadith/collections.service';
+import { buildHadithIndexPath, buildHadithOgImagePath } from '@/lib/hadith/hadith-routing';
+import { GLOBAL_HADITH_SEO_KEYWORDS } from '@/lib/seo-keywords';
+import { buildCollectionPageJsonLd, buildPageMetadata } from '@/lib/seo';
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: 'Hadith Collections | ReadAlQuran',
+export const metadata = buildPageMetadata({
+  title: 'Hadith Collections – Sahih Bukhari, Muslim & Six Books Online',
   description:
-    'Browse authentic Hadith collections including Sahih Bukhari, Sahih Muslim, Abu Dawud, Tirmidhi, Nasai, and Ibn Majah with English and Urdu translations.',
-  alternates: {
-    canonical: 'https://readalquran.online/hadith',
-  },
-  openGraph: {
-    title: 'Hadith Collections | ReadAlQuran',
-    description: 'Browse authentic Hadith collections with English and Urdu translations.',
-    url: 'https://readalquran.online/hadith',
-    type: 'website',
-  },
-};
+    'Browse authentic Hadith collections including Sahih Bukhari, Sahih Muslim, Abu Dawud, Tirmidhi, Nasai, and Ibn Majah with Arabic, English and Urdu translations.',
+  path: buildHadithIndexPath(),
+  keywords: GLOBAL_HADITH_SEO_KEYWORDS,
+  imageUrl: buildHadithOgImagePath({ variant: 'index' }),
+});
 
 export default async function HadithPage() {
   const collections = await getAllCollections();
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const jsonLd = buildCollectionPageJsonLd({
     name: 'Hadith Collections',
-    description: 'Complete collection of authentic Hadith books',
-    url: 'https://readalquran.online/hadith',
-    publisher: {
-      '@type': 'Organization',
-      name: 'ReadAlQuran',
-      url: 'https://readalquran.online',
-    },
-  };
+    description: 'Complete collection of authentic Hadith books with Arabic, English and Urdu translations.',
+    path: buildHadithIndexPath(),
+  });
 
   return (
     <>

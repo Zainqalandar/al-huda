@@ -10,22 +10,33 @@ function sanitize(input: string | null, fallback: string) {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const kind = sanitize(searchParams.get('kind'), 'quran');
+  const variant = sanitize(searchParams.get('variant'), 'index');
+  const book = sanitize(searchParams.get('book'), '');
+  const hadithNumber = sanitize(searchParams.get('number'), '');
   const surah = sanitize(searchParams.get('surah'), '');
   const ayah = sanitize(searchParams.get('ayah'), '');
 
   const title =
-    kind === 'tafsir'
-      ? `Urdu Tafseer ${surah && ayah ? `${surah}:${ayah}` : ''}`.trim()
-      : kind === 'ayah'
-        ? `Ayah ${surah && ayah ? `${surah}:${ayah}` : ''}`.trim()
-        : kind === 'surah'
-          ? `Surah ${surah}`.trim()
-          : 'Read al Quran';
+    kind === 'hadith'
+      ? variant === 'detail' && book && hadithNumber
+        ? `Hadith ${hadithNumber} – ${book}`.trim()
+        : variant === 'collection' && book
+          ? book
+          : 'Hadith Collections'
+      : kind === 'tafsir'
+        ? `Urdu Tafseer ${surah && ayah ? `${surah}:${ayah}` : ''}`.trim()
+        : kind === 'ayah'
+          ? `Ayah ${surah && ayah ? `${surah}:${ayah}` : ''}`.trim()
+          : kind === 'surah'
+            ? `Surah ${surah}`.trim()
+            : 'Read al Quran';
 
   const subtitle =
-    kind === 'surah-index'
-      ? 'Surah Index • Arabic • Urdu • Audio'
-      : 'Arabic Text • Urdu Translation • Audio';
+    kind === 'hadith'
+      ? 'Arabic • English • Urdu • Authentic Collections'
+      : kind === 'surah-index'
+        ? 'Surah Index • Arabic • Urdu • Audio'
+        : 'Arabic Text • Urdu Translation • Audio';
 
   return new ImageResponse(
     (
@@ -37,7 +48,9 @@ export async function GET(request: Request) {
           flexDirection: 'column',
           justifyContent: 'space-between',
           background:
-            'linear-gradient(135deg, #0b2017 0%, #13382b 40%, #1f5843 100%)',
+            kind === 'hadith'
+              ? 'linear-gradient(135deg, #1a1408 0%, #3d2e10 40%, #5c4518 100%)'
+              : 'linear-gradient(135deg, #0b2017 0%, #13382b 40%, #1f5843 100%)',
           color: '#ecfff8',
           padding: '72px',
           fontFamily: 'system-ui',

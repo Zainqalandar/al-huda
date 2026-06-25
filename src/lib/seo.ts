@@ -267,11 +267,18 @@ export function buildWebsiteJsonLd() {
     url: siteOrigin,
     description: SITE_DESCRIPTION,
     inLanguage: ['en', 'ur', 'ar'],
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${siteOrigin}/surah?search={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
+    potentialAction: [
+      {
+        '@type': 'SearchAction',
+        target: `${siteOrigin}/surah?search={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+      {
+        '@type': 'SearchAction',
+        target: `${siteOrigin}/hadith/search?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+    ],
   };
 }
 
@@ -419,13 +426,126 @@ export function buildSearchActionJsonLd() {
     '@type': 'WebSite',
     name: SITE_NAME,
     url: siteOrigin,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${siteOrigin}/search?q={search_term_string}`,
+    potentialAction: [
+      {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${siteOrigin}/surah?search={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
       },
-      'query-input': 'required name=search_term_string',
+      {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${siteOrigin}/hadith/search?q={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    ],
+  };
+}
+
+export function buildCollectionPageJsonLd(options: {
+  name: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: options.name,
+    description: options.description,
+    url: toAbsoluteUrl(options.path),
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: siteOrigin,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: siteOrigin,
+      logo: toAbsoluteUrl('/logos/logo1.png'),
+    },
+  };
+}
+
+export function buildBookJsonLd(options: {
+  name: string;
+  description: string;
+  path: string;
+  author: string;
+  numberOfPages?: number;
+  inLanguage?: string[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: options.name,
+    description: options.description,
+    url: toAbsoluteUrl(options.path),
+    author: {
+      '@type': 'Person',
+      name: options.author,
+    },
+    ...(options.numberOfPages && { numberOfPages: options.numberOfPages }),
+    ...(options.inLanguage && { inLanguage: options.inLanguage }),
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: siteOrigin,
+    },
+  };
+}
+
+export function buildHadithArticleJsonLd(options: {
+  title: string;
+  description: string;
+  content: string;
+  path: string;
+  imageUrl?: string;
+  author?: string;
+  bookName: string;
+  bookAuthor: string;
+  keywords?: string[];
+  inLanguage?: string[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: options.title,
+    description: options.description,
+    articleBody: options.content,
+    url: toAbsoluteUrl(options.path),
+    ...(options.imageUrl && {
+      image: {
+        '@type': 'ImageObject',
+        url: toAbsoluteUrl(options.imageUrl),
+      },
+    }),
+    ...(options.author && {
+      author: {
+        '@type': 'Person',
+        name: options.author,
+      },
+    }),
+    ...(options.inLanguage && { inLanguage: options.inLanguage }),
+    ...(options.keywords && { keywords: options.keywords.join(', ') }),
+    isPartOf: {
+      '@type': 'Book',
+      name: options.bookName,
+      author: {
+        '@type': 'Person',
+        name: options.bookAuthor,
+      },
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: siteOrigin,
+      logo: toAbsoluteUrl('/logos/logo1.png'),
     },
   };
 }

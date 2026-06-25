@@ -2,12 +2,15 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import HadithSearch from '@/components/hadith/HadithSearch';
 import { getAllCollections } from '@/lib/hadith/collections.service';
+import { getSiteName } from '@/lib/seo';
 import { Suspense } from 'react';
+
+const siteName = getSiteName();
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Hadith | ReadAlQuran',
-    default: 'Hadith Collections | ReadAlQuran',
+    template: `%s | Hadith | ${siteName}`,
+    default: `Hadith Collections | ${siteName}`,
   },
 };
 

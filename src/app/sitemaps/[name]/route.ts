@@ -1,5 +1,17 @@
 import { getAllSurahs } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
+import { getAllCollections, getChaptersByCollection } from '@/lib/hadith/collections.service';
+import {
+  getAllHadithRefs,
+  getHadithChunkNumber,
+  HADITH_SITEMAP_CHUNK_SIZE,
+} from '@/lib/hadith/hadith-index';
+import {
+  buildHadithBookPath,
+  buildHadithCollectionPath,
+  buildHadithDetailPath,
+  buildHadithIndexPath,
+} from '@/lib/hadith/hadith-routing';
 import { getSiteOrigin } from '@/lib/seo';
 import { getAllTafsirRefs } from '@/lib/tafsir-index';
 
@@ -99,6 +111,70 @@ export async function GET(
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
+  }
+
+  if (normalizedName === 'hadith-collections') {
+    try {
+      const collections = await getAllCollections();
+      const hadithUrls = [`${origin}${buildHadithIndexPath()}`];
+
+      for (const collection of collections) {
+        hadithUrls.push(`${origin}${buildHadithCollectionPath(collection.bookSlug)}`);
+        hadithUrls.push(`${origin}${buildHadithBookPath(collection.bookSlug)}`);
+
+        const chapters = await getChaptersByCollection(collection.bookSlug);
+        for (const chapter of chapters) {
+          hadithUrls.push(
+            `${origin}${buildHadithBookPath(collection.bookSlug, {
+              chapter: chapter.chapterNumber,
+              page: 1,
+            })}`
+          );
+        }
+      }
+
+      return new Response(renderUrlSet(hadithUrls, 'weekly', '0.85'), {
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
+      });
+    } catch (error) {
+      console.warn('Hadith collections sitemap failed:', error);
+      return new Response(renderUrlSet([`${origin}${buildHadithIndexPath()}`], 'weekly', '0.85'), {
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
+      });
+    }
+  }
+
+  const hadithChunk = getHadithChunkNumber(normalizedName);
+  if (hadithChunk) {
+    try {
+      const refs = await getAllHadithRefs();
+      const start = (hadithChunk - 1) * HADITH_SITEMAP_CHUNK_SIZE;
+      const chunk = refs.slice(start, start + HADITH_SITEMAP_CHUNK_SIZE);
+
+      if (chunk.length === 0) {
+        return new Response('Not found.', { status: 404 });
+      }
+
+      const urls = chunk.map((entry) => {
+        return `${origin}${buildHadithDetailPath(entry.collectionSlug, entry.hadithNumber)}`;
+      });
+
+      return new Response(renderUrlSet(urls, 'monthly', '0.75'), {
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
+      });
+    } catch (error) {
+      console.warn('Hadith detail sitemap chunk failed:', error);
+      return new Response('Sitemap data unavailable.', { status: 500 });
+    }
   }
 
   const ayahChunk = getAyahChunk(normalizedName);

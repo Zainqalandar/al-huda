@@ -3,6 +3,9 @@ import { Suspense } from 'react';
 import HadithCard from '@/components/hadith/HadithCard';
 import HadithPagination from '@/components/hadith/HadithPagination';
 import { searchHadiths } from '@/lib/hadith/hadith.service';
+import { buildHadithSearchPath } from '@/lib/hadith/hadith-routing';
+import { HADITH_SEARCH_KEYWORDS } from '@/lib/seo-keywords';
+import { buildPageMetadata } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,11 +15,16 @@ export async function generateMetadata({
   searchParams: Promise<{ q?: string }>;
 }): Promise<Metadata> {
   const { q } = await searchParams;
-  return {
-    title: q ? `"${q}" — Hadith Search | ReadAlQuran` : 'Search Hadiths | ReadAlQuran',
-    description: 'Search thousands of authentic hadiths by keyword.',
-    robots: { index: false },
-  };
+
+  return buildPageMetadata({
+    title: q ? `"${q}" – Hadith Search` : 'Search Hadiths Online',
+    description: q
+      ? `Search results for "${q}" across authentic Hadith collections with English and Urdu translations.`
+      : 'Search thousands of authentic hadiths by keyword across Sahih Bukhari, Sahih Muslim, and the six major books.',
+    path: q ? `${buildHadithSearchPath()}?q=${encodeURIComponent(q)}` : buildHadithSearchPath(),
+    index: false,
+    keywords: HADITH_SEARCH_KEYWORDS,
+  });
 }
 
 async function SearchResults({ query, page }: { query: string; page: number }) {
@@ -50,7 +58,7 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
       <HadithPagination
         currentPage={page}
         totalPages={results.hadiths.last_page}
-        baseUrl="/hadith/search"
+        baseUrl={buildHadithSearchPath()}
       />
     </div>
   );

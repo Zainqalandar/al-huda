@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
+import { getSiteOrigin } from '@/lib/seo';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.readalquran.online';
+const baseUrl = getSiteOrigin();
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -62,11 +63,11 @@ export default function robots(): MetadataRoute.Robots {
     ],
     sitemap: [
       `${baseUrl}/sitemap.xml`,
-      `${baseUrl}/sitemaps/surah.xml`,
-      `${baseUrl}/sitemaps/ayah-1.xml`,
+      `${baseUrl}/hadith/sitemap.xml`,
+      `${baseUrl}/sitemaps/hadith-collections`,
+      `${baseUrl}/sitemaps/surah`,
       `${baseUrl}/local-sitemap.xml`,
       `${baseUrl}/voice-sitemap.xml`,
-      `${baseUrl}/hadith/sitemap.xml`,
     ],
     host: baseUrl,
   };

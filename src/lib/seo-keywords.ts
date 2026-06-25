@@ -120,6 +120,107 @@ export const TECHNICAL_KEYWORDS = [
   'dark mode quran reader',
 ];
 
+export const CORE_HADITH_KEYWORDS = [
+  'hadith online',
+  'read hadith online',
+  'islamic hadith',
+  'authentic hadith',
+  'sunnah online',
+  'prophetic traditions',
+  'hadith in english',
+  'hadith urdu translation',
+  'hadith arabic english urdu',
+  'islamic hadith library',
+  'hadith collections online',
+  'free hadith online',
+];
+
+export const SAHIH_HADITH_KEYWORDS = [
+  'sahih bukhari online',
+  'sahih muslim online',
+  'sahih bukhari english',
+  'sahih muslim english',
+  'sahih bukhari urdu',
+  'sahih muslim urdu',
+  'bukhari hadith online',
+  'muslim hadith online',
+  'sunan abu dawud online',
+  'jami tirmidhi online',
+  'sunan nasai online',
+  'sunan ibn majah online',
+];
+
+export const HADITH_SEARCH_KEYWORDS = [
+  'search hadith online',
+  'hadith search by keyword',
+  'find hadith online',
+  'hadith lookup',
+  'islamic hadith search',
+  'sunnah search',
+];
+
+export const HADITH_LEARNING_KEYWORDS = [
+  'learn hadith online',
+  'islamic knowledge hadith',
+  'hadith for beginners',
+  'understanding hadith',
+  'hadith explanation',
+  'narrator chain hadith',
+  'hadith grade sahih hasan',
+];
+
+export const GLOBAL_HADITH_SEO_KEYWORDS = Array.from(
+  new Set([
+    ...CORE_HADITH_KEYWORDS,
+    ...SAHIH_HADITH_KEYWORDS,
+    ...HADITH_SEARCH_KEYWORDS,
+    ...HADITH_LEARNING_KEYWORDS,
+  ])
+);
+
+export function buildHadithCollectionKeywords(bookName: string, writerName: string) {
+  const normalizedBook = bookName.toLowerCase();
+
+  return Array.from(
+    new Set([
+      ...GLOBAL_HADITH_SEO_KEYWORDS,
+      bookName,
+      `${bookName} online`,
+      `${bookName} english`,
+      `${bookName} urdu`,
+      `${bookName} arabic`,
+      `${bookName} hadith`,
+      writerName,
+      `${writerName} hadith`,
+      `${normalizedBook} read online`,
+      `${normalizedBook} full text`,
+    ])
+  );
+}
+
+export function buildHadithDetailKeywords(options: {
+  bookName: string;
+  writerName: string;
+  hadithNumber: string;
+  chapterEnglish?: string;
+  grade?: string;
+}) {
+  const { bookName, writerName, hadithNumber, chapterEnglish, grade } = options;
+
+  return Array.from(
+    new Set([
+      ...buildHadithCollectionKeywords(bookName, writerName),
+      `hadith ${hadithNumber}`,
+      `${bookName} hadith ${hadithNumber}`,
+      `${bookName} ${hadithNumber}`,
+      chapterEnglish,
+      grade ? `${grade} hadith` : undefined,
+      'hadith translation urdu',
+      'hadith english translation',
+    ].filter(Boolean) as string[])
+  );
+}
+
 export const GLOBAL_QURAN_SEO_KEYWORDS = Array.from(
   new Set([
     ...CORE_QURAN_KEYWORDS,
@@ -131,6 +232,7 @@ export const GLOBAL_QURAN_SEO_KEYWORDS = Array.from(
     ...ISLAMIC_LEARNING_KEYWORDS,
     ...ACCESSIBILITY_KEYWORDS,
     ...TECHNICAL_KEYWORDS,
+    ...GLOBAL_HADITH_SEO_KEYWORDS,
   ])
 );
 
@@ -221,6 +323,11 @@ export const VOICE_SEARCH_KEYWORDS = [
   'quran reading tips',
   'how to understand quran',
   'islamic learning for beginners',
+  'what is sahih bukhari',
+  'what is sahih muslim',
+  'how to search hadith online',
+  'where can i read hadith online',
+  'what are the six books of hadith',
 ];
 
 export const VOICE_SEARCH_QUESTIONS = [
@@ -263,6 +370,16 @@ export const VOICE_SEARCH_QUESTIONS = [
     question: 'What is the best time to read Quran?',
     answer: 'Early morning (Fajr time) is considered spiritually beneficial, but any time with focus and intention is good.',
     keywords: ['best time quran', 'quran routine', 'reading schedule'],
+  },
+  {
+    question: 'What is Sahih Bukhari?',
+    answer: 'Sahih Bukhari is one of the most authentic collections of Prophetic hadith, compiled by Imam al-Bukhari.',
+    keywords: ['sahih bukhari', 'hadith collection', 'authentic hadith'],
+  },
+  {
+    question: 'Where can I read hadith online?',
+    answer: 'Read al Quran offers Sahih Bukhari, Sahih Muslim, and the major hadith books with Arabic, English, and Urdu translations.',
+    keywords: ['hadith online', 'read hadith', 'sunnah online'],
   },
 ];
 

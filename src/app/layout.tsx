@@ -19,6 +19,7 @@ import { AppSettingsProvider } from '@/components/providers/app-settings-provide
 import { SuspenseBoundary } from '@/components/ui/suspense-boundary';
 import { PerformanceMonitor } from '@/components/performance-monitor';
 import { GLOBAL_QURAN_SEO_KEYWORDS } from '@/lib/seo-keywords';
+import { buildWebsiteJsonLd } from '@/lib/seo';
 
 // Dynamically import components that don't need to be critical for initial render
 const ServiceWorkerRegister = dynamic(
@@ -171,18 +172,7 @@ const organizationJsonLd = {
 	logo: `${siteOriginString}/logos/logo1.png`,
 };
 
-const websiteJsonLd = {
-	'@context': 'https://schema.org',
-	'@type': 'WebSite',
-	name: siteName,
-	url: siteOriginString,
-	inLanguage: ['en', 'ur', 'ar'],
-	potentialAction: {
-		'@type': 'SearchAction',
-		target: `${siteOriginString}/surah?search={search_term_string}`,
-		'query-input': 'required name=search_term_string',
-	},
-};
+const websiteJsonLd = buildWebsiteJsonLd();
 
 export default function RootLayout({
 	children,
@@ -194,11 +184,17 @@ export default function RootLayout({
 			<head>
 				{/* DNS prefetch for external API services */}
 			<link rel="dns-prefetch" href="//api.quran.com" />
+			<link rel="dns-prefetch" href="//hadithapi.com" />
 			<link rel="dns-prefetch" href="//ia801503.us.archive.org" />
 
 				<link
 					rel="preconnect"
 					href="https://api.quran.com"
+					crossOrigin=""
+				/>
+				<link
+					rel="preconnect"
+					href="https://hadithapi.com"
 					crossOrigin=""
 				/>
 				<link
