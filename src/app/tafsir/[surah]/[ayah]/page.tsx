@@ -211,7 +211,7 @@ export default async function TafsirDetailPage({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 p-5">
-          <p lang="ar" dir="rtl" className="arabic-font text-right text-[var(--color-heading)]">
+          <p lang="ar" dir="rtl" className="arabic-font arabic-mushaf text-[var(--color-heading)]">
             {ayah.arabicText}
           </p>
           <p lang="ur" dir="rtl" className="urdu-font text-right text-[var(--color-text)]">

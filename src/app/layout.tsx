@@ -5,6 +5,7 @@ import {
 	Manrope,
 	Cormorant_Garamond,
 	Amiri,
+	Amiri_Quran,
 	Noto_Naskh_Arabic,
 	Noto_Nastaliq_Urdu,
 	Scheherazade_New,
@@ -63,6 +64,14 @@ const arabicAmiri = Amiri({
 	weight: ['400', '700'],
 	display: 'swap',
 	preload: false,
+});
+
+const arabicQuran = Amiri_Quran({
+	subsets: ['arabic'],
+	variable: '--font-arabic-quran',
+	weight: '400',
+	display: 'swap',
+	preload: true,
 });
 
 const arabicNaskh = Noto_Naskh_Arabic({
@@ -180,7 +189,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang="en" data-arabic-font="amiriQuran" suppressHydrationWarning>
 			<head>
 				{/* DNS prefetch for external API services */}
 			<link rel="dns-prefetch" href="//api.quran.com" />
@@ -204,7 +213,7 @@ export default function RootLayout({
 				/>
 			</head>
 			<body
-				className={`${bodyFont.variable} ${displayFont.variable} ${arabicAmiri.variable} ${arabicNaskh.variable} ${arabicScheherazade.variable} ${urduNastaliq.variable} font-body`}
+				className={`${bodyFont.variable} ${displayFont.variable} ${arabicQuran.variable} ${arabicAmiri.variable} ${arabicNaskh.variable} ${arabicScheherazade.variable} ${urduNastaliq.variable} font-body`}
 			>
 				{/* Structured data - critical for SEO */}
 				<script

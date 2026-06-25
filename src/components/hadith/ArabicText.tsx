@@ -4,11 +4,11 @@ interface ArabicTextProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-const sizeClasses = {
-  sm: 'text-lg leading-loose',
-  md: 'text-2xl leading-loose',
-  lg: 'text-3xl leading-relaxed',
-  xl: 'text-4xl leading-relaxed',
+const sizeScale: Record<NonNullable<ArabicTextProps['size']>, string> = {
+  sm: 'text-[calc(1.15rem*var(--arabic-font-scale))]',
+  md: 'text-[calc(1.65rem*var(--arabic-font-scale))]',
+  lg: 'text-[calc(2rem*var(--arabic-font-scale))]',
+  xl: 'text-[calc(2.45rem*var(--arabic-font-scale))]',
 };
 
 export default function ArabicText({ text, className = '', size = 'md' }: ArabicTextProps) {
@@ -16,8 +16,7 @@ export default function ArabicText({ text, className = '', size = 'md' }: Arabic
     <p
       dir="rtl"
       lang="ar"
-      className={`font-arabic-amiri text-right ${sizeClasses[size]} ${className}`}
-      style={{ fontFeatureSettings: '"liga" 1, "calt" 1' }}
+      className={`arabic-font arabic-reading text-right ${sizeScale[size]} ${className}`.trim()}
     >
       {text}
     </p>

@@ -48,6 +48,7 @@ import type {
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import { clampRange, formatAudioTime, isValidSurahId } from '@/lib/quran-utils';
 import { buildSurahPath, parseSurahIdFromParam } from '@/lib/quran-routing';
+import AyahEndMarker from '@/components/quran/AyahEndMarker';
 
 interface AyahWithTranslation {
   ayah: SurahAyah;
@@ -1854,25 +1855,24 @@ export default function QuranReaderPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="arabic-font arabic-reading text-right text-[var(--color-heading)]">
-                  {filteredAyahs.map(({ ayah }, index) => (
-                    <span key={ayah.number}>
-                      <span
-                        id={`ayah-${ayah.numberInSurah}`}
-                        className={
-                          isPlaying && activeAudioAyahNumber === ayah.numberInSurah
-                            ? 'rounded-lg bg-[color-mix(in_oklab,var(--color-accent),white_78%)] px-1.5 py-0.5 text-[var(--color-heading)] shadow-[var(--shadow-soft)]'
-                            : undefined
-                        }
-                      >
-                        {ayah.text}
-                      </span>{' '}
-                      <span className="mx-1 text-sm text-[color-mix(in_oklab,var(--color-accent),var(--color-accent)_42%)]">
-                        ({ayah.numberInSurah})
-                      </span>{' '}
-                      {index === filteredAyahs.length - 1 ? '' : ' '}
-                    </span>
-                  ))}
+                <p className="arabic-font arabic-mushaf text-[var(--color-heading)]">
+                  {filteredAyahs.map(({ ayah }, index) => {
+                    const isActive =
+                      isPlaying && activeAudioAyahNumber === ayah.numberInSurah;
+
+                    return (
+                      <span key={ayah.number}>
+                        <span
+                          id={`ayah-${ayah.numberInSurah}`}
+                          className={`ayah-phrase ${isActive ? 'is-active' : ''}`.trim()}
+                        >
+                          {ayah.text}
+                        </span>
+                        <AyahEndMarker number={ayah.numberInSurah} />
+                        {index === filteredAyahs.length - 1 ? '' : ' '}
+                      </span>
+                    );
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -1952,12 +1952,10 @@ export default function QuranReaderPage() {
                       </div>
 
                       <p
-                        className={`arabic-font arabic-reading mt-4 text-right text-[var(--color-heading)] ${isAudioActiveAyah ? 'rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_35%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_92%)] px-3 py-2 shadow-[var(--shadow-glow)]' : ''}`}
+                        className={`arabic-font arabic-reading mt-4 text-[var(--color-heading)] ${isAudioActiveAyah ? 'rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_35%)] bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_92%)] px-3 py-2 shadow-[var(--shadow-glow)]' : ''}`}
                       >
                         <HighlightText text={ayah.text} query={highlightQuery} />
-                        <span className="inline-flex items-center justify-center w-8 h-8 mx-2 rounded-full border-2 border-[var(--color-accent)] text-[var(--color-accent)] text-xs font-bold ml-auto" style={{color: 'var(--color-accent)'}}>
-                          {ayah.numberInSurah}
-                        </span>
+                        <AyahEndMarker number={ayah.numberInSurah} />
                       </p>
 
                       {translation ? (
