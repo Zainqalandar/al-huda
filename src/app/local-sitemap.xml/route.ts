@@ -6,6 +6,18 @@ function renderLocalSitemapXml() {
 
   const entries = [
     {
+      url: `${baseUrl}/about`,
+      lastmod: updatedAt,
+      changefreq: 'monthly',
+      priority: '0.85',
+    },
+    {
+      url: `${baseUrl}/read-quran-online`,
+      lastmod: updatedAt,
+      changefreq: 'weekly',
+      priority: '0.9',
+    },
+    {
       url: `${baseUrl}/contact`,
       lastmod: updatedAt,
       changefreq: 'monthly',

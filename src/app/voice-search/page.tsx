@@ -6,14 +6,14 @@ import {
   buildSearchActionJsonLd,
   toAbsoluteUrl,
 } from '@/lib/seo';
-import { VOICE_SEARCH_KEYWORDS, VOICE_SEARCH_QUESTIONS } from '@/lib/seo-keywords';
+import { MASTER_SEO_KEYWORDS, VOICE_SEARCH_KEYWORDS, VOICE_SEARCH_QUESTIONS } from '@/lib/seo-keywords';
 
 export const metadata: Metadata = buildPageMetadata({
   title: 'Voice Search - Ask Questions About the Quran',
   description:
     'Use voice search to ask questions about the Quran. Read al Quran provides instant answers using AI and schema-optimized content for voice assistants.',
   path: '/voice-search',
-  keywords: [...VOICE_SEARCH_KEYWORDS, 'voice search', 'voice assistant', 'ask quran questions'],
+  keywords: [...VOICE_SEARCH_KEYWORDS, ...MASTER_SEO_KEYWORDS.slice(0, 150), 'voice search', 'voice assistant', 'ask quran questions'],
 });
 
 export default function VoiceSearchPage() {

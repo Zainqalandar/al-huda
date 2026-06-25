@@ -1,38 +1,28 @@
 import type { Metadata } from 'next';
-import { buildLocalBusinessJsonLd, buildEducationalOrganizationJsonLd, toAbsoluteUrl } from '@/lib/seo';
+import { buildLocalBusinessJsonLd, buildEducationalOrganizationJsonLd, buildPageMetadata } from '@/lib/seo';
+import { ALL_LOCAL_KEYWORDS, MASTER_SEO_KEYWORDS } from '@/lib/seo-keywords';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: 'Contact Read al Quran - Pakistan | Get in Touch',
   description:
     'Contact Read al Quran team in Pakistan. Support, feedback, or partnership inquiries. Available in Urdu, English, and Arabic.',
+  path: '/contact',
   keywords: [
+    ...ALL_LOCAL_KEYWORDS,
+    ...MASTER_SEO_KEYWORDS.slice(0, 120),
     'contact read al quran',
     'quran app contact pakistan',
     'read al quran support',
     'quran app customer service',
     'islamic learning support',
   ],
-  alternates: {
-    canonical: '/contact',
-    languages: {
-      en: '/contact',
-      'ur-PK': '/contact',
-      ar: '/contact',
-    },
-  },
-  openGraph: {
-    title: 'Contact Read al Quran',
-    description: 'Get in touch with Read al Quran team',
-    url: toAbsoluteUrl('/contact'),
-    type: 'website',
-  },
-};
+});
 
 export default function ContactPage() {
   const localBusinessSchema = buildLocalBusinessJsonLd({
     name: 'Read al Quran',
     description: 'Islamic learning platform with Quran, Tafseer, and Hadith',
-    url: toAbsoluteUrl('/'),
+    url: '/',
     telephone: '+923364157981',
     email: 'zainqlandar@gmail.com',
     address: {
@@ -40,14 +30,14 @@ export default function ContactPage() {
       country: 'Pakistan',
       postalCode: '44000',
     },
-    image: toAbsoluteUrl('/logos/logo3.png'),
+    image: '/og?kind=surah-index',
   });
 
   const educationalOrgSchema = buildEducationalOrganizationJsonLd({
     name: 'Read al Quran',
     description: 'Islamic learning platform with Quran, Tafseer, and Hadith',
-    url: toAbsoluteUrl('/'),
-    logo: toAbsoluteUrl('/logos/logo3.png'),
+    url: '/',
+    logo: '/logos/logo1.png',
     location: 'Islamabad, Pakistan',
   });
 

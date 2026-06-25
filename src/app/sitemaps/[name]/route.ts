@@ -101,7 +101,12 @@ export async function GET(
     const surahUrls = [
       `${origin}/`,
       `${origin}/surah`,
+      `${origin}/about`,
+      `${origin}/contact`,
+      `${origin}/tafsir`,
+      `${origin}${buildHadithIndexPath()}`,
       `${origin}/read-quran-online`,
+      `${origin}/voice-search`,
       ...surahs.map((surah) => `${origin}${buildSurahPath(surah.id, surah.surahName)}`),
     ];
 

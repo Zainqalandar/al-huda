@@ -14,6 +14,7 @@ import {
 } from '@/lib/quran-server';
 import { resolveSurahParam } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
+import { buildAyahPageKeywords } from '@/lib/seo-keywords';
 import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
 
 interface AyahPageProps {
@@ -83,6 +84,11 @@ export async function generateMetadata({
     path: canonicalPath,
     ogType: 'article',
     imageUrl: `/og?kind=ayah&surah=${surah.id}&ayah=${ayahNumber}`,
+    keywords: buildAyahPageKeywords({
+      surahId: surah.id,
+      surahName: surah.surahName,
+      ayahNumber,
+    }),
   });
 }
 

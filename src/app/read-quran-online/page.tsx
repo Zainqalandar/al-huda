@@ -7,13 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getSurahById } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 import { buildPageMetadata } from '@/lib/seo';
-import {
-  AUDIO_KEYWORDS,
-  CORE_QURAN_KEYWORDS,
-  SURAH_AYAH_KEYWORDS,
-  TAFSEER_LEARNING_KEYWORDS,
-  URDU_TRANSLATION_KEYWORDS,
-} from '@/lib/seo-keywords';
+import { GENERATED_LONG_TAIL_KEYWORDS, MASTER_SEO_KEYWORDS } from '@/lib/seo-keywords';
 
 const POPULAR_SURAH_IDS = [1, 2, 18, 36, 55, 56, 67] as const;
 
@@ -44,23 +38,15 @@ function getTafsirPath(surahId: number, ayahNumber: number) {
   return buildTafsirPath(surah.id, surah.surahName, ayahNumber);
 }
 
-export const metadata: Metadata = {
-  ...buildPageMetadata({
-    title: 'Read Quran Online – Quran Pak, Urdu Translation, Audio Tilawat, Tafseer',
-    description:
-      'Read Quran online with Arabic text, Urdu and English translation, ayah tafseer, and audio tilawat. Access Surah Yaseen, Rahman, Kahf, Mulk, Waqiah, and Ayat ul Kursi quickly.',
-    path: '/read-quran-online',
-    ogType: 'article',
-    imageUrl: '/og?kind=surah-index',
-  }),
-  keywords: [
-    ...CORE_QURAN_KEYWORDS,
-    ...URDU_TRANSLATION_KEYWORDS,
-    ...AUDIO_KEYWORDS,
-    ...SURAH_AYAH_KEYWORDS,
-    ...TAFSEER_LEARNING_KEYWORDS,
-  ],
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Read Quran Online – Quran Pak, Urdu Translation, Audio Tilawat, Tafseer',
+  description:
+    'Read Quran online with Arabic text, Urdu and English translation, ayah tafseer, and audio tilawat. Access Surah Yaseen, Rahman, Kahf, Mulk, Waqiah, and Ayat ul Kursi quickly.',
+  path: '/read-quran-online',
+  ogType: 'article',
+  imageUrl: '/og?kind=surah-index',
+  keywords: [...MASTER_SEO_KEYWORDS, ...GENERATED_LONG_TAIL_KEYWORDS],
+});
 
 export default function ReadQuranOnlinePage() {
   return (

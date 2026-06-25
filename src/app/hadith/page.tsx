@@ -2,7 +2,7 @@ import Link from 'next/link';
 import CollectionGrid from '@/components/hadith/CollectionGrid';
 import { getAllCollections } from '@/lib/hadith/collections.service';
 import { buildHadithIndexPath, buildHadithOgImagePath } from '@/lib/hadith/hadith-routing';
-import { GLOBAL_HADITH_SEO_KEYWORDS } from '@/lib/seo-keywords';
+import { GENERATED_HADITH_KEYWORDS, GLOBAL_HADITH_SEO_KEYWORDS } from '@/lib/seo-keywords';
 import { buildCollectionPageJsonLd, buildPageMetadata } from '@/lib/seo';
 
 export const revalidate = 86400;
@@ -12,7 +12,7 @@ export const metadata = buildPageMetadata({
   description:
     'Browse authentic Hadith collections including Sahih Bukhari, Sahih Muslim, Abu Dawud, Tirmidhi, Nasai, and Ibn Majah with Arabic, English and Urdu translations.',
   path: buildHadithIndexPath(),
-  keywords: GLOBAL_HADITH_SEO_KEYWORDS,
+  keywords: [...GLOBAL_HADITH_SEO_KEYWORDS, ...GENERATED_HADITH_KEYWORDS],
   imageUrl: buildHadithOgImagePath({ variant: 'index' }),
 });
 

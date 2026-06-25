@@ -14,6 +14,7 @@ import {
 } from '@/lib/quran-server';
 import { resolveSurahParam } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
+import { buildTafsirPageKeywords } from '@/lib/seo-keywords';
 import { buildBreadcrumbJsonLd, buildPageMetadata, getSiteOrigin } from '@/lib/seo';
 
 interface TafsirPageProps {
@@ -74,6 +75,11 @@ export async function generateMetadata({
     path: canonicalPath,
     ogType: 'article',
     imageUrl: `/og?kind=tafsir&surah=${surah.id}&ayah=${ayahNumber}`,
+    keywords: buildTafsirPageKeywords({
+      surahId: surah.id,
+      surahName: surah.surahName,
+      ayahNumber,
+    }),
   });
 }
 

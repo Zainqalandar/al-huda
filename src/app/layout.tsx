@@ -19,8 +19,8 @@ import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppSettingsProvider } from '@/components/providers/app-settings-provider';
 import { SuspenseBoundary } from '@/components/ui/suspense-boundary';
 import { PerformanceMonitor } from '@/components/performance-monitor';
-import { GLOBAL_QURAN_SEO_KEYWORDS } from '@/lib/seo-keywords';
-import { buildWebsiteJsonLd } from '@/lib/seo';
+import { GLOBAL_QURAN_SEO_KEYWORDS, MASTER_SEO_KEYWORDS } from '@/lib/seo-keywords';
+import { buildOrganizationJsonLd, buildWebsiteJsonLd } from '@/lib/seo';
 
 // Dynamically import components that don't need to be critical for initial render
 const ServiceWorkerRegister = dynamic(
@@ -38,7 +38,7 @@ const siteOriginString = siteOrigin.toString().replace(/\/$/, '');
 const siteName = 'Read al Quran';
 const siteDescription =
 	'Read al Quran is a Quran-first web app for recitation, Urdu translation, bookmarks, audio playback, and progress tracking.';
-const ogImage = '/logos/logo3.png';
+const ogImage = '/og?kind=surah-index';
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 // Optimize font loading with preload strategy
@@ -106,14 +106,11 @@ export const metadata: Metadata = {
 	},
 	description: siteDescription,
 	applicationName: 'Read al Quran',
-	keywords: [...GLOBAL_QURAN_SEO_KEYWORDS],
+	keywords: [...MASTER_SEO_KEYWORDS],
 	category: 'education',
 	alternates: {
 		canonical: siteOriginString,
 		languages: {
-			en: siteOriginString,
-			'ur-PK': siteOriginString,
-			ar: siteOriginString,
 			'x-default': siteOriginString,
 		},
 	},
@@ -173,13 +170,7 @@ export const viewport: Viewport = {
 	],
 };
 
-const organizationJsonLd = {
-	'@context': 'https://schema.org',
-	'@type': 'Organization',
-	name: siteName,
-	url: siteOriginString,
-	logo: `${siteOriginString}/logos/logo1.png`,
-};
+const organizationJsonLd = buildOrganizationJsonLd();
 
 const websiteJsonLd = buildWebsiteJsonLd();
 

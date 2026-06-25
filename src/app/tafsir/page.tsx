@@ -4,8 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { getAllSurahs } from '@/lib/quran-index';
 import { getTafsirAyahNumbersBySurah } from '@/lib/tafsir-index';
-import { buildPageMetadata } from '@/lib/seo';
-import { CORE_QURAN_KEYWORDS, SURAH_AYAH_KEYWORDS } from '@/lib/seo-keywords';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
+import {
+  GENERATED_TAFSEER_KEYWORDS,
+  MASTER_SEO_KEYWORDS,
+} from '@/lib/seo-keywords';
 import TafsirIndexClient from '@/components/tafsir/TafsirIndexClient';
 
 interface TafsirIndexPageProps {
@@ -27,17 +30,7 @@ export async function generateMetadata({
       path: '/tafsir',
       ogType: 'website',
       imageUrl: '/og?kind=tafsir-index',
-      keywords: [
-        ...CORE_QURAN_KEYWORDS,
-        ...SURAH_AYAH_KEYWORDS,
-        'tafseer urdu',
-        'tafsir',
-        'quran explanation',
-        'islamic tafseer',
-        'quran interpretation',
-        'urdu tafseer',
-        'tafseer of quran',
-      ],
+      keywords: [...GENERATED_TAFSEER_KEYWORDS, ...MASTER_SEO_KEYWORDS.slice(0, 200)],
     });
   }
 
@@ -62,8 +55,17 @@ export default async function TafsirIndexPage({
     tafseerAyahs: getTafsirAyahNumbersBySurah(surah.id),
   }));
 
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: 'Home', item: '/' },
+    { name: 'Tafseer Index', item: '/tafsir' },
+  ]);
+
   return (
     <div className="pb-20 pt-8 md:pt-12" data-slot="page-shell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
       <section className="mb-10 animate-fade-up">
         {/* Header Section */}
         <div className="mb-8">

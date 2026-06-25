@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: 'Googlebot',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search', '/hadith', '/hadith/'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/read-quran-online', '/voice-search', '/hadith', '/hadith/'],
         disallow: [
           '/admin',
           '/admin/',
@@ -27,7 +27,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'Bingbot',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search', '/hadith', '/hadith/'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/read-quran-online', '/voice-search', '/hadith', '/hadith/'],
         disallow: [
           '/admin',
           '/admin/',
@@ -43,7 +43,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: '*',
-        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/voice-search', '/hadith', '/hadith/'],
+        allow: ['/', '/surah', '/surah/', '/tafsir', '/tafsir/', '/about', '/contact', '/cities', '/read-quran-online', '/voice-search', '/hadith', '/hadith/'],
         disallow: [
           '/admin',
           '/admin/',

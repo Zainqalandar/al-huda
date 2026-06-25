@@ -221,21 +221,6 @@ export function buildHadithDetailKeywords(options: {
   );
 }
 
-export const GLOBAL_QURAN_SEO_KEYWORDS = Array.from(
-  new Set([
-    ...CORE_QURAN_KEYWORDS,
-    ...URDU_TRANSLATION_KEYWORDS,
-    ...AUDIO_KEYWORDS,
-    ...SURAH_AYAH_KEYWORDS,
-    ...TAFSEER_LEARNING_KEYWORDS,
-    ...TRUST_KEYWORDS,
-    ...ISLAMIC_LEARNING_KEYWORDS,
-    ...ACCESSIBILITY_KEYWORDS,
-    ...TECHNICAL_KEYWORDS,
-    ...GLOBAL_HADITH_SEO_KEYWORDS,
-  ])
-);
-
 /**
  * LOCAL SEO - Pakistan Keywords
  */
@@ -382,4 +367,42 @@ export const VOICE_SEARCH_QUESTIONS = [
     keywords: ['hadith online', 'read hadith', 'sunnah online'],
   },
 ];
+
+export {
+  ALL_GENERATED_SEO_KEYWORDS,
+  GENERATED_SURAH_KEYWORDS,
+  GENERATED_AYAH_KEYWORDS,
+  GENERATED_CITY_KEYWORDS,
+  GENERATED_HADITH_KEYWORDS,
+  GENERATED_JUZ_PARA_KEYWORDS,
+  GENERATED_TAFSEER_KEYWORDS,
+  GENERATED_LONG_TAIL_KEYWORDS,
+  buildSurahPageKeywords,
+  buildAyahPageKeywords,
+  buildTafsirPageKeywords,
+} from './seo-keywords-generator';
+
+import { ALL_GENERATED_SEO_KEYWORDS } from './seo-keywords-generator';
+
+export const GLOBAL_QURAN_SEO_KEYWORDS = Array.from(
+  new Set([
+    ...CORE_QURAN_KEYWORDS,
+    ...URDU_TRANSLATION_KEYWORDS,
+    ...AUDIO_KEYWORDS,
+    ...SURAH_AYAH_KEYWORDS,
+    ...TAFSEER_LEARNING_KEYWORDS,
+    ...TRUST_KEYWORDS,
+    ...ISLAMIC_LEARNING_KEYWORDS,
+    ...ACCESSIBILITY_KEYWORDS,
+    ...TECHNICAL_KEYWORDS,
+    ...GLOBAL_HADITH_SEO_KEYWORDS,
+    ...PAKISTAN_LOCAL_KEYWORDS,
+    ...ALL_LOCAL_KEYWORDS,
+    ...VOICE_SEARCH_KEYWORDS,
+  ])
+);
+
+export const MASTER_SEO_KEYWORDS = Array.from(
+  new Set([...GLOBAL_QURAN_SEO_KEYWORDS, ...ALL_GENERATED_SEO_KEYWORDS])
+);
 

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { buildCityPageSchema, toAbsoluteUrl } from '@/lib/seo';
-import { CITY_KEYWORDS } from '@/lib/seo-keywords';
+import { buildCityPageSchema, buildPageMetadata } from '@/lib/seo';
+import { CITY_KEYWORDS, GENERATED_CITY_KEYWORDS } from '@/lib/seo-keywords';
 
 type CityType = 'karachi' | 'islamabad' | 'lahore' | 'rawalpindi' | 'multan';
 
@@ -22,26 +22,26 @@ const cityInfo: Record<CityType, { name: string; fullName: string; population: s
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { city } = await params;
   const cityData = cityInfo[city];
-  const keywords = CITY_KEYWORDS[city as CityType] || [];
+  const keywords = Array.from(
+    new Set([
+      ...(CITY_KEYWORDS[city as CityType] || []),
+      ...GENERATED_CITY_KEYWORDS.filter((keyword) => keyword.includes(city)),
+    ])
+  );
 
-  return {
+  return buildPageMetadata({
     title: `Read Quran Online in ${cityData.name}, Pakistan | Read al Quran`,
-    description: `Read al Quran app available in ${cityData.name}. Free Quran reader with Urdu translation, tafseer, audio.`,
-    keywords: keywords,
-    alternates: { canonical: `/cities/${city}` },
-    openGraph: {
-      title: `Read al Quran in ${cityData.name}`,
-      description: `Free Quran app for ${cityData.name}`,
-      url: toAbsoluteUrl(`/cities/${city}`),
-      type: 'website',
-    },
-  };
+    description: `Read al Quran app available in ${cityData.name}. Free Quran reader with Urdu translation, tafseer, audio, and offline access for ${cityData.fullName}.`,
+    path: `/cities/${city}`,
+    keywords,
+    imageUrl: '/og?kind=surah-index',
+  });
 }
 
 export default async function CityPage({ params }: CityPageProps) {
   const { city } = await params;
   const cityData = cityInfo[city];
-  const citySchema = buildCityPageSchema(cityData.name);
+  const citySchema = buildCityPageSchema(cityData.name, 'Pakistan', city);
 
   const features = [
     { icon: '📖', title: 'Free', description: 'Completely free Quran app' },

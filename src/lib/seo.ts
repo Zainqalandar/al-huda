@@ -27,15 +27,12 @@ export function toAbsoluteUrl(path: string) {
 }
 
 export function buildLanguageAlternates(path: string) {
-  const absolute = toAbsoluteUrl(path);
-
   return {
-    en: absolute,
-    'ur-PK': absolute,
-    ar: absolute,
-    'x-default': absolute,
+    'x-default': toAbsoluteUrl(path),
   } as const;
 }
+
+export const DEFAULT_OG_IMAGE = '/og?kind=surah-index';
 
 interface BuildMetadataOptions {
   title: string;
@@ -57,7 +54,7 @@ export function buildPageMetadata(options: BuildMetadataOptions): Metadata {
     path,
     index = true,
     ogType = 'website',
-    imageUrl = '/logos/logo3.png',
+    imageUrl = DEFAULT_OG_IMAGE,
     keywords,
     author,
     publishedDate,
@@ -249,7 +246,9 @@ export function buildOrganizationJsonLd() {
     logo: toAbsoluteUrl('/logos/logo1.png'),
     description: SITE_DESCRIPTION,
     sameAs: [
-      // Add social media links if available
+      'https://www.facebook.com/alhuda.quran',
+      'https://www.instagram.com/alhuda.quran',
+      'https://twitter.com/al_huda_quran',
     ],
     contact: {
       '@type': 'ContactPoint',
@@ -331,7 +330,7 @@ export function buildLocalBusinessJsonLd(options: {
     '@type': 'LocalBusiness',
     name: options.name,
     description: options.description,
-    url: options.url,
+    url: toAbsoluteUrl(options.url),
     telephone: options.telephone,
     email: options.email,
     address: {
@@ -340,7 +339,7 @@ export function buildLocalBusinessJsonLd(options: {
       addressCountry: options.address.country,
       postalCode: options.address.postalCode,
     },
-    image: options.image,
+    image: toAbsoluteUrl(options.image),
     sameAs: [
       'https://www.facebook.com/alhuda.quran',
       'https://www.instagram.com/alhuda.quran',
@@ -361,8 +360,8 @@ export function buildEducationalOrganizationJsonLd(options: {
     '@type': 'EducationalOrganization',
     name: options.name,
     description: options.description,
-    url: options.url,
-    logo: options.logo,
+    url: toAbsoluteUrl(options.url),
+    logo: toAbsoluteUrl(options.logo),
     location: options.location,
     foundingDate: '2024',
     sameAs: [
@@ -372,13 +371,19 @@ export function buildEducationalOrganizationJsonLd(options: {
   };
 }
 
-export function buildCityPageSchema(city: string, country: string = 'Pakistan') {
+export function buildCityPageSchema(
+  city: string,
+  country: string = 'Pakistan',
+  citySlug?: string
+) {
+  const slug = citySlug ?? city.toLowerCase().replace(/\s+/g, '-');
+
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: `Read al Quran - ${city}, ${country}`,
     description: `Read Quran online in ${city} with Urdu translation, tafseer, and audio`,
-    url: toAbsoluteUrl(`/${city.toLowerCase()}`),
+    url: toAbsoluteUrl(`/cities/${slug}`),
     areaServed: {
       '@type': 'City',
       name: city,

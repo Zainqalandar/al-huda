@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { getAllSurahs } from '@/lib/quran-index';
-import { buildPageMetadata } from '@/lib/seo';
-import { CORE_QURAN_KEYWORDS, SURAH_AYAH_KEYWORDS } from '@/lib/seo-keywords';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
+import { GENERATED_SURAH_KEYWORDS, MASTER_SEO_KEYWORDS } from '@/lib/seo-keywords';
 import SurahIndexClient from '@/components/quran/SurahIndexClient';
 
 interface SurahIndexPageProps {
@@ -26,16 +26,7 @@ export async function generateMetadata({
       path: '/surah',
       ogType: 'website',
       imageUrl: '/og?kind=surah-index',
-      keywords: [
-        ...CORE_QURAN_KEYWORDS,
-        ...SURAH_AYAH_KEYWORDS,
-        'surah list',
-        '114 surahs',
-        'quran chapters',
-        'all surahs quran',
-        'surah index',
-        'quran surah directory',
-      ],
+      keywords: [...GENERATED_SURAH_KEYWORDS, ...MASTER_SEO_KEYWORDS.slice(0, 200)],
     });
   }
 
@@ -55,8 +46,17 @@ export default async function SurahIndexPage({
   const query = String((await searchParams).search ?? '').trim();
   const allSurahs = getAllSurahs();
 
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: 'Home', item: '/' },
+    { name: 'Surah Index', item: '/surah' },
+  ]);
+
   return (
     <div className="pb-20 pt-8 md:pt-12" data-slot="page-shell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
       <section className="mb-10">
         {/* Header Section with Enhanced Design */}
         <div className="mb-8">
