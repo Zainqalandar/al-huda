@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import HadithCard from '@/components/hadith/HadithCard';
 import HadithPagination from '@/components/hadith/HadithPagination';
+import { HadithApiError } from '@/lib/hadith/api-client';
 import { searchHadiths } from '@/lib/hadith/hadith.service';
 import { buildHadithSearchPath } from '@/lib/hadith/hadith-routing';
 import { HADITH_SEARCH_KEYWORDS } from '@/lib/seo-keywords';
@@ -28,7 +29,9 @@ export async function generateMetadata({
 }
 
 async function SearchResults({ query, page }: { query: string; page: number }) {
-  if (!query) {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) {
     return (
       <div className="text-center py-16 text-[var(--color-muted-text)]">
         <p className="text-lg">Type a keyword above to search hadiths</p>
@@ -36,12 +39,28 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
     );
   }
 
-  const results = await searchHadiths(query, page);
+  let results;
+
+  try {
+    results = await searchHadiths(normalizedQuery, page);
+  } catch (error) {
+    const message =
+      error instanceof HadithApiError
+        ? 'Hadith search is temporarily unavailable. Please try again in a moment.'
+        : 'Something went wrong while searching hadiths. Please try again.';
+
+    return (
+      <div className="py-16 text-center text-[var(--color-muted-text)]">
+        <p className="text-lg text-[var(--color-heading)]">Search unavailable</p>
+        <p className="mt-2 text-sm">{message}</p>
+      </div>
+    );
+  }
 
   if (results.hadiths.data.length === 0) {
     return (
       <div className="py-16 text-center text-[var(--color-muted-text)]">
-        <p className="text-lg">No hadiths found for "{query}"</p>
+        <p className="text-lg">No hadiths found for "{normalizedQuery}"</p>
         <p className="text-sm mt-2">Try different keywords</p>
       </div>
     );
@@ -50,7 +69,7 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-[var(--color-muted-text)]">
-        {results.hadiths.total.toLocaleString()} results for "{query}"
+        {results.hadiths.total.toLocaleString()} results for "{normalizedQuery}"
       </p>
       {results.hadiths.data.map((hadith) => (
         <HadithCard key={hadith.id} hadith={hadith} showBook />
@@ -58,7 +77,7 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
       <HadithPagination
         currentPage={page}
         totalPages={results.hadiths.last_page}
-        baseUrl={buildHadithSearchPath()}
+        baseUrl={`${buildHadithSearchPath()}?q=${encodeURIComponent(normalizedQuery)}`}
       />
     </div>
   );

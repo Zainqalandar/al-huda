@@ -4,7 +4,10 @@ import type { PaginationProps } from '@/lib/hadith/types/hadith.types';
 export default function HadithPagination({ currentPage, totalPages, baseUrl }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const getPageUrl = (page: number) => `${baseUrl}?page=${page}`;
+  const getPageUrl = (page: number) => {
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}page=${page}`;
+  };
 
   const pages: (number | 'ellipsis')[] = [];
   if (totalPages <= 7) {
