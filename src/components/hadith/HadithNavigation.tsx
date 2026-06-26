@@ -1,3 +1,9 @@
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { buildHadithDetailPath } from '@/lib/hadith/hadith-routing';
+
 interface HadithNavigationProps {
   bookSlug: string;
   currentNumber: number;
@@ -9,41 +15,43 @@ export default function HadithNavigation({
   currentNumber,
   totalHadiths,
 }: HadithNavigationProps) {
-  const baseUrl = `/hadith/${bookSlug}/books/${bookSlug}`;
+  const prevUrl =
+    currentNumber > 1 ? buildHadithDetailPath(bookSlug, currentNumber - 1) : null;
+  const nextUrl =
+    currentNumber < totalHadiths
+      ? buildHadithDetailPath(bookSlug, currentNumber + 1)
+      : null;
 
   return (
-    <div className="mt-8 flex items-center justify-between border-t border-[var(--color-border)] py-4">
-      {currentNumber > 1 ? (
-        <a
-          href={`${baseUrl}/${currentNumber - 1}`}
-          className="flex items-center gap-2 text-sm text-[var(--color-muted-text)] transition-colors hover:text-[var(--color-accent-soft)]"
-        >
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Previous Hadith
-        </a>
+    <nav
+      aria-label="Hadith navigation"
+      className="mt-8 flex flex-col gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      {prevUrl ? (
+        <Button asChild variant="outline" size="sm" className="justify-start">
+          <Link href={prevUrl}>
+            <ChevronLeft className="size-4" aria-hidden="true" />
+            Hadith #{currentNumber - 1}
+          </Link>
+        </Button>
       ) : (
-        <div />
+        <div className="hidden sm:block" />
       )}
 
-      <span className="text-sm text-[var(--color-muted-text)]">
-        {currentNumber} / {totalHadiths}
-      </span>
+      <p className="text-center text-sm font-medium text-[var(--color-muted-text)]">
+        Hadith {currentNumber} of {totalHadiths.toLocaleString()}
+      </p>
 
-      {currentNumber < totalHadiths ? (
-        <a
-          href={`${baseUrl}/${currentNumber + 1}`}
-          className="flex items-center gap-2 text-sm text-[var(--color-muted-text)] transition-colors hover:text-[var(--color-accent-soft)]"
-        >
-          Next Hadith
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
+      {nextUrl ? (
+        <Button asChild variant="outline" size="sm" className="justify-end sm:ml-auto">
+          <Link href={nextUrl}>
+            Hadith #{currentNumber + 1}
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </Link>
+        </Button>
       ) : (
-        <div />
+        <div className="hidden sm:block" />
       )}
-    </div>
+    </nav>
   );
 }

@@ -1,5 +1,6 @@
-import Link from 'next/link';
 import CollectionGrid from '@/components/hadith/CollectionGrid';
+import HadithPageHeader from '@/components/hadith/HadithPageHeader';
+import HadithSeoIntro from '@/components/hadith/HadithSeoIntro';
 import { getAllCollections } from '@/lib/hadith/collections.service';
 import { buildHadithIndexPath, buildHadithOgImagePath } from '@/lib/hadith/hadith-routing';
 import { GENERATED_HADITH_KEYWORDS, GLOBAL_HADITH_SEO_KEYWORDS } from '@/lib/seo-keywords';
@@ -18,10 +19,12 @@ export const metadata = buildPageMetadata({
 
 export default async function HadithPage() {
   const collections = await getAllCollections();
+  const totalHadiths = collections.reduce((sum, col) => sum + col.hadiths_count, 0);
 
   const jsonLd = buildCollectionPageJsonLd({
     name: 'Hadith Collections',
-    description: 'Complete collection of authentic Hadith books with Arabic, English and Urdu translations.',
+    description:
+      'Complete collection of authentic Hadith books with Arabic, English and Urdu translations.',
     path: buildHadithIndexPath(),
   });
 
@@ -32,18 +35,17 @@ export default async function HadithPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="space-y-8">
-        <header>
-          <h1 className="text-3xl font-bold text-[var(--color-heading)] mb-2">
-            Hadith Collections
-          </h1>
-          <p className="text-[var(--color-muted-text)] text-lg">
-            {collections.length} authentic collections · Over 60,000 hadiths with Arabic, English
-            and Urdu translations
-          </p>
-        </header>
+      <div className="space-y-10 animate-fade-up">
+        <HadithPageHeader
+          badge="Sunnah & Hadith"
+          badgeSecondary={`${collections.length} Collections`}
+          title="Hadith Collections"
+          description={`Explore ${totalHadiths.toLocaleString()} authentic hadiths from major Islamic books — with Arabic text, English translation, and Urdu translation for every narration.`}
+        />
 
         <CollectionGrid collections={collections} />
+
+        <HadithSeoIntro />
       </div>
     </>
   );

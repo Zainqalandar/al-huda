@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
+import BreadcrumbNav from '@/components/hadith/BreadcrumbNav';
+import ChapterFilterBar from '@/components/hadith/ChapterFilterBar';
 import HadithCard from '@/components/hadith/HadithCard';
 import HadithPagination from '@/components/hadith/HadithPagination';
-import BreadcrumbNav from '@/components/hadith/BreadcrumbNav';
+import { Badge } from '@/components/ui/badge';
 import { getCollectionBySlug, getChaptersByCollection } from '@/lib/hadith/collections.service';
 import { getHadiths } from '@/lib/hadith/hadith.service';
 import {
@@ -67,16 +70,16 @@ export default async function BookPage({
 
   const currentPage = Math.max(1, parseInt(page, 10));
 
-  const [bookData, hadithsData, chapters] = await Promise.all([
+  const [bookData, hadithsData, allChapters] = await Promise.all([
     getCollectionBySlug(collection),
     getHadiths({ bookSlug: collection, chapterId: chapter, page: currentPage }),
-    chapter ? getChaptersByCollection(collection) : Promise.resolve([]),
+    getChaptersByCollection(collection),
   ]);
 
   if (!bookData) notFound();
 
   const chapterMeta = chapter
-    ? chapters.find((entry) => entry.chapterNumber === chapter)
+    ? allChapters.find((entry) => entry.chapterNumber === chapter)
     : undefined;
   const collectionPath = buildHadithCollectionPath(collection);
   const bookPath = buildHadithBookPath(collection, { chapter, page: currentPage });
@@ -110,18 +113,51 @@ export default async function BookPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
 
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-up">
         <BreadcrumbNav items={navBreadcrumbs} includeSchema={false} />
 
-        <header>
-          <h1 className="text-2xl font-bold text-[var(--color-heading)]">
-            {chapterMeta ? chapterMeta.chapterEnglish : bookData.bookName}
-          </h1>
-          <p className="mt-1 text-[var(--color-muted-text)]">
-            {chapterMeta ? `${bookData.bookName} · ` : ''}
+        <header className="space-y-4">
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Badge variant="secondary">{bookData.bookName}</Badge>
+              {chapterMeta ? (
+                <Badge variant="outline">Chapter {chapterMeta.chapterNumber}</Badge>
+              ) : null}
+            </div>
+            <h1 className="font-display text-3xl font-bold text-[var(--color-heading)] md:text-4xl">
+              {chapterMeta ? chapterMeta.chapterEnglish : bookData.bookName}
+            </h1>
+            {chapterMeta?.chapterUrdu ? (
+              <p
+                dir="rtl"
+                lang="ur"
+                className="mt-2 font-urdu-nastaliq text-lg text-[var(--color-muted-text)]"
+              >
+                {chapterMeta.chapterUrdu}
+              </p>
+            ) : null}
+            {chapterMeta?.chapterArabic ? (
+              <p
+                dir="rtl"
+                lang="ar"
+                className="mt-1 font-arabic-amiri text-base text-[var(--color-muted-text)]"
+              >
+                {chapterMeta.chapterArabic}
+              </p>
+            ) : null}
+          </div>
+
+          <p className="text-sm text-[var(--color-muted-text)]">
             Showing {hadithsData.hadiths.from}–{hadithsData.hadiths.to} of{' '}
             {hadithsData.hadiths.total.toLocaleString()} hadiths
+            {chapterMeta ? ` in this chapter` : ''}
           </p>
+
+          <ChapterFilterBar
+            collectionSlug={collection}
+            chapters={allChapters}
+            activeChapter={chapter}
+          />
         </header>
 
         <div className="space-y-4">

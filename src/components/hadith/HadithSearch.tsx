@@ -1,55 +1,85 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useTransition } from 'react';
+import { Search } from 'lucide-react';
 import { useDebouncedCallback } from 'use-debounce';
+
+import { buildHadithSearchPath } from '@/lib/hadith/hadith-routing';
 
 export default function HadithSearch() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const handleSearch = useDebouncedCallback((term: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set('q', term);
-      params.delete('page');
-    } else {
-      params.delete('q');
+  const isSearchPage = pathname.startsWith(buildHadithSearchPath());
+  const currentQuery = searchParams.get('q') ?? '';
+
+  const navigateToSearch = useCallback(
+    (term: string) => {
+      const params = new URLSearchParams();
+      const trimmed = term.trim();
+
+      if (trimmed) {
+        params.set('q', trimmed);
+      }
+
+      startTransition(() => {
+        router.push(`${buildHadithSearchPath()}?${params.toString()}`);
+      });
+    },
+    [router]
+  );
+
+  const handleLiveSearch = useDebouncedCallback((term: string) => {
+    if (isSearchPage) {
+      navigateToSearch(term);
     }
-    startTransition(() => {
-      router.push(`/hadith/search?${params.toString()}`);
-    });
   }, 400);
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const term = String(formData.get('q') ?? '');
+    navigateToSearch(term);
+  };
+
   return (
-    <div className="relative">
-      <label htmlFor="hadith-search" className="sr-only">Search Hadiths</label>
+    <form onSubmit={handleSubmit} className="relative">
+      <label htmlFor="hadith-search" className="sr-only">
+        Search Hadiths
+      </label>
       <div className="relative">
-        <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted-text)]"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
+        <Search
+          className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]"
           aria-hidden="true"
-        >
-          <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-        </svg>
+        />
         <input
           id="hadith-search"
+          name="q"
           type="search"
-          placeholder="Search hadiths in English..."
-          defaultValue={searchParams.get('q') ?? ''}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+          placeholder="Search hadiths in English or Urdu…"
+          defaultValue={currentQuery}
+          onChange={(event) => handleLiveSearch(event.target.value)}
+          className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] py-3 pl-11 pr-24 text-sm text-[var(--color-text)] shadow-[var(--shadow-soft)] outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
           aria-label="Search hadiths"
         />
-        {isPending && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-accent)] border-t-transparent" />
-          </div>
-        )}
+        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
+          {isPending ? (
+            <div
+              className="size-4 animate-spin rounded-full border-2 border-[var(--color-accent)] border-t-transparent"
+              aria-hidden="true"
+            />
+          ) : null}
+          <button
+            type="submit"
+            className="rounded-xl bg-[var(--color-accent)] px-3 py-1.5 text-xs font-semibold text-[var(--color-accent-foreground)] transition-opacity hover:opacity-90"
+          >
+            Search
+          </button>
+        </div>
       </div>
-    </div>
+    </form>
   );
 }

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+
 import BreadcrumbNav from '@/components/hadith/BreadcrumbNav';
+import ChapterList from '@/components/hadith/ChapterList';
+import CollectionHero from '@/components/hadith/CollectionHero';
 import {
   getAllCollections,
   getCollectionBySlug,
@@ -9,7 +11,6 @@ import {
 } from '@/lib/hadith/collections.service';
 import {
   buildHadithCollectionPath,
-  buildHadithBookPath,
   buildHadithOgImagePath,
 } from '@/lib/hadith/hadith-routing';
 import { buildHadithCollectionKeywords } from '@/lib/seo-keywords';
@@ -94,52 +95,12 @@ export default async function CollectionPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(bookJsonLd) }}
       />
 
-      <div className="space-y-6">
+      <div className="space-y-8 animate-fade-up">
         <BreadcrumbNav items={navBreadcrumbs} includeSchema={false} />
 
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold text-[var(--color-heading)]">{book.bookName}</h1>
-          <p className="text-[var(--color-muted-text)]">
-            By {book.writerName} ·{' '}
-            <span className="font-medium">{book.hadiths_count.toLocaleString()} hadiths</span> ·{' '}
-            {chapters.length} chapters
-          </p>
-        </header>
+        <CollectionHero book={book} chapterCount={chapters.length} />
 
-        <section aria-labelledby="chapters-heading">
-          <h2 id="chapters-heading" className="mb-4 text-xl font-semibold text-[var(--color-heading)]">
-            Chapters
-          </h2>
-          <div className="space-y-1">
-            {chapters.map((chapter) => (
-              <Link
-                key={chapter.id}
-                href={buildHadithBookPath(collection, {
-                  chapter: chapter.chapterNumber,
-                  page: 1,
-                })}
-                className="group flex items-center gap-4 rounded-lg border border-transparent px-4 py-3 transition-all hover:border-[var(--color-border)] hover:bg-[var(--color-surface-elevated)]"
-              >
-                <span className="w-8 shrink-0 font-mono text-sm text-[var(--color-muted-text)]">
-                  {chapter.chapterNumber}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent-soft)]">
-                    {chapter.chapterEnglish}
-                  </p>
-                  {chapter.chapterArabic && (
-                    <p dir="rtl" lang="ar" className="mt-0.5 font-arabic-amiri text-sm text-[var(--color-muted-text)]">
-                      {chapter.chapterArabic}
-                    </p>
-                  )}
-                </div>
-                <svg className="h-4 w-4 shrink-0 text-[var(--color-border)] transition-colors group-hover:text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <ChapterList collectionSlug={collection} chapters={chapters} />
       </div>
     </>
   );

@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { SearchX } from 'lucide-react';
+
 import HadithCard from '@/components/hadith/HadithCard';
+import HadithPageHeader from '@/components/hadith/HadithPageHeader';
 import HadithPagination from '@/components/hadith/HadithPagination';
+import { Card, CardContent } from '@/components/ui/card';
 import { HadithApiError } from '@/lib/hadith/api-client';
 import { searchHadiths } from '@/lib/hadith/hadith.service';
 import { buildHadithSearchPath } from '@/lib/hadith/hadith-routing';
@@ -33,9 +37,17 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
 
   if (!normalizedQuery) {
     return (
-      <div className="text-center py-16 text-[var(--color-muted-text)]">
-        <p className="text-lg">Type a keyword above to search hadiths</p>
-      </div>
+      <Card>
+        <CardContent className="py-16 text-center">
+          <SearchX className="mx-auto mb-4 size-10 text-[var(--color-muted-text)]" aria-hidden="true" />
+          <p className="text-lg font-medium text-[var(--color-heading)]">
+            Search authentic hadiths
+          </p>
+          <p className="mt-2 text-sm text-[var(--color-muted-text)]">
+            Type a keyword above in English or Urdu to find hadiths across all major collections.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -50,26 +62,35 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
         : 'Something went wrong while searching hadiths. Please try again.';
 
     return (
-      <div className="py-16 text-center text-[var(--color-muted-text)]">
-        <p className="text-lg text-[var(--color-heading)]">Search unavailable</p>
-        <p className="mt-2 text-sm">{message}</p>
-      </div>
+      <Card>
+        <CardContent className="py-16 text-center">
+          <p className="text-lg font-medium text-[var(--color-heading)]">Search unavailable</p>
+          <p className="mt-2 text-sm text-[var(--color-muted-text)]">{message}</p>
+        </CardContent>
+      </Card>
     );
   }
 
   if (results.hadiths.data.length === 0) {
     return (
-      <div className="py-16 text-center text-[var(--color-muted-text)]">
-        <p className="text-lg">No hadiths found for "{normalizedQuery}"</p>
-        <p className="text-sm mt-2">Try different keywords</p>
-      </div>
+      <Card>
+        <CardContent className="py-16 text-center">
+          <SearchX className="mx-auto mb-4 size-10 text-[var(--color-muted-text)]" aria-hidden="true" />
+          <p className="text-lg font-medium text-[var(--color-heading)]">
+            No hadiths found for &ldquo;{normalizedQuery}&rdquo;
+          </p>
+          <p className="mt-2 text-sm text-[var(--color-muted-text)]">
+            Try different keywords or check spelling
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-[var(--color-muted-text)]">
-        {results.hadiths.total.toLocaleString()} results for "{normalizedQuery}"
+        {results.hadiths.total.toLocaleString()} results for &ldquo;{normalizedQuery}&rdquo;
       </p>
       {results.hadiths.data.map((hadith) => (
         <HadithCard key={hadith.id} hadith={hadith} showBook />
@@ -92,9 +113,24 @@ export default async function SearchPage({
   const currentPage = Math.max(1, parseInt(page, 10));
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[var(--color-heading)]">Search Hadiths</h1>
-      <Suspense fallback={<div className="text-[var(--color-muted-text)] text-sm">Searching...</div>}>
+    <div className="space-y-6 animate-fade-up">
+      <HadithPageHeader
+        badge="Hadith Search"
+        title="Search Hadiths"
+        description="Find hadiths by keyword across Sahih Bukhari, Sahih Muslim, and all major collections — in English or Urdu."
+      />
+      <Suspense
+        fallback={
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-48 animate-pulse rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]"
+              />
+            ))}
+          </div>
+        }
+      >
         <SearchResults query={q} page={currentPage} />
       </Suspense>
     </div>
