@@ -16,6 +16,10 @@ import {
   Timer,
 } from 'lucide-react';
 
+import {
+  AUTH_CHANGED_EVENT,
+  loadGuestQuranState,
+} from '@/lib/quran-user-state';
 import type { AyahBookmark, LastReadEntry } from '@/types/quran';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -115,10 +119,11 @@ export default function HomeRoot() {
         });
 
         if (!sessionResponse.ok) {
+          const guestState = loadGuestQuranState();
           if (!ignore) {
-            setFavorites([]);
-            setBookmarks([]);
-            setLastRead(null);
+            setFavorites(guestState?.favoriteSurahIds ?? []);
+            setBookmarks(guestState?.bookmarkedAyahs ?? []);
+            setLastRead(guestState?.lastRead ?? null);
           }
           return;
         }
@@ -128,10 +133,17 @@ export default function HomeRoot() {
         };
 
         if (!sessionPayload.user?.id) {
+          const guestState = loadGuestQuranState();
           if (!ignore) {
-            setFavorites([]);
-            setBookmarks([]);
-            setLastRead(null);
+            if (guestState) {
+              setFavorites(guestState.favoriteSurahIds);
+              setBookmarks(guestState.bookmarkedAyahs);
+              setLastRead(guestState.lastRead);
+            } else {
+              setFavorites([]);
+              setBookmarks([]);
+              setLastRead(null);
+            }
           }
           return;
         }
@@ -170,9 +182,10 @@ export default function HomeRoot() {
         }
       } catch {
         if (!ignore) {
-          setFavorites([]);
-          setBookmarks([]);
-          setLastRead(null);
+          const guestState = loadGuestQuranState();
+          setFavorites(guestState?.favoriteSurahIds ?? []);
+          setBookmarks(guestState?.bookmarkedAyahs ?? []);
+          setLastRead(guestState?.lastRead ?? null);
         }
       } finally {
         if (!ignore) {
@@ -183,8 +196,15 @@ export default function HomeRoot() {
 
     void loadQuranState();
 
+    const onAuthChanged = () => {
+      void loadQuranState();
+    };
+
+    window.addEventListener(AUTH_CHANGED_EVENT, onAuthChanged);
+
     return () => {
       ignore = true;
+      window.removeEventListener(AUTH_CHANGED_EVENT, onAuthChanged);
     };
   }, []);
 
@@ -230,7 +250,7 @@ export default function HomeRoot() {
               </span>
               <span id="home-tour-quran-settings" className="inline-flex">
                 <Button asChild variant="outline" size="lg">
-                  <Link href="/surah">
+                  <Link href="/surah#quran-settings">
                     <Settings2 className="size-4" />
                     Quran Settings
                   </Link>

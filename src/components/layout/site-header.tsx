@@ -31,6 +31,7 @@ import {
   type MegaNavGroup,
   type NavLinkItem,
 } from '@/lib/navigation-config';
+import { AUTH_CHANGED_EVENT } from '@/lib/quran-user-state';
 import { cn } from '@/lib/utils';
 
 const NAV_LINK_BASE =
@@ -279,6 +280,7 @@ export default function SiteHeader() {
       setSessionUser(null);
       setMobileOpen(false);
       setAuthModalOpen(false);
+      window.dispatchEvent(new CustomEvent(AUTH_CHANGED_EVENT));
     }
   };
 

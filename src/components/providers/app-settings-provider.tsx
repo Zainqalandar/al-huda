@@ -6,11 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
   type PropsWithChildren,
 } from 'react';
 
+import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import type { AppSettings, ArabicFont, AudioPreference, ReadingMode } from '@/types/settings';
+
+const APP_SETTINGS_STORAGE_KEY = 'alhuda:app-settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
   readingMode: 'ayah',
@@ -37,44 +39,84 @@ function clampScale(value: number): number {
   return Math.max(0.9, Math.min(1.9, Number.isFinite(value) ? value : 1.1));
 }
 
+function normalizeSettings(input: Partial<AppSettings>): AppSettings {
+  return {
+    readingMode: input.readingMode === 'continuous' ? 'continuous' : 'ayah',
+    arabicFont:
+      input.arabicFont === 'notoNaskh' || input.arabicFont === 'scheherazade'
+        ? input.arabicFont
+        : 'amiriQuran',
+    arabicFontScale: clampScale(Number(input.arabicFontScale ?? DEFAULT_SETTINGS.arabicFontScale)),
+    audioPreference: input.audioPreference === 'tr' ? 'tr' : 'ar',
+    autoPlayAudio: Boolean(input.autoPlayAudio),
+  };
+}
+
 export function AppSettingsProvider({ children }: PropsWithChildren) {
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const isLoaded = true;
+  const [settings, setSettings, isLoaded] = useLocalStorageState<AppSettings>(
+    APP_SETTINGS_STORAGE_KEY,
+    DEFAULT_SETTINGS
+  );
 
   useEffect(() => {
     if (!isLoaded) return;
     const root = document.documentElement;
-    root.dataset.arabicFont = settings.arabicFont;
-    root.style.setProperty('--arabic-font-scale', String(clampScale(settings.arabicFontScale)));
+    const normalized = normalizeSettings(settings);
+    root.dataset.arabicFont = normalized.arabicFont;
+    root.style.setProperty('--arabic-font-scale', String(normalized.arabicFontScale));
   }, [isLoaded, settings.arabicFont, settings.arabicFontScale]);
 
-  const setReadingMode = useCallback((mode: ReadingMode) => {
-    setSettings((prev) => ({ ...prev, readingMode: mode }));
-  }, [setSettings]);
+  const updateSettings = useCallback(
+    (updater: (prev: AppSettings) => AppSettings) => {
+      setSettings((prev) => normalizeSettings(updater(normalizeSettings(prev))));
+    },
+    [setSettings]
+  );
 
-  const setArabicFont = useCallback((font: ArabicFont) => {
-    setSettings((prev) => ({ ...prev, arabicFont: font }));
-  }, [setSettings]);
+  const setReadingMode = useCallback(
+    (mode: ReadingMode) => {
+      updateSettings((prev) => ({ ...prev, readingMode: mode }));
+    },
+    [updateSettings]
+  );
 
-  const setArabicFontScale = useCallback((value: number) => {
-    setSettings((prev) => ({ ...prev, arabicFontScale: clampScale(value) }));
-  }, [setSettings]);
+  const setArabicFont = useCallback(
+    (font: ArabicFont) => {
+      updateSettings((prev) => ({ ...prev, arabicFont: font }));
+    },
+    [updateSettings]
+  );
 
-  const setAudioPreference = useCallback((value: AudioPreference) => {
-    setSettings((prev) => ({ ...prev, audioPreference: value }));
-  }, [setSettings]);
+  const setArabicFontScale = useCallback(
+    (value: number) => {
+      updateSettings((prev) => ({ ...prev, arabicFontScale: clampScale(value) }));
+    },
+    [updateSettings]
+  );
 
-  const setAutoPlayAudio = useCallback((value: boolean) => {
-    setSettings((prev) => ({ ...prev, autoPlayAudio: value }));
-  }, [setSettings]);
+  const setAudioPreference = useCallback(
+    (value: AudioPreference) => {
+      updateSettings((prev) => ({ ...prev, audioPreference: value }));
+    },
+    [updateSettings]
+  );
+
+  const setAutoPlayAudio = useCallback(
+    (value: boolean) => {
+      updateSettings((prev) => ({ ...prev, autoPlayAudio: value }));
+    },
+    [updateSettings]
+  );
 
   const resetSettings = useCallback(() => {
     setSettings(DEFAULT_SETTINGS);
   }, [setSettings]);
 
+  const normalizedSettings = useMemo(() => normalizeSettings(settings), [settings]);
+
   const value = useMemo(
     () => ({
-      settings,
+      settings: normalizedSettings,
       isLoaded,
       setReadingMode,
       setArabicFont,
@@ -84,7 +126,7 @@ export function AppSettingsProvider({ children }: PropsWithChildren) {
       resetSettings,
     }),
     [
-      settings,
+      normalizedSettings,
       isLoaded,
       setReadingMode,
       setArabicFont,

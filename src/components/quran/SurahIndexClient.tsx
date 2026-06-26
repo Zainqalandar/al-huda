@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import SurahFeatureTour from '@/components/quran/surah-feature-tour';
+import QuranSettingsPanel from '@/components/quran/quran-settings-panel';
 import { buildSurahPath } from '@/lib/quran-routing';
 import type { SurahIndexEntry } from '@/lib/quran-index';
 
@@ -509,6 +510,8 @@ export default function SurahIndexClient({ initialSurahs, initialSearchQuery = '
           })}
         </div>
       )}
+
+      <QuranSettingsPanel variant="inline" />
     </div>
   );
 }

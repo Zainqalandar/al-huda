@@ -31,7 +31,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import StickyNavigatorMenuButton from '@/components/ui/StickyNavigatorMenuButton';
-import StickyScrollNav from '@/components/ui/StickyScrollNav';
+import SmartAyahScrollNav from '@/components/ui/SmartAyahScrollNav';
+import QuranSettingsPanel from '@/components/quran/quran-settings-panel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSurahContext } from '@/hooks/useSurahContext';
 import {
@@ -2126,7 +2127,13 @@ export default function QuranReaderPage() {
         </div>
       </div>
       <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
-      <StickyScrollNav />
+      <SmartAyahScrollNav
+        ayahNumbers={filteredAyahs.map(({ ayah }) => ayah.numberInSurah)}
+        activeAudioAyahNumber={activeAudioAyahNumber}
+        isPlaying={isPlaying}
+        hasAudioPlayer
+      />
+      <QuranSettingsPanel variant="floating" />
       <StickyNavigatorMenuButton
         targetRef={navigatorMenuButtonRef}
         isNavigatorOpen={isNavigatorOpen}
