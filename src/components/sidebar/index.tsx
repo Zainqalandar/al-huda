@@ -20,6 +20,7 @@ import {
   Repeat,
   Search,
   Sparkles,
+  WifiOff,
   X,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -33,6 +34,8 @@ import { Input } from '@/components/ui/input';
 import StickyNavigatorMenuButton from '@/components/ui/StickyNavigatorMenuButton';
 import SmartAyahScrollNav from '@/components/ui/SmartAyahScrollNav';
 import QuranSettingsPanel from '@/components/quran/quran-settings-panel';
+import { useGlobalQuranAudio } from '@/components/providers/global-quran-audio-provider';
+import { useOfflineSurahStatus } from '@/hooks/useOfflineSurah';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSurahContext } from '@/hooks/useSurahContext';
 import {
@@ -50,6 +53,13 @@ import type {
 import { useAppSettings } from '@/components/providers/app-settings-provider';
 import { clampRange, formatAudioTime, isValidSurahId } from '@/lib/quran-utils';
 import { buildSurahPath, parseSurahIdFromParam } from '@/lib/quran-routing';
+import {
+  downloadSurahForOffline,
+  getOfflineAudioObjectUrl,
+  getOfflineSurahRecord,
+  getTranslationAudioUrl as getOfflineTranslationAudioUrl,
+  removeOfflineSurah,
+} from '@/lib/offline-surah-store';
 import AyahEndMarker from '@/components/quran/AyahEndMarker';
 
 interface AyahWithTranslation {
@@ -397,8 +407,13 @@ export default function QuranReaderPage() {
 
   const debouncedSearch = useDebouncedValue(searchInput, 280);
   const resumeTargetRef = useRef<HTMLButtonElement | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { audioRef, registerReader, unregisterReader, updateSession } = useGlobalQuranAudio();
+  const { isOfflineReady, refresh: refreshOfflineStatus } = useOfflineSurahStatus(surahId);
   const audioUsageLastTimeRef = useRef(0);
+  const toggleAudioPlayRef = useRef<() => Promise<void>>(async () => {});
+  const handleSeekChangeRef = useRef<(rawValue: number) => void>(() => {});
+  const handlePreviousAudioStepRef = useRef<() => void>(() => {});
+  const handleNextAudioStepRef = useRef<() => void>(() => {});
 
   const [audioSrc, setAudioSrc] = useState('');
   const [audioReciters, setAudioReciters] = useState<SurahAudioOption[]>([]);
@@ -425,6 +440,9 @@ export default function QuranReaderPage() {
     null
   );
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [offlineDownloading, setOfflineDownloading] = useState(false);
+  const [offlineDownloadProgress, setOfflineDownloadProgress] = useState(0);
+  const [offlineDownloadError, setOfflineDownloadError] = useState<string | null>(null);
 
   const [tafseerOpen, setTafseerOpen] = useState(false);
   const [tafseerAyahNumber, setTafseerAyahNumber] = useState<number | null>(null);
@@ -452,6 +470,14 @@ export default function QuranReaderPage() {
       try {
         setLoading(true);
         setError(null);
+
+        const offlineRecord = await getOfflineSurahRecord(surahId);
+        if (offlineRecord) {
+          setSurahDetail(offlineRecord.detail);
+          setSurahMeta(offlineRecord.meta);
+          return;
+        }
+
         const [detail, meta] = await Promise.all([
           fetchSurahDetail(surahId, controller.signal),
           fetchSurahMeta(surahId, controller.signal),
@@ -623,9 +649,10 @@ export default function QuranReaderPage() {
       setAudioSourceError(null);
 
       if (settings.audioPreference === 'tr') {
+        const offlineUrl = await getOfflineAudioObjectUrl(surahId, 'tr', 0);
         setAudioReciters([]);
         setSelectedReciter(0);
-        setAudioSrc(getTranslationAudioUrl(surahId));
+        setAudioSrc(offlineUrl ?? getTranslationAudioUrl(surahId));
         setLoadingAudioSource(false);
         return;
       }
@@ -653,7 +680,9 @@ export default function QuranReaderPage() {
           setSelectedReciter(nextReciterIndex);
         }
 
+        const offlineUrl = await getOfflineAudioObjectUrl(surahId, 'ar', nextReciterIndex);
         const source =
+          offlineUrl ??
           availableReciters[nextReciterIndex]?.originalUrl ??
           availableReciters[nextReciterIndex]?.url ??
           '';
@@ -1016,6 +1045,12 @@ export default function QuranReaderPage() {
       ),
     [surahMeta?.audio]
   );
+  const currentSurahPath = useMemo(() => {
+    const targetSurah = surahs.find((entry) => entry.id === surahId);
+    return targetSurah
+      ? buildSurahPath(targetSurah.id, targetSurah.surahName)
+      : `/surah/${surahId}`;
+  }, [surahId, surahs]);
   const hasArabicAudioSource = arabicAudioSources.length > 0;
   const selectedDownloadLabel =
     downloadAudioSelection === 'ar' ? 'Arabic Audio' : 'Arabic + Urdu Audio';
@@ -1192,6 +1227,51 @@ export default function QuranReaderPage() {
     abRepeatStartSeconds,
     audioCurrentTime,
     isPlaying,
+  ]);
+
+  useEffect(() => {
+    registerReader({
+      togglePlay: () => void toggleAudioPlayRef.current(),
+      seek: (value) => handleSeekChangeRef.current(value),
+      skipBack: () => handlePreviousAudioStepRef.current(),
+      skipForward: () => handleNextAudioStepRef.current(),
+    });
+
+    return () => {
+      unregisterReader();
+    };
+  }, [registerReader, unregisterReader]);
+
+  useEffect(() => {
+    if (!audioSrc) {
+      updateSession(null);
+      return;
+    }
+
+    updateSession({
+      surahId,
+      surahName: surahDetail?.englishName ?? `Surah ${surahId}`,
+      surahPath: currentSurahPath,
+      audioSrc,
+      isPlaying,
+      isPlayPending,
+      currentTime: audioCurrentTime,
+      duration: audioDuration,
+      reciterName: activeReciterName,
+      activeAyahNumber: activeAudioAyahNumber,
+    });
+  }, [
+    activeAudioAyahNumber,
+    activeReciterName,
+    audioCurrentTime,
+    audioDuration,
+    audioSrc,
+    currentSurahPath,
+    isPlayPending,
+    isPlaying,
+    surahDetail?.englishName,
+    surahId,
+    updateSession,
   ]);
 
   if (loading) {
@@ -1523,6 +1603,63 @@ export default function QuranReaderPage() {
       });
   };
 
+  toggleAudioPlayRef.current = toggleAudioPlay;
+  handleSeekChangeRef.current = handleSeekChange;
+  handlePreviousAudioStepRef.current = handlePreviousAudioStep;
+  handleNextAudioStepRef.current = handleNextAudioStep;
+
+  const saveSurahForOffline = async () => {
+    if (!surahDetail || !surahMeta || offlineDownloading) {
+      return;
+    }
+
+    setOfflineDownloadError(null);
+    setOfflineDownloading(true);
+    setOfflineDownloadProgress(0);
+
+    const reciterIndex = clampRange(
+      selectedReciter,
+      0,
+      Math.max(arabicAudioSources.length - 1, 0)
+    );
+    const arabicSource =
+      arabicAudioSources[reciterIndex]?.originalUrl ??
+      arabicAudioSources[reciterIndex]?.url ??
+      '';
+
+    try {
+      await downloadSurahForOffline({
+        surahId,
+        detail: surahDetail,
+        meta: surahMeta,
+        arabicAudioUrl: arabicSource || undefined,
+        urduAudioUrl: getOfflineTranslationAudioUrl(surahId),
+        arabicReciterIndex: reciterIndex,
+        onProgress: (progress) => {
+          setOfflineDownloadProgress(progress.percent);
+        },
+      });
+      await refreshOfflineStatus();
+    } catch (offlineError) {
+      const message =
+        offlineError instanceof globalThis.Error
+          ? offlineError.message
+          : 'Unable to save this surah for offline reading.';
+      setOfflineDownloadError(message);
+    } finally {
+      setOfflineDownloading(false);
+    }
+  };
+
+  const clearOfflineSurah = async () => {
+    try {
+      await removeOfflineSurah(surahId);
+      await refreshOfflineStatus();
+    } catch {
+      setOfflineDownloadError('Unable to remove offline copy right now.');
+    }
+  };
+
   return (
     <div className="pb-36 pt-6 sm:pb-28 sm:pt-8" data-slot="page-shell">
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
@@ -1548,6 +1685,12 @@ export default function QuranReaderPage() {
 
                   <div>
                     <Badge className="mb-2">Surah {surahDetail.number}</Badge>
+                    {isOfflineReady ? (
+                      <Badge className="mb-2 ml-2 inline-flex items-center gap-1">
+                        <WifiOff className="size-3.5" />
+                        Offline Available
+                      </Badge>
+                    ) : null}
                     <CardTitle className="font-display text-4xl text-[var(--color-heading)]">
                       {surahDetail.englishName}
                     </CardTitle>
@@ -1678,6 +1821,61 @@ export default function QuranReaderPage() {
 
                   {downloadError ? (
                     <p className="mt-2 text-xs text-[var(--color-danger)]">{downloadError}</p>
+                  ) : null}
+                </div>
+
+                <div className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(145deg,color-mix(in_oklab,var(--color-surface-2),white_10%),color-mix(in_oklab,var(--color-highlight),var(--color-surface-2)_96%))] p-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <WifiOff className="size-4 text-[var(--color-info)]" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]">
+                          Offline Reading
+                        </p>
+                        <p className="text-xs text-[var(--color-muted-text)]">
+                          {isOfflineReady
+                            ? 'This surah is available offline (text + audio).'
+                            : 'Save text and audio to read without internet.'}
+                        </p>
+                      </div>
+                    </div>
+                    {isOfflineReady ? (
+                      <Badge className="bg-[color-mix(in_oklab,var(--color-info),var(--color-surface)_82%)] text-[var(--color-heading)]">
+                        Offline Ready
+                      </Badge>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={isOfflineReady ? 'outline' : 'default'}
+                      disabled={offlineDownloading || !surahDetail || !surahMeta}
+                      onClick={() => void saveSurahForOffline()}
+                    >
+                      <Download className="size-4" />
+                      {offlineDownloading
+                        ? `Saving... ${offlineDownloadProgress}%`
+                        : isOfflineReady
+                          ? 'Update Offline Copy'
+                          : 'Download for Offline'}
+                    </Button>
+                    {isOfflineReady ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={offlineDownloading}
+                        onClick={() => void clearOfflineSurah()}
+                      >
+                        Remove Offline Copy
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  {offlineDownloadError ? (
+                    <p className="mt-2 text-xs text-[var(--color-danger)]">{offlineDownloadError}</p>
                   ) : null}
                 </div>
 
@@ -2126,7 +2324,6 @@ export default function QuranReaderPage() {
           ) : null}
         </div>
       </div>
-      <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
       <SmartAyahScrollNav
         ayahNumbers={filteredAyahs.map(({ ayah }) => ayah.numberInSurah)}
         activeAudioAyahNumber={activeAudioAyahNumber}

@@ -24,8 +24,14 @@ export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const collections = await getAllCollections();
+  if (collections.length === 0) {
+    return [];
+  }
+
   return collections.map((c) => ({ collection: c.bookSlug }));
 }
+
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,

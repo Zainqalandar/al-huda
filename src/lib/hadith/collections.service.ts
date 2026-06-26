@@ -7,11 +7,16 @@ import type {
 } from './types/hadith.types';
 
 export async function getAllCollections(): Promise<HadithBook[]> {
-  const data = await hadithFetch<HadithApiBookResponse>('/books', {
-    revalidate: 86400,
-    tags: ['hadith-collections'],
-  });
-  return data.books;
+  try {
+    const data = await hadithFetch<HadithApiBookResponse>('/books', {
+      revalidate: 86400,
+      tags: ['hadith-collections'],
+    });
+    return Array.isArray(data.books) ? data.books : [];
+  } catch (error) {
+    console.warn('[hadith] Unable to load collections:', error);
+    return [];
+  }
 }
 
 export async function getCollectionBySlug(slug: string): Promise<HadithBook | null> {
@@ -20,9 +25,14 @@ export async function getCollectionBySlug(slug: string): Promise<HadithBook | nu
 }
 
 export async function getChaptersByCollection(bookSlug: string): Promise<HadithChapter[]> {
-  const data = await hadithFetch<HadithApiChapterResponse>(`/${bookSlug}/chapters`, {
-    revalidate: 86400,
-    tags: [`hadith-chapters-${bookSlug}`],
-  });
-  return data.chapters;
+  try {
+    const data = await hadithFetch<HadithApiChapterResponse>(`/${bookSlug}/chapters`, {
+      revalidate: 86400,
+      tags: [`hadith-chapters-${bookSlug}`],
+    });
+    return Array.isArray(data.chapters) ? data.chapters : [];
+  } catch (error) {
+    console.warn(`[hadith] Unable to load chapters for ${bookSlug}:`, error);
+    return [];
+  }
 }

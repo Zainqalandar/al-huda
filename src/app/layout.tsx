@@ -17,6 +17,8 @@ import SiteFooter from '@/components/layout/site-footer';
 import ScrollProgress from '@/components/ui/ScrollProgress';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppSettingsProvider } from '@/components/providers/app-settings-provider';
+import { GlobalQuranAudioProvider } from '@/components/providers/global-quran-audio-provider';
+import FloatingMiniPlayer from '@/components/ui/floating-mini-player';
 import { SuspenseBoundary } from '@/components/ui/suspense-boundary';
 import { PerformanceMonitor } from '@/components/performance-monitor';
 import { GLOBAL_QURAN_SEO_KEYWORDS, MASTER_SEO_KEYWORDS } from '@/lib/seo-keywords';
@@ -226,6 +228,7 @@ export default function RootLayout({
 					enableSystem
 				>
 					<AppSettingsProvider>
+						<GlobalQuranAudioProvider>
 						{/* Skip to main content link for accessibility */}
 						<a
 							href="#main-content"
@@ -259,6 +262,8 @@ export default function RootLayout({
 
 						{/* Performance monitoring */}
 						<PerformanceMonitor />
+						<FloatingMiniPlayer />
+						</GlobalQuranAudioProvider>
 					</AppSettingsProvider>
 				</ThemeProvider>
 
