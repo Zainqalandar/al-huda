@@ -25,7 +25,7 @@ export default async function HadithLayout({
   const totalHadiths = collections.reduce((sum, col) => sum + col.hadiths_count, 0);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)]" data-slot="page-shell">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--color-bg)]">
       <div className="border-b border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-md">
         <div className="mx-auto max-w-7xl space-y-3 px-4 py-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">

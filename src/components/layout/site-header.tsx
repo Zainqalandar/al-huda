@@ -204,6 +204,23 @@ export default function SiteHeader() {
   }, [pathname]);
 
   useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const syncHeaderHeight = () => {
+      document.documentElement.style.setProperty(
+        '--site-header-height',
+        `${header.offsetHeight}px`
+      );
+    };
+
+    syncHeaderHeight();
+    const observer = new ResizeObserver(syncHeaderHeight);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     let ignore = false;
     const load = async () => {
       try {
@@ -296,7 +313,7 @@ export default function SiteHeader() {
 
   return (
     <>
-      <header ref={headerRef} className="sticky top-0 z-[100]">
+      <header ref={headerRef} data-site-header className="sticky top-0 z-[100]">
         <IslamicTopBanner />
 
         <div className="relative border-b border-[var(--color-border)] bg-[color-mix(in_oklab,var(--color-bg),transparent_6%)] backdrop-blur-xl">

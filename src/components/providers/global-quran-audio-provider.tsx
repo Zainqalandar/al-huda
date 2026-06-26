@@ -39,6 +39,7 @@ interface GlobalQuranAudioContextValue {
   registerReader: (controls: GlobalAudioControls) => void;
   unregisterReader: () => void;
   updateSession: (session: GlobalAudioSession | null) => void;
+  dismissSession: () => void;
 }
 
 const GlobalQuranAudioContext = createContext<GlobalQuranAudioContextValue | null>(null);
@@ -62,6 +63,11 @@ export function GlobalQuranAudioProvider({ children }: PropsWithChildren) {
     setSession(nextSession);
   }, []);
 
+  const dismissSession = useCallback(() => {
+    audioRef.current?.pause();
+    setSession(null);
+  }, []);
+
   const value = useMemo(
     () => ({
       audioRef,
@@ -71,9 +77,11 @@ export function GlobalQuranAudioProvider({ children }: PropsWithChildren) {
       registerReader,
       unregisterReader,
       updateSession,
+      dismissSession,
     }),
     [
       controls,
+      dismissSession,
       isReaderMounted,
       registerReader,
       session,

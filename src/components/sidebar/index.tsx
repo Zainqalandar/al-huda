@@ -2341,55 +2341,63 @@ export default function QuranReaderPage() {
       />
 
       {isNavigatorOpen ? (
-        <div className="fixed inset-0 z-[85]">
+        <div className="fixed inset-0 z-[110]">
           <button
             type="button"
             className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
             onClick={() => setIsNavigatorOpen(false)}
             aria-label="Close surah navigator"
           />
-          <aside className="absolute left-0 top-0 h-full w-full max-w-md animate-fade-up border-r border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))] shadow-2xl">
-            <div className="flex h-full flex-col">
-              <div className="border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] p-4">
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
-                      Quran Navigator
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--color-muted-text)]">
-                      Jump directly to any surah or ayah.
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setIsNavigatorOpen(false)}
-                    aria-label="Close navigator"
-                  >
-                    <X className="size-4" />
-                  </Button>
+          <button
+            type="button"
+            onClick={() => setIsNavigatorOpen(false)}
+            aria-label="Close navigator"
+            className="absolute right-4 top-4 z-20 hidden size-11 items-center justify-center rounded-full border border-white/25 bg-black/50 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/65 md:flex"
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
+          <aside className="absolute left-0 top-0 flex h-full w-full max-w-md animate-fade-up flex-col border-r border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))] shadow-2xl">
+            <div className="sticky top-0 z-10 shrink-0 border-b border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[linear-gradient(155deg,color-mix(in_oklab,var(--color-surface),white_12%),color-mix(in_oklab,var(--color-accent),var(--color-surface)_95%))] px-3 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-4">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted-text)]">
+                    Quran Navigator
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--color-muted-text)]">
+                    Jump directly to any surah or ayah.
+                  </p>
                 </div>
-
-                <label
-                  htmlFor="surah-navigator-search"
-                  className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]"
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsNavigatorOpen(false)}
+                  aria-label="Close navigator"
+                  className="h-10 shrink-0 gap-1.5 rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_24%)] px-3 shadow-sm md:h-9"
                 >
-                  Search Surah
-                </label>
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
-                  <Input
-                    id="surah-navigator-search"
-                    value={navigatorSearch}
-                    onChange={(event) => setNavigatorSearch(event.target.value)}
-                    placeholder="Surah name / Arabic / number"
-                    className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_24%)] pl-9"
-                  />
-                </div>
+                  <X className="size-4 shrink-0" aria-hidden="true" />
+                  <span className="text-sm font-semibold">Close</span>
+                </Button>
               </div>
 
-              <div ref={navigatorListRef} className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+              <label
+                htmlFor="surah-navigator-search"
+                className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted-text)]"
+              >
+                Search Surah
+              </label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-text)]" />
+                <Input
+                  id="surah-navigator-search"
+                  value={navigatorSearch}
+                  onChange={(event) => setNavigatorSearch(event.target.value)}
+                  placeholder="Surah name / Arabic / number"
+                  className="border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_24%)] pl-9"
+                />
+              </div>
+            </div>
+
+            <div ref={navigatorListRef} className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
                 {surahListLoading ? (
                   <p className="rounded-xl border border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_65%)] bg-[color-mix(in_oklab,var(--color-surface),white_14%)] p-3 text-sm text-[var(--color-muted-text)]">
                     Loading surah list...
@@ -2480,7 +2488,6 @@ export default function QuranReaderPage() {
                     })
                   : null}
               </div>
-            </div>
           </aside>
         </div>
       ) : null}

@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Loader2, Pause, Play } from 'lucide-react';
+import { Loader2, Pause, Play, X } from 'lucide-react';
 
 import { useGlobalQuranAudio } from '@/components/providers/global-quran-audio-provider';
 import { Button } from '@/components/ui/button';
 import { formatAudioTime } from '@/lib/quran-utils';
 
 export default function FloatingMiniPlayer() {
-  const { isReaderMounted, session, controls } = useGlobalQuranAudio();
+  const { isReaderMounted, session, controls, dismissSession } = useGlobalQuranAudio();
 
   if (isReaderMounted || !session?.audioSrc || !controls) {
     return null;
@@ -39,21 +39,34 @@ export default function FloatingMiniPlayer() {
                 : session.reciterName}
             </p>
           </div>
-          <Button
-            type="button"
-            size="icon"
-            className="size-9 shrink-0 rounded-xl"
-            onClick={() => void controls.togglePlay()}
-            aria-label={session.isPlaying ? 'Pause audio' : 'Play audio'}
-          >
-            {session.isPlaying ? (
-              <Pause className="size-4" />
-            ) : session.isPlayPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Play className="size-4" />
-            )}
-          </Button>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="size-8 rounded-xl border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_58%)] bg-[color-mix(in_oklab,var(--color-surface),white_18%)]"
+              onClick={dismissSession}
+              aria-label="Close audio player"
+              title="Close player"
+            >
+              <X className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              className="size-9 rounded-xl"
+              onClick={() => void controls.togglePlay()}
+              aria-label={session.isPlaying ? 'Pause audio' : 'Play audio'}
+            >
+              {session.isPlaying ? (
+                <Pause className="size-4" />
+              ) : session.isPlayPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Play className="size-4" />
+              )}
+            </Button>
+          </div>
         </div>
 
         <input

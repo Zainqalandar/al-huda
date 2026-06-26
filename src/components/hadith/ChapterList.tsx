@@ -67,7 +67,7 @@ export default function ChapterList({ collectionSlug, chapters }: ChapterListPro
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-2">
+        <div className="grid min-w-0 gap-2">
           {filteredChapters.map((chapter) => (
             <Link
               key={chapter.id}
@@ -75,13 +75,13 @@ export default function ChapterList({ collectionSlug, chapters }: ChapterListPro
                 chapter: chapter.chapterNumber,
                 page: 1,
               })}
-              className="group flex items-center gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 transition-all hover:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] hover:bg-[var(--color-surface-elevated)] hover:shadow-[var(--shadow-soft)]"
+              className="group flex min-w-0 items-start gap-3 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3 transition-all hover:border-[color-mix(in_oklab,var(--color-accent),var(--color-border)_50%)] hover:bg-[var(--color-surface-elevated)] hover:shadow-[var(--shadow-soft)] sm:items-center sm:gap-4 sm:px-4 sm:py-4"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_90%)] font-mono text-sm font-semibold text-[var(--color-accent-soft)]">
+              <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--color-accent),var(--color-surface)_90%)] font-mono text-sm font-semibold text-[var(--color-accent-soft)] sm:mt-0">
                 {chapter.chapterNumber}
               </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-[var(--color-heading)] transition-colors group-hover:text-[var(--color-accent-soft)]">
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <p className="truncate font-medium text-[var(--color-heading)] transition-colors group-hover:text-[var(--color-accent-soft)]">
                   {chapter.chapterEnglish}
                 </p>
                 {chapter.chapterUrdu ? (
@@ -104,7 +104,7 @@ export default function ChapterList({ collectionSlug, chapters }: ChapterListPro
                 ) : null}
               </div>
               <ChevronRight
-                className="size-4 shrink-0 text-[var(--color-border)] transition-all group-hover:translate-x-0.5 group-hover:text-[var(--color-accent)]"
+                className="mt-0.5 size-4 shrink-0 text-[var(--color-border)] transition-all group-hover:translate-x-0.5 group-hover:text-[var(--color-accent)] sm:mt-0"
                 aria-hidden="true"
               />
             </Link>
