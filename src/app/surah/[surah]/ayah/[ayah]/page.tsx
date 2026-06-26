@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Download, FileText, Headphones } from 'lucid
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AyahSidebar from '@/components/ayah-sidebar';
+import BreadcrumbNav from '@/components/ui/breadcrumb-nav';
 import {
   getAyahAudioUrls,
   getAyahContent,
@@ -125,6 +126,7 @@ export default async function AyahDetailPage({
   const canOpenTafsir = Boolean(tafsir);
 
   const surahPath = buildSurahPath(surah.id, surah.surahName);
+  const surahBreadcrumbLabel = `Surah ${surah.surahName}`;
   const tafsirPath = buildTafsirPath(surah.id, surah.surahName, ayahNumber);
   const canonicalPath = buildAyahPath(surah.id, surah.surahName, ayahNumber);
   const prevAyahPath =
@@ -136,9 +138,8 @@ export default async function AyahDetailPage({
 
   const breadcrumbs = buildBreadcrumbJsonLd([
     { name: 'Home', item: '/' },
-    { name: 'Surah Index', item: '/surah' },
-    { name: `Surah ${surah.id}`, item: surahPath },
-    { name: `Ayah ${surah.id}:${ayahNumber}`, item: canonicalPath },
+    { name: surahBreadcrumbLabel, item: surahPath },
+    { name: `Ayah ${ayahNumber}`, item: canonicalPath },
   ]);
 
   const audioJsonLd = [
@@ -189,10 +190,14 @@ export default async function AyahDetailPage({
         />
       ) : null}
 
-      <nav className="mb-3 text-xs text-[var(--color-muted-text)]">
-        <Link href="/">Home</Link> / <Link href="/surah">Surah</Link> /{' '}
-        <Link href={surahPath}>Surah {surah.id}</Link> / Ayah {ayahNumber}
-      </nav>
+      <BreadcrumbNav
+        items={[
+          { label: 'Home', href: '/' },
+          { label: surahBreadcrumbLabel, href: surahPath },
+          { label: `Ayah ${ayahNumber}`, href: canonicalPath },
+        ]}
+        includeSchema={false}
+      />
 
       <section className="mb-6">
         <Badge className="mb-2">Ayah {surah.id}:{ayahNumber}</Badge>

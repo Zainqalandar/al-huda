@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Badge } from '@/components/ui/badge';
+import BreadcrumbNav from '@/components/ui/breadcrumb-nav';
 import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { getAllSurahs } from '@/lib/quran-index';
 import { getTafsirAyahNumbersBySurah } from '@/lib/tafsir-index';
@@ -67,6 +68,14 @@ export default async function TafsirIndexPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
       <section className="mb-10 animate-fade-up">
+        <BreadcrumbNav
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Tafseer Index', href: '/tafsir' },
+          ]}
+          includeSchema={false}
+        />
+
         {/* Header Section */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 mb-3">

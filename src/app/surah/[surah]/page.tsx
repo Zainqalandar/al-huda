@@ -2,6 +2,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 
+import BreadcrumbNav from '@/components/ui/breadcrumb-nav';
+
 import QuranReaderPage from '@/components/sidebar';
 import { getAllSurahs, resolveSurahParam } from '@/lib/quran-index';
 import { getAyahRowsForSurah } from '@/lib/quran-server';
@@ -79,15 +81,14 @@ export default async function SurahDetailPage({ params }: SurahPageProps) {
     previewAyahs = [];
   }
 
+  const surahPath = buildSurahPath(surah.id, surah.surahName);
+  const surahBreadcrumbLabel = `Surah ${surah.surahName}`;
+
   const breadcrumbs = buildBreadcrumbJsonLd([
     { name: 'Home', item: '/' },
-    { name: 'Surah Index', item: '/surah' },
-    {
-      name: `Surah ${surah.id} ${surah.surahName}`,
-      item: buildSurahPath(surah.id, surah.surahName),
-    },
+    { name: surahBreadcrumbLabel, item: surahPath },
   ]);
-  const canonicalPath = buildSurahPath(surah.id, surah.surahName);
+  const canonicalPath = surahPath;
   const surahJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
@@ -112,9 +113,13 @@ export default async function SurahDetailPage({ params }: SurahPageProps) {
 
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 px-4 py-6 sm:px-6">
         <div className="mx-auto max-w-4xl">
-          <nav className="mb-3 text-xs text-[var(--color-muted-text)]">
-            <Link href="/">Home</Link> / <Link href="/surah">Surah Index</Link> / Surah {surah.id}
-          </nav>
+          <BreadcrumbNav
+            items={[
+              { label: 'Home', href: '/' },
+              { label: surahBreadcrumbLabel, href: surahPath },
+            ]}
+            includeSchema={false}
+          />
           <h1 className="font-display text-3xl text-[var(--color-heading)] sm:text-4xl">
             {`Surah ${surah.surahName} (${surah.surahNameArabic})`}
           </h1>

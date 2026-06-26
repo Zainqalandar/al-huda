@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import HomeFeatureTour from '@/components/home/home-feature-tour';
+import HomeContextualWidgets from '@/components/home/contextual-widgets';
 import { getSurahById } from '@/lib/quran-index';
 import { buildAyahPath, buildSurahPath, buildTafsirPath } from '@/lib/quran-routing';
 
@@ -379,6 +380,8 @@ export default function HomeRoot() {
           </Card>
         </div>
       </section>
+
+      <HomeContextualWidgets />
 
       <section className="mt-12" data-slot="page-shell">
         <h2 className="mb-5 font-display text-3xl tracking-tight text-[var(--color-heading)]">Core Quran Tools</h2>

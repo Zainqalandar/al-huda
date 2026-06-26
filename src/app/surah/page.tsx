@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Badge } from '@/components/ui/badge';
+import BreadcrumbNav from '@/components/ui/breadcrumb-nav';
 import StickyScrollNav from '@/components/ui/StickyScrollNav';
 import { getAllSurahs } from '@/lib/quran-index';
 import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
@@ -58,6 +59,14 @@ export default async function SurahIndexPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
       <section className="mb-10">
+        <BreadcrumbNav
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Surah Index', href: '/surah' },
+          ]}
+          includeSchema={false}
+        />
+
         {/* Header Section with Enhanced Design */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 mb-3">

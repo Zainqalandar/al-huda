@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ChevronLeft, Download, Headphones } from 'lucide-react';
 
+import BreadcrumbNav from '@/components/ui/breadcrumb-nav';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -115,6 +116,7 @@ export default async function TafsirDetailPage({
 
   const safeTafsirHtml = sanitizeTafsirHtml(tafsir.textHtml);
   const surahPath = buildSurahPath(surah.id, surah.surahName);
+  const surahBreadcrumbLabel = `Surah ${surah.surahName}`;
   const ayahPath = buildAyahPath(surah.id, surah.surahName, ayahNumber);
   const canonicalPath = buildTafsirPath(surah.id, surah.surahName, ayahNumber);
   const prevTafsirPath = ayahNumber > 1 
@@ -126,10 +128,9 @@ export default async function TafsirDetailPage({
 
   const breadcrumbs = buildBreadcrumbJsonLd([
     { name: 'Home', item: '/' },
-    { name: 'Surah Index', item: '/surah' },
-    { name: `Surah ${surah.id}`, item: surahPath },
-    { name: `Ayah ${surah.id}:${ayahNumber}`, item: ayahPath },
-    { name: 'Urdu Tafseer', item: canonicalPath },
+    { name: surahBreadcrumbLabel, item: surahPath },
+    { name: `Ayah ${ayahNumber}`, item: ayahPath },
+    { name: 'Tafseer', item: canonicalPath },
   ]);
 
   const creativeWorkJsonLd = {
@@ -184,11 +185,15 @@ export default async function TafsirDetailPage({
         />
       ) : null}
 
-      <nav className="mb-3 text-xs text-[var(--color-muted-text)]">
-        <Link href="/">Home</Link> / <Link href="/surah">Surah</Link> /{' '}
-        <Link href={surahPath}>Surah {surah.id}</Link> /{' '}
-        <Link href={ayahPath}>Ayah {ayahNumber}</Link> / Tafseer
-      </nav>
+      <BreadcrumbNav
+        items={[
+          { label: 'Home', href: '/' },
+          { label: surahBreadcrumbLabel, href: surahPath },
+          { label: `Ayah ${ayahNumber}`, href: ayahPath },
+          { label: 'Tafseer', href: canonicalPath },
+        ]}
+        includeSchema={false}
+      />
 
       <section className="mb-6">
         <Badge className="mb-2">Urdu Tafseer</Badge>

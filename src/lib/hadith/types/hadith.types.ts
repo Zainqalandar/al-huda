@@ -90,10 +90,7 @@ export interface HadithApiHadithsResponse {
 
 export type HadithGradeType = 'Sahih' | 'Hasan' | 'Daif' | 'Maudu' | 'Unknown';
 
-export interface BreadcrumbItem {
-  label: string;
-  href: string;
-}
+export type { BreadcrumbItem } from '@/types/breadcrumb';
 
 export interface PaginationProps {
   currentPage: number;

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { buildSurahPath } from '@/lib/quran-routing';
+import { buildHadithCollectionPath } from '@/lib/hadith/hadith-routing';
 
 export interface NavLinkItem {
   label: string;
@@ -184,25 +185,37 @@ export const HADITH_MEGA_NAV: MegaNavGroup = {
         {
           label: 'Sahih al-Bukhari',
           description: 'The most authentic hadith collection',
-          href: '/hadith',
+          href: buildHadithCollectionPath('sahih-bukhari'),
           icon: BookMarked,
         },
         {
           label: 'Sahih Muslim',
           description: 'Second most authentic compilation',
-          href: '/hadith',
+          href: buildHadithCollectionPath('sahih-muslim'),
           icon: BookMarked,
         },
         {
           label: 'Sunan Abu Dawud',
           description: 'Focus on legal hadiths',
-          href: '/hadith',
+          href: buildHadithCollectionPath('abu-dawood'),
           icon: BookMarked,
         },
         {
           label: 'Jami at-Tirmidhi',
           description: 'With grading of each narration',
-          href: '/hadith',
+          href: buildHadithCollectionPath('tirmidhi'),
+          icon: BookMarked,
+        },
+        {
+          label: 'Sunan an-Nasa’i',
+          description: 'Sixth major hadith collection',
+          href: buildHadithCollectionPath('sunan-nasai'),
+          icon: BookMarked,
+        },
+        {
+          label: 'Sunan Ibn Majah',
+          description: 'Complete the six books',
+          href: buildHadithCollectionPath('ibn-e-majah'),
           icon: BookMarked,
         },
       ],
