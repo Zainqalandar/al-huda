@@ -30,7 +30,7 @@ const POPULAR_COLLECTIONS = [
   { slug: 'sahih-bukhari', label: 'Sahih al-Bukhari' },
   { slug: 'sahih-muslim', label: 'Sahih Muslim' },
   { slug: 'abu-dawood', label: 'Sunan Abu Dawud' },
-  { slug: 'tirmidhi', label: 'Jami at-Tirmidhi' },
+  { slug: 'al-tirmidhi', label: 'Jami at-Tirmidhi' },
   { slug: 'sunan-nasai', label: 'Sunan an-Nasa\'i' },
   { slug: 'ibn-e-majah', label: 'Sunan Ibn Majah' },
 ] as const;

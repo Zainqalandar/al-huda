@@ -109,7 +109,7 @@ export function buildPageMetadata(options: BuildMetadataOptions): Metadata {
   };
 
   if (keywords && keywords.length > 0) {
-    metadata.keywords = keywords;
+    metadata.keywords = keywords.slice(0, 15);
   }
 
   if (author) {

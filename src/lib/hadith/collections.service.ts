@@ -12,7 +12,15 @@ export async function getAllCollections(): Promise<HadithBook[]> {
       revalidate: 86400,
       tags: ['hadith-collections'],
     });
-    return Array.isArray(data.books) ? data.books : [];
+    if (!Array.isArray(data.books)) {
+      return [];
+    }
+    return data.books
+      .map((b) => ({
+        ...b,
+        hadiths_count: Number(b.hadiths_count) || 0,
+      }))
+      .filter((b) => b.hadiths_count > 0);
   } catch (error) {
     console.warn('[hadith] Unable to load collections:', error);
     return [];

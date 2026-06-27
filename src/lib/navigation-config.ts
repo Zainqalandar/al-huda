@@ -203,7 +203,7 @@ export const HADITH_MEGA_NAV: MegaNavGroup = {
         {
           label: 'Jami at-Tirmidhi',
           description: 'With grading of each narration',
-          href: buildHadithCollectionPath('tirmidhi'),
+          href: buildHadithCollectionPath('al-tirmidhi'),
           icon: BookMarked,
         },
         {

@@ -47,6 +47,21 @@ const nextConfig = {
         destination: '/sitemaps/:name',
         permanent: true,
       },
+      {
+        source: '/hadith/tirmidhi',
+        destination: '/hadith/al-tirmidhi',
+        permanent: true,
+      },
+      {
+        source: '/hadith/al-silsila-sahiha',
+        destination: '/hadith',
+        permanent: false,
+      },
+      {
+        source: '/hadith/musnad-ahmad',
+        destination: '/hadith',
+        permanent: false,
+      },
     ];
   },
   async headers() {

@@ -13,7 +13,7 @@ const FEATURED_SLUGS = new Set([
   'sahih-bukhari',
   'sahih-muslim',
   'abu-dawood',
-  'tirmidhi',
+  'al-tirmidhi',
   'sunan-nasai',
   'ibn-e-majah',
 ]);

@@ -21,7 +21,7 @@ import { GlobalQuranAudioProvider } from '@/components/providers/global-quran-au
 import FloatingMiniPlayer from '@/components/ui/floating-mini-player';
 import { SuspenseBoundary } from '@/components/ui/suspense-boundary';
 import { PerformanceMonitor } from '@/components/performance-monitor';
-import { GLOBAL_QURAN_SEO_KEYWORDS, MASTER_SEO_KEYWORDS } from '@/lib/seo-keywords';
+import { HOMEPAGE_KEYWORDS } from '@/lib/seo-keywords';
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from '@/lib/seo';
 
 // Dynamically import components that don't need to be critical for initial render
@@ -108,7 +108,7 @@ export const metadata: Metadata = {
 	},
 	description: siteDescription,
 	applicationName: 'Read al Quran',
-	keywords: [...MASTER_SEO_KEYWORDS],
+	keywords: HOMEPAGE_KEYWORDS,
 	category: 'education',
 	alternates: {
 		canonical: siteOriginString,

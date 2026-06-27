@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import HomeRoot from '@/components/home';
-import { MASTER_SEO_KEYWORDS, VOICE_SEARCH_QUESTIONS } from '@/lib/seo-keywords';
+import { HOMEPAGE_KEYWORDS, VOICE_SEARCH_QUESTIONS } from '@/lib/seo-keywords';
 import { buildFaqJsonLd, buildPageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildPageMetadata({
@@ -9,7 +9,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     'Read al Quran: Read Quran online free with Arabic text, Urdu and English translation, ayah-wise tafseer, tilawat audio, bookmarks, and progress tracking. Open Surah Yaseen, Rahman, Kahf, Mulk, Waqiah, Ayat ul Kursi, and explore 114 Surahs with offline access.',
   path: '/',
-  keywords: MASTER_SEO_KEYWORDS,
+  keywords: HOMEPAGE_KEYWORDS,
   imageUrl: '/og?kind=surah-index',
 });
 

@@ -406,3 +406,15 @@ export const MASTER_SEO_KEYWORDS = Array.from(
   new Set([...GLOBAL_QURAN_SEO_KEYWORDS, ...ALL_GENERATED_SEO_KEYWORDS])
 );
 
+export const HOMEPAGE_KEYWORDS = [
+  'read quran online',
+  'quran with urdu translation',
+  'quran tafseer',
+  'hadith online',
+  'surah yasin',
+  'ayat ul kursi',
+  'quran audio',
+  'quran free',
+  'online quran pakistan',
+];
+
