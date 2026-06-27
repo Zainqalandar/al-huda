@@ -1,10 +1,11 @@
 import CollectionGrid from '@/components/hadith/CollectionGrid';
 import HadithPageHeader from '@/components/hadith/HadithPageHeader';
 import HadithSeoIntro from '@/components/hadith/HadithSeoIntro';
+import { HadithIndexSchema } from '@/components/hadith/HadithSchema';
 import { getAllCollections } from '@/lib/hadith/collections.service';
 import { buildHadithIndexPath, buildHadithOgImagePath } from '@/lib/hadith/hadith-routing';
 import { GENERATED_HADITH_KEYWORDS, GLOBAL_HADITH_SEO_KEYWORDS } from '@/lib/seo-keywords';
-import { buildCollectionPageJsonLd, buildPageMetadata } from '@/lib/seo';
+import { buildPageMetadata } from '@/lib/seo';
 
 export const revalidate = 86400;
 
@@ -21,19 +22,9 @@ export default async function HadithPage() {
   const collections = await getAllCollections();
   const totalHadiths = collections.reduce((sum, col) => sum + col.hadiths_count, 0);
 
-  const jsonLd = buildCollectionPageJsonLd({
-    name: 'Hadith Collections',
-    description:
-      'Complete collection of authentic Hadith books with Arabic, English and Urdu translations.',
-    path: buildHadithIndexPath(),
-  });
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <HadithIndexSchema collections={collections} />
 
       <div className="space-y-10 animate-fade-up">
         <HadithPageHeader

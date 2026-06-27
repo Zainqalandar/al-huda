@@ -411,10 +411,9 @@ export const HOMEPAGE_KEYWORDS = [
   'quran with urdu translation',
   'quran tafseer',
   'hadith online',
-  'surah yasin',
-  'ayat ul kursi',
-  'quran audio',
-  'quran free',
-  'online quran pakistan',
+  'sahih bukhari online',
+  'quran audio tilawat',
+  'quran pak online',
+  'islamic education',
 ];
 

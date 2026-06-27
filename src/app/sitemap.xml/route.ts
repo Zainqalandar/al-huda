@@ -3,6 +3,9 @@ import { getAllSurahs, TOTAL_AYAHS } from '@/lib/quran-index';
 import { getSiteOrigin } from '@/lib/seo';
 import { getAllTafsirRefs } from '@/lib/tafsir-index';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const AYAH_SITEMAP_CHUNK_SIZE = 1000;
 const TAFSIR_SITEMAP_CHUNK_SIZE = 800;
 

@@ -9,6 +9,17 @@ export interface HadithRef {
   hadithNumber: string;
 }
 
+// Fallback collections to guarantee sitemap generation if API fails or rate-limits
+const FALLBACK_COLLECTIONS = [
+  { bookSlug: 'sahih-bukhari', hadiths_count: 7276 },
+  { bookSlug: 'sahih-muslim', hadiths_count: 7564 },
+  { bookSlug: 'al-tirmidhi', hadiths_count: 3956 },
+  { bookSlug: 'abu-dawood', hadiths_count: 5274 },
+  { bookSlug: 'ibn-e-majah', hadiths_count: 4341 },
+  { bookSlug: 'sunan-nasai', hadiths_count: 5761 },
+  { bookSlug: 'mishkat', hadiths_count: 6293 },
+];
+
 function normalizeHadithCount(count: unknown): number {
   const parsed = Math.floor(Number(count));
   if (!Number.isFinite(parsed) || parsed < 0) {
@@ -19,7 +30,13 @@ function normalizeHadithCount(count: unknown): number {
 }
 
 export async function getAllHadithRefs(): Promise<HadithRef[]> {
-  const collections = await getAllCollections();
+  let collections = await getAllCollections();
+  
+  if (!collections || collections.length === 0) {
+    console.warn('[hadith-index] getAllHadithRefs API returned empty. Using fallback collections data.');
+    collections = FALLBACK_COLLECTIONS as any;
+  }
+
   const refs: HadithRef[] = [];
 
   for (const collection of collections) {
@@ -36,18 +53,24 @@ export async function getAllHadithRefs(): Promise<HadithRef[]> {
 }
 
 export async function getHadithSitemapChunkCount(): Promise<number> {
-  const collections = await getAllCollections();
+  let collections = await getAllCollections();
+  
+  if (!collections || collections.length === 0) {
+    console.warn('[hadith-index] getHadithSitemapChunkCount API returned empty. Using fallback collections data.');
+    collections = FALLBACK_COLLECTIONS as any;
+  }
+
   const total = collections.reduce(
     (sum, collection) => sum + normalizeHadithCount(collection.hadiths_count),
     0
   );
 
   if (total <= 0) {
-    return 1;
+    return 41; // Fallback chunk count (40,465 hadiths / 1,000)
   }
 
   const chunkCount = Math.ceil(total / HADITH_SITEMAP_CHUNK_SIZE);
-  return Number.isFinite(chunkCount) && chunkCount > 0 ? chunkCount : 1;
+  return Number.isFinite(chunkCount) && chunkCount > 0 ? chunkCount : 41;
 }
 
 export function getHadithChunkNumber(name: string) {

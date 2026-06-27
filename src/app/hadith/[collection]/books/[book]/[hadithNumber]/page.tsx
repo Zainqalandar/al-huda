@@ -6,6 +6,7 @@ import BreadcrumbNav from '@/components/hadith/BreadcrumbNav';
 import HadithActions from '@/components/hadith/HadithActions';
 import HadithGrade from '@/components/hadith/HadithGrade';
 import HadithNavigation from '@/components/hadith/HadithNavigation';
+import { HadithDetailSchema, HadithBreadcrumbsSchema } from '@/components/hadith/HadithSchema';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCollectionBySlug } from '@/lib/hadith/collections.service';
@@ -16,11 +17,7 @@ import {
   buildHadithOgImagePath,
 } from '@/lib/hadith/hadith-routing';
 import { buildHadithDetailKeywords } from '@/lib/seo-keywords';
-import {
-  buildBreadcrumbJsonLd,
-  buildHadithArticleJsonLd,
-  buildPageMetadata,
-} from '@/lib/seo';
+import { buildPageMetadata } from '@/lib/seo';
 
 export const revalidate = false;
 
@@ -74,39 +71,7 @@ export default async function HadithDetailPage({
 
   const detailPath = buildHadithDetailPath(collection, hadithNumber);
   const collectionPath = buildHadithCollectionPath(collection);
-  const title = `Hadith ${hadithNumber} – ${hadith.book.bookName}`;
   const description = hadith.hadithEnglish.slice(0, 155).trim();
-  const keywords = buildHadithDetailKeywords({
-    bookName: hadith.book.bookName,
-    writerName: hadith.book.writerName,
-    hadithNumber,
-    chapterEnglish: hadith.chapter.chapterEnglish,
-    grade: hadith.status,
-  });
-
-  const breadcrumbs = buildBreadcrumbJsonLd([
-    { name: 'Home', item: '/' },
-    { name: 'Hadith', item: '/hadith' },
-    { name: bookData.bookName, item: collectionPath },
-    { name: `Hadith ${hadithNumber}`, item: detailPath },
-  ]);
-
-  const articleJsonLd = buildHadithArticleJsonLd({
-    title,
-    description,
-    content: hadith.hadithEnglish,
-    path: detailPath,
-    author: hadith.englishNarrator || undefined,
-    bookName: hadith.book.bookName,
-    bookAuthor: hadith.book.writerName,
-    keywords,
-    inLanguage: ['en', 'ar', 'ur'],
-    imageUrl: buildHadithOgImagePath({
-      variant: 'detail',
-      bookName: hadith.book.bookName,
-      hadithNumber,
-    }),
-  });
 
   const navBreadcrumbs = [
     { label: 'Home', href: '/' },
@@ -117,13 +82,29 @@ export default async function HadithDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      <HadithBreadcrumbsSchema
+        collectionName={bookData.bookName}
+        collectionSlug={collection}
+        chapterNumber={hadith.chapter.chapterNumber}
+        chapterName={hadith.chapter.chapterEnglish}
+        hadithNumber={hadithNumber}
+        hadithPath={detailPath}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      <HadithDetailSchema
+        hadithNumber={hadithNumber}
+        bookName={hadith.book.bookName}
+        writerName={hadith.book.writerName}
+        chapterEnglish={hadith.chapter.chapterEnglish}
+        content={hadith.hadithEnglish}
+        path={detailPath}
+        description={description}
+        datePublished="2024-01-01T00:00:00Z"
+        inLanguage={['Arabic', 'English', 'Urdu']}
+        imageUrl={buildHadithOgImagePath({
+          variant: 'detail',
+          bookName: hadith.book.bookName,
+          hadithNumber,
+        })}
       />
 
       <article className="mx-auto max-w-3xl space-y-6 animate-fade-up">
