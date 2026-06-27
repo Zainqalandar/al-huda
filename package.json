@@ -9,7 +9,7 @@
     "seo:generate-tafsir": "node scripts/generate-tafsir-availability.mjs",
     "build:seo": "npm run seo:generate && npm run seo:generate-tafsir && npm run build",
     "embed:generate": "node scripts/generate-embeddings.mjs",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run"
